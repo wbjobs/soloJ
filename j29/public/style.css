@@ -1,0 +1,458 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #fff;
+    min-height: 100vh;
+}
+
+.screen {
+    width: 100%;
+    min-height: 100vh;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#loginScreen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-box {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    width: 350px;
+}
+
+.login-box h2 {
+    margin-bottom: 30px;
+    color: #00d4ff;
+}
+
+.login-box input {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 15px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 16px;
+}
+
+.login-box input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.login-box button {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(45deg, #00d4ff, #0099cc);
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.login-box button:hover {
+    transform: scale(1.02);
+}
+
+.error {
+    color: #ff4444;
+    margin-top: 15px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.header h1 {
+    color: #00d4ff;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-info button {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #ff4444;
+    color: #fff;
+    cursor: pointer;
+}
+
+.main-container {
+    display: grid;
+    grid-template-columns: 350px 1fr 350px;
+    gap: 20px;
+    padding: 20px;
+    height: calc(100vh - 80px);
+}
+
+.left-panel, .center-panel, .right-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.left-panel > div, .center-panel > div, .right-panel > div {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+}
+
+h3 {
+    color: #00d4ff;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.robot-list {
+    flex-shrink: 0;
+}
+
+.robot-item {
+    padding: 15px;
+    margin-bottom: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+}
+
+.robot-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.robot-item.selected {
+    border-color: #00d4ff;
+    background: rgba(0, 212, 255, 0.1);
+}
+
+.robot-item .status {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #00ff00;
+    margin-right: 10px;
+}
+
+.robot-item .controller {
+    font-size: 12px;
+    color: #888;
+    margin-top: 5px;
+}
+
+.video-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+#videoStream {
+    width: 100%;
+    border-radius: 10px;
+    background: #000;
+    min-height: 200px;
+}
+
+#videoStatus {
+    text-align: center;
+    padding: 10px;
+    color: #888;
+    font-size: 14px;
+}
+
+.joystick-container {
+    flex-shrink: 0;
+}
+
+.joystick-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.joystick {
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    position: relative;
+    border: 3px solid rgba(0, 212, 255, 0.3);
+    cursor: pointer;
+    touch-action: none;
+}
+
+.joystick-knob {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(45deg, #00d4ff, #0099cc);
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+}
+
+.velocity-display {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+.arm-control {
+    flex: 1;
+}
+
+.arm-coords {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.arm-coords label {
+    display: flex;
+    flex-direction: column;
+    font-size: 12px;
+}
+
+.arm-coords input {
+    padding: 8px;
+    margin-top: 5px;
+    border: none;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.gripper-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.gripper-control button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.gripper-control button.active {
+    background: #00d4ff;
+}
+
+.arm-control > button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(45deg, #00d4ff, #0099cc);
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.viz-container {
+    flex-shrink: 0;
+}
+
+#vizCanvas {
+    width: 100%;
+    height: 250px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.pose-info {
+    margin-top: 10px;
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+.trajectory-control {
+    flex-shrink: 0;
+}
+
+.traj-buttons {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.traj-buttons button {
+    flex: 1;
+    padding: 10px 8px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+#recordBtn {
+    background: #ff4444;
+    color: #fff;
+}
+
+#recordBtn.recording {
+    background: #666;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+#playbackBtn {
+    background: #00cc66;
+    color: #fff;
+}
+
+#playbackBtn.playing {
+    background: #666;
+}
+
+#playbackBtn:disabled, #clearTrajBtn:disabled {
+    background: #444;
+    color: #888;
+    cursor: not-allowed;
+}
+
+#clearTrajBtn {
+    background: #ff8800;
+    color: #fff;
+}
+
+#trajStatus {
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    text-align: center;
+    font-size: 12px;
+}
+
+.traj-info {
+    display: flex;
+    justify-content: space-around;
+    font-size: 11px;
+    color: #888;
+}
+
+.control-status {
+    flex-shrink: 0;
+}
+
+#controlStatus {
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.control-status button {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#requestBtn {
+    background: linear-gradient(45deg, #00d4ff, #0099cc);
+    color: #fff;
+}
+
+#releaseBtn {
+    background: #ff4444;
+    color: #fff;
+}
+
+#releaseBtn:disabled {
+    background: #666;
+    cursor: not-allowed;
+}
+
+.command-log {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+#commandLog {
+    flex: 1;
+    overflow-y: auto;
+    font-family: monospace;
+    font-size: 11px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    padding: 10px;
+    max-height: 300px;
+}
+
+.log-entry {
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.log-entry .time {
+    color: #888;
+}
+
+.log-entry .type-velocity {
+    color: #00ff88;
+}
+
+.log-entry .type-arm {
+    color: #ffaa00;
+}
+
+@media (max-width: 1200px) {
+    .main-container {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+}

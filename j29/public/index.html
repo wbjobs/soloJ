@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>机器人控制系统</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+    <div id="loginScreen" class="screen">
+        <div class="login-box">
+            <h2>机器人控制系统登录</h2>
+            <input type="text" id="username" placeholder="用户名" value="admin">
+            <input type="password" id="password" placeholder="密码" value="admin123">
+            <button onclick="login()">登录</button>
+            <div id="loginError" class="error"></div>
+        </div>
+    </div>
+
+    <div id="controlScreen" class="screen hidden">
+        <div class="header">
+            <h1>机器人控制中心</h1>
+            <div class="user-info">
+                <span id="currentUser"></span>
+                <button onclick="logout()">退出</button>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <div class="left-panel">
+                <div class="robot-list">
+                    <h3>在线机器人</h3>
+                    <div id="robotList"></div>
+                </div>
+                
+                <div class="video-container">
+                    <h3>实时视频</h3>
+                    <video id="videoStream" autoplay playsinline muted></video>
+                    <div id="videoStatus">等待连接...</div>
+                </div>
+            </div>
+
+            <div class="center-panel">
+                <div class="joystick-container">
+                    <h3>移动控制</h3>
+                    <div class="joystick-wrapper">
+                        <div id="joystick" class="joystick">
+                            <div id="joystickKnob" class="joystick-knob"></div>
+                        </div>
+                    </div>
+                    <div class="velocity-display">
+                        <span>线速度: <span id="linearVel">0</span> m/s</span>
+                        <span>角速度: <span id="angularVel">0</span> rad/s</span>
+                    </div>
+                </div>
+
+                <div class="arm-control">
+                    <h3>机械臂控制</h3>
+                    <div class="arm-coords">
+                        <label>X: <input type="number" id="armX" value="0" step="0.01"></label>
+                        <label>Y: <input type="number" id="armY" value="0" step="0.01"></label>
+                        <label>Z: <input type="number" id="armZ" value="0.5" step="0.01"></label>
+                    </div>
+                    <div class="gripper-control">
+                        <label>夹爪:</label>
+                        <button id="gripperOpen" onclick="setGripper(true)">张开</button>
+                        <button id="gripperClose" onclick="setGripper(false)">闭合</button>
+                    </div>
+                    <button onclick="sendArmCommand()">发送机械臂指令</button>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <div class="viz-container">
+                    <h3>3D姿态可视化</h3>
+                    <canvas id="vizCanvas"></canvas>
+                    <div class="pose-info">
+                        <div>位置: X=<span id="poseX">0</span>, Y=<span id="poseY">0</span></div>
+                        <div>Roll: <span id="poseRoll">0</span>°</div>
+                        <div>Pitch: <span id="posePitch">0</span>°</div>
+                        <div>Yaw: <span id="poseYaw">0</span>°</div>
+                        <div>关节角度: <span id="armAngles">0,0,0,0,0,0</span></div>
+                    </div>
+                </div>
+
+                <div class="trajectory-control">
+                    <h3>轨迹录制/回放</h3>
+                    <div class="traj-buttons">
+                        <button id="recordBtn" onclick="toggleRecording()">开始录制</button>
+                        <button id="playbackBtn" onclick="togglePlayback()" disabled>开始回放</button>
+                        <button id="clearTrajBtn" onclick="clearTrajectory()" disabled>清空轨迹</button>
+                    </div>
+                    <div id="trajStatus">未录制轨迹</div>
+                    <div class="traj-info">
+                        <span>指令数: <span id="trajCount">0</span></span>
+                        <span>时长: <span id="trajDuration">0</span>s</span>
+                    </div>
+                </div>
+
+                <div class="control-status">
+                    <h3>控制状态</h3>
+                    <div id="controlStatus">未选择机器人</div>
+                    <button id="requestBtn" onclick="requestControl()">请求控制</button>
+                    <button id="releaseBtn" onclick="releaseControl()" disabled>释放控制</button>
+                </div>
+
+                <div class="command-log">
+                    <h3>指令日志</h3>
+                    <div id="commandLog"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
