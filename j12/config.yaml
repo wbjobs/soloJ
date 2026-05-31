@@ -1,0 +1,26 @@
+p2p:
+  listen_port: 4001
+  bootstrap_peers: []
+  heartbeat_interval: 30s
+  node_timeout: 90s
+  enable_mdns: true
+
+ipfs:
+  api_address: "http://localhost:5001"
+
+scheduler:
+  queue_size: 1000
+  worker_count: 4
+  retry_interval: 5s
+  max_retries: 3
+  result_ttl: 1h
+  enable_dedup: true
+
+plugin:
+  plugin_dir: "./plugins"
+  auto_load: true
+  allowed_plugins: []
+
+log:
+  level: "info"
+  format: "console"
