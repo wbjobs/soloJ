@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package modbus;
+
+service ModbusDataService {
+  rpc SendDataStream (stream ModbusData) returns (StreamResponse);
+  rpc SendData (ModbusData) returns (StreamResponse);
+}
+
+message RegisterValue {
+  int32 address = 1;
+  int32 value = 2;
+  string name = 3;
+}
+
+message ModbusData {
+  string device_id = 1;
+  string device_name = 2;
+  int64 timestamp = 3;
+  repeated RegisterValue registers = 4;
+}
+
+message StreamResponse {
+  bool success = 1;
+  string message = 2;
+  int64 received_count = 3;
+}

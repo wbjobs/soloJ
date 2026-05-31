@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  influxdb:
+    image: influxdb:2.7-alpine
+    container_name: modbus-influxdb
+    restart: unless-stopped
+    ports:
+      - "8086:8086"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=admin12345
+      - DOCKER_INFLUXDB_INIT_ORG=industrial-iot
+      - DOCKER_INFLUXDB_INIT_BUCKET=modbus-data
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=influxdb-token-12345
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+    healthcheck:
+      test: ["CMD", "influx", "ping"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  influxdb_data:
