@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voxel Sandbox - 管理后台</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      min-height: 100vh;
+      color: #e2e8f0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    h1 {
+      font-size: 2em;
+      color: #4ade80;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      color: #94a3b8;
+      font-size: 0.95em;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+    .stat-card {
+      background: rgba(255,255,255,0.05);
+      padding: 18px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .stat-label {
+      font-size: 0.85em;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+    .stat-value {
+      font-size: 1.8em;
+      font-weight: bold;
+      color: #f1f5f9;
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-primary {
+      background: #4ade80;
+      color: #052e16;
+    }
+    .btn-primary:hover {
+      background: #22c55e;
+      transform: translateY(-1px);
+    }
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,0.1);
+      color: #e2e8f0;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.15);
+    }
+    .section-title {
+      font-size: 1.2em;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .snapshot-list {
+      background: rgba(255,255,255,0.03);
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+      overflow: hidden;
+    }
+    .snapshot-header {
+      display: grid;
+      grid-template-columns: 1fr auto auto auto;
+      gap: 15px;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.05);
+      font-weight: 600;
+      color: #94a3b8;
+      font-size: 0.9em;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .snapshot-item {
+      display: grid;
+      grid-template-columns: 1fr auto auto auto;
+      gap: 15px;
+      padding: 14px 16px;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      transition: background 0.15s;
+    }
+    .snapshot-item:last-child {
+      border-bottom: none;
+    }
+    .snapshot-item:hover {
+      background: rgba(255,255,255,0.05);
+    }
+    .snapshot-item.latest {
+      background: rgba(74, 222, 128, 0.1);
+    }
+    .snapshot-time {
+      font-weight: 500;
+    }
+    .snapshot-meta {
+      color: #94a3b8;
+      font-size: 0.85em;
+    }
+    .snapshot-tag {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.75em;
+      font-weight: 600;
+    }
+    .tag-latest {
+      background: #4ade80;
+      color: #052e16;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #64748b;
+    }
+    .empty-state-icon {
+      font-size: 3em;
+      margin-bottom: 10px;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal.active {
+      display: flex;
+    }
+    .modal-content {
+      background: #1e293b;
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 450px;
+      width: 90%;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .modal-title {
+      font-size: 1.3em;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #ef4444;
+    }
+    .modal-text {
+      color: #cbd5e1;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 14px 20px;
+      border-radius: 8px;
+      font-weight: 500;
+      z-index: 2000;
+      transform: translateX(120%);
+      transition: transform 0.3s ease;
+    }
+    .toast.show {
+      transform: translateX(0);
+    }
+    .toast.success {
+      background: #22c55e;
+      color: white;
+    }
+    .toast.error {
+      background: #ef4444;
+      color: white;
+    }
+    .toast.info {
+      background: #3b82f6;
+      color: white;
+    }
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    a {
+      color: #4ade80;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎮 Voxel Sandbox 管理后台</h1>
+      <p class="subtitle">世界快照管理 · 一键回滚 · 实时监控</p>
+      <p style="margin-top: 10px; font-size: 0.9em;">
+        <a href="/">← 返回游戏</a>
+      </p>
+    </header>
+
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-label">在线玩家</div>
+        <div class="stat-value" id="stat-players">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Chunk 数量</div>
+        <div class="stat-value" id="stat-chunks">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">快照数量</div>
+        <div class="stat-value" id="stat-snapshots">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">快照间隔</div>
+        <div class="stat-value" id="stat-interval">-</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="btn-create" onclick="createSnapshot()">
+        <span>📷</span> 创建快照
+      </button>
+      <button class="btn btn-secondary" id="btn-refresh" onclick="refreshSnapshots()">
+        <span>🔄</span> 刷新列表
+      </button>
+    </div>
+
+    <div class="section-title">
+      <span>📜</span> 历史快照
+      <span style="font-size: 0.8em; color: #64748b; font-weight: normal;">
+        （最多保留 <span id="max-snapshots">30</span> 个）
+      </span>
+    </div>
+
+    <div class="snapshot-list" id="snapshot-list">
+      <div class="empty-state">
+        <div class="empty-state-icon">📂</div>
+        <div>正在加载快照列表...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="confirm-modal">
+    <div class="modal-content">
+      <div class="modal-title">⚠️ 确认回滚世界</div>
+      <div class="modal-text" id="modal-text">
+        你确定要将世界回滚到这个时间点吗？<br><br>
+        <strong>此操作不可撤销</strong>，所有在线玩家的客户端将被强制刷新。
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+        <button class="btn btn-danger" id="modal-confirm-btn" onclick="confirmRollback()">
+          确认回滚
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const API_BASE = '';
+    let pendingRollbackTimestamp = null;
+
+    async function apiCall(path, method = 'GET', body = null) {
+      const options = { method, headers: { 'Content-Type': 'application/json' } };
+      if (body) options.body = JSON.stringify(body);
+      const res = await fetch(API_BASE + path, options);
+      const data = await res.json();
+      return data;
+    }
+
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `toast ${type}`;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function openModal(timestamp) {
+      pendingRollbackTimestamp = timestamp;
+      const timeStr = new Date(timestamp).toLocaleString('zh-CN');
+      document.getElementById('modal-text').innerHTML = `
+        你确定要将世界回滚到以下时间点吗？<br><br>
+        <strong style="color: #fbbf24;">${timeStr}</strong><br><br>
+        <strong style="color: #ef4444;">此操作不可撤销</strong>，所有 ${document.getElementById('stat-players').textContent} 名在线玩家的客户端将被强制刷新。
+      `;
+      document.getElementById('confirm-modal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('confirm-modal').classList.remove('active');
+      pendingRollbackTimestamp = null;
+    }
+
+    async function confirmRollback() {
+      if (!pendingRollbackTimestamp) return;
+      const btn = document.getElementById('modal-confirm-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> 回滚中...';
+
+      try {
+        const data = await apiCall(`/api/snapshot/restore/${pendingRollbackTimestamp}`, 'POST');
+        if (data.success) {
+          showToast(`✅ 回滚成功！已通知 ${data.playersNotified} 名玩家`, 'success');
+          await refreshSnapshots();
+        } else {
+          showToast(`❌ 回滚失败: ${data.error}`, 'error');
+        }
+      } catch (e) {
+        showToast('❌ 网络错误', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '确认回滚';
+        closeModal();
+      }
+    }
+
+    async function createSnapshot() {
+      const btn = document.getElementById('btn-create');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> 创建中...';
+
+      try {
+        const data = await apiCall('/api/snapshot/create', 'POST');
+        if (data.success) {
+          showToast('✅ 快照创建成功', 'success');
+          await refreshSnapshots();
+        } else {
+          showToast(`❌ 创建失败: ${data.error}`, 'error');
+        }
+      } catch (e) {
+        showToast('❌ 网络错误', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>📷</span> 创建快照';
+      }
+    }
+
+    async function refreshStatus() {
+      try {
+        const data = await apiCall('/api/status');
+        if (data.success) {
+          document.getElementById('stat-players').textContent = data.players;
+          document.getElementById('stat-chunks').textContent = data.chunks;
+          document.getElementById('stat-interval').textContent = (data.snapshotInterval / 1000) + 's';
+          document.getElementById('max-snapshots').textContent = data.maxSnapshots;
+        }
+      } catch (e) {}
+    }
+
+    async function refreshSnapshots() {
+      await refreshStatus();
+      try {
+        const data = await apiCall('/api/snapshots');
+        if (data.success) {
+          document.getElementById('stat-snapshots').textContent = data.count;
+          renderSnapshotList(data.snapshots);
+        }
+      } catch (e) {
+        document.getElementById('snapshot-list').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">❌</div>
+            <div>加载失败，请刷新页面重试</div>
+          </div>
+        `;
+      }
+    }
+
+    function renderSnapshotList(snapshots) {
+      const container = document.getElementById('snapshot-list');
+
+      if (snapshots.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <div>暂无快照记录</div>
+            <div style="font-size: 0.9em; color: #64748b; margin-top: 8px;">
+              点击上方"创建快照"按钮或等待系统自动创建
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      let html = `
+        <div class="snapshot-header">
+          <div>时间</div>
+          <div>大小</div>
+          <div>版本</div>
+          <div>操作</div>
+        </div>
+      `;
+
+      snapshots.forEach((s, index) => {
+        const isLatest = index === 0;
+        html += `
+          <div class="snapshot-item ${isLatest ? 'latest' : ''}">
+            <div>
+              <div class="snapshot-time">
+                ${s.dateStr}
+                ${isLatest ? '<span class="snapshot-tag tag-latest">最新</span>' : ''}
+              </div>
+              <div class="snapshot-meta">ID: ${s.timestamp}</div>
+            </div>
+            <div style="color: #94a3b8; font-size: 0.9em;">${s.size}</div>
+            <div style="color: #64748b; font-size: 0.85em; font-family: monospace;">${s.date} ${s.time}</div>
+            <div>
+              <button class="btn btn-danger" style="padding: 6px 12px; font-size: 0.85em;"
+                onclick="openModal(${s.timestamp})">
+                ⏪ 回滚
+              </button>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    refreshSnapshots();
+    setInterval(refreshStatus, 5000);
+  </script>
+</body>
+</html>

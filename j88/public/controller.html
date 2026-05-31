@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>分布式大整数分解 - 主控端</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="controller-page">
+  <header class="header">
+    <h1>🧮 分布式大整数分解</h1>
+    <span class="role-badge controller">主控端</span>
+    <span id="status" class="status disconnected">未连接</span>
+  </header>
+
+  <div class="main-layout">
+    <aside class="sidebar">
+      <section class="panel">
+        <h3>连接</h3>
+        <button id="btn-connect" class="btn btn-primary">连接信令服务器</button>
+      </section>
+
+      <section class="panel">
+        <h3>任务配置</h3>
+        <div class="form-group">
+          <label for="input-number">待分解大整数</label>
+          <input type="text" id="input-number" placeholder="例如: 12345678901234567" class="input">
+        </div>
+        <button id="btn-start" class="btn btn-success">开始分解</button>
+      </section>
+
+      <section class="panel">
+        <h3>工作端列表 (<span id="worker-count">0</span>)
+          <button id="btn-refresh" class="btn-sm btn-secondary">刷新</button>
+        </h3>
+        <div id="worker-list" class="worker-list">
+          <div class="empty-state">等待工作端连接...</div>
+        </div>
+      </section>
+    </aside>
+
+    <main class="content">
+      <section class="panel">
+        <h3>总进度</h3>
+        <div class="progress-container">
+          <div id="progress-bar" class="progress-bar"></div>
+        </div>
+        <div id="progress-text" class="progress-text">总进度: 0/0 (0%)</div>
+      </section>
+
+      <section class="panel">
+        <h3>⚡ 节点算力分布（动态负载均衡）</h3>
+        <div id="worker-power" class="worker-power">
+          <div class="empty-state">等待工作端连接...</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h3>分解结果</h3>
+        <div id="results" class="results">
+          <div class="empty-state">尚未开始计算</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h3>运行日志</h3>
+        <div id="log" class="log"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/signaling.js"></script>
+  <script src="/js/webrtc.js"></script>
+  <script src="/js/controller.js"></script>
+</body>
+</html>

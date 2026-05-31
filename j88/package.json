@@ -1,0 +1,13 @@
+{
+  "name": "distributed-factorizer",
+  "version": "1.0.0",
+  "description": "Distributed large integer factorization using WebRTC and Web Workers",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2"
+  }
+}

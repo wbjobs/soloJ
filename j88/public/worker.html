@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>分布式大整数分解 - 工作端</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="worker-page">
+  <header class="header">
+    <h1>🧮 分布式大整数分解</h1>
+    <span class="role-badge worker">工作端</span>
+    <span id="status" class="status disconnected">未连接</span>
+  </header>
+
+  <div class="main-layout worker-layout">
+    <main class="content">
+      <section class="panel">
+        <h3>连接</h3>
+        <button id="btn-connect" class="btn btn-primary">连接信令服务器</button>
+        <span id="channel-status" class="status disconnected" style="margin-left: 16px;">DataChannel: 未连接</span>
+      </section>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">当前任务</div>
+          <div class="stat-value" id="current-task">无</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">分解数字</div>
+          <div class="stat-value" id="task-number">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">已完成任务</div>
+          <div class="stat-value" id="tasks-done">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">已找到因子</div>
+          <div class="stat-value" id="factors-found">0</div>
+        </div>
+      </div>
+
+      <section class="panel">
+        <h3>当前任务进度</h3>
+        <div class="progress-container">
+          <div id="progress-bar" class="progress-bar"></div>
+        </div>
+        <div id="progress-text" class="progress-text">0%</div>
+      </section>
+
+      <section class="panel">
+        <h3>运行日志</h3>
+        <div id="log" class="log"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/signaling.js"></script>
+  <script src="/js/webrtc.js"></script>
+  <script src="/js/worker.js"></script>
+</body>
+</html>

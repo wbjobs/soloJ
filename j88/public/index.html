@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>分布式大整数分解</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="index-page">
+  <div class="hero">
+    <h1>🧮 分布式大整数分解系统</h1>
+    <p class="subtitle">基于 WebRTC DataChannel + Web Worker 的浏览器端分布式计算</p>
+    <div class="architecture">
+      <div class="arch-node">主控端<br><small>拆分任务 · 汇总结果</small></div>
+      <div class="arch-arrow">⇄ 信令服务器 + WebRTC</div>
+      <div class="arch-node">工作端<br><small>Web Worker 后台计算</small></div>
+    </div>
+    <div class="role-cards">
+      <a href="/controller.html" class="role-card controller-card">
+        <div class="role-icon">🖥️</div>
+        <h2>主控端</h2>
+        <p>输入大整数，拆分为子任务，分发给工作端，汇总分解结果</p>
+      </a>
+      <a href="/worker.html" class="role-card worker-card">
+        <div class="role-icon">⚙️</div>
+        <h2>工作端</h2>
+        <p>接收子任务，使用 Web Worker 后台计算，通过 WebRTC 回传结果</p>
+      </a>
+    </div>
+  </div>
+</body>
+</html>

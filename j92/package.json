@@ -1,0 +1,15 @@
+{
+  "name": "lsb-steganography",
+  "version": "1.0.0",
+  "description": "LSB Steganography with WebAssembly",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd backend && npm run dev",
+    "client": "cd frontend && npm run dev",
+    "build:wasm": "cd wasm && wasm-pack build --target web --out-dir ../frontend/src/wasm",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install && cd ../wasm && cargo build"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

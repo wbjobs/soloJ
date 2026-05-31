@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voxel Sandbox - 多人3D沙盘</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="blocker">
+    <div id="overlay">
+      <h1>🏗️ Voxel Sandbox</h1>
+      <p>简易在线多人 3D 沙盘游戏</p>
+      <div id="controls-info">
+        <h3>操作说明</h3>
+        <ul>
+          <li><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> - 移动</li>
+          <li><kbd>Space</kbd> - 跳跃</li>
+          <li><kbd>鼠标</kbd> - 视角</li>
+          <li><kbd>左键</kbd> - 破坏方块</li>
+          <li><kbd>右键</kbd> - 放置方块</li>
+          <li><kbd>1</kbd>-<kbd>5</kbd> - 选择方块类型</li>
+        </ul>
+      </div>
+      <button id="play-btn">点击开始游戏</button>
+      <p id="status">正在连接服务器...</p>
+    </div>
+  </div>
+
+  <div id="crosshair">+</div>
+
+  <div id="hud">
+    <div id="block-selector">
+      <div class="block-option selected" data-block="1">
+        <div class="block-preview grass"></div>
+        <span>1</span>
+      </div>
+      <div class="block-option" data-block="2">
+        <div class="block-preview dirt"></div>
+        <span>2</span>
+      </div>
+      <div class="block-option" data-block="3">
+        <div class="block-preview stone"></div>
+        <span>3</span>
+      </div>
+      <div class="block-option" data-block="4">
+        <div class="block-preview wood"></div>
+        <span>4</span>
+      </div>
+      <div class="block-option" data-block="5">
+        <div class="block-preview sand"></div>
+        <span>5</span>
+      </div>
+    </div>
+    <div id="player-count">在线: 1</div>
+    <div id="coords"></div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

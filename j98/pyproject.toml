@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "opsflow"
+version = "0.1.0"
+description = "A CLI ops scaffolding tool with task pipeline, plugin system, and shell completion"
+requires-python = ">=3.10"
+dependencies = [
+    "click>=8.1",
+    "pyyaml>=6.0",
+    "rich>=13.0",
+]
+
+[project.scripts]
+opsflow = "opsflow.cli:cli"
+
+[tool.setuptools.packages.find]
+include = ["opsflow*"]

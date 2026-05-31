@@ -1,0 +1,13 @@
+{
+  "name": "3d-molecule-builder",
+  "version": "1.0.0",
+  "description": "3D Molecule Builder with Three.js and RDKit",
+  "main": "index.js",
+  "scripts": {
+    "dev": "python app.py",
+    "start": "python app.py"
+  },
+  "keywords": ["three.js", "molecule", "rdkit", "chemistry"],
+  "author": "",
+  "license": "MIT"
+}

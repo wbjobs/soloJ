@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code RAG 代码问答系统</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>🔍 Code RAG</h1>
+                <p class="subtitle">代码智能问答</p>
+            </div>
+            <div class="sidebar-section">
+                <h3>索引管理</h3>
+                <div class="index-controls">
+                    <div class="input-group">
+                        <label for="codeDir">代码目录</label>
+                        <input type="text" id="codeDir" placeholder="留空使用默认路径">
+                    </div>
+                    <button id="btnIndex" class="btn btn-primary" onclick="buildIndex()">
+                        ⚡ 建立索引
+                    </button>
+                    <button id="btnClearIndex" class="btn btn-danger" onclick="clearIndex()">
+                        🗑️ 清除索引
+                    </button>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <h3>系统状态</h3>
+                <div id="statusPanel" class="status-panel">
+                    <div class="status-item">
+                        <span class="status-label">索引状态</span>
+                        <span id="statusIndexed" class="status-value">未检测</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">代码目录</span>
+                        <span id="statusCodeDir" class="status-value">-</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">文件数量</span>
+                        <span id="statusFileCount" class="status-value">-</span>
+                    </div>
+                </div>
+                <button class="btn btn-secondary" onclick="refreshStatus()">🔄 刷新状态</button>
+            </div>
+            <div class="sidebar-footer">
+                <p>LangChain + ChromaDB</p>
+                <p>本地代码库 RAG 系统</p>
+            </div>
+        </aside>
+
+        <main class="chat-area">
+            <div class="chat-header">
+                <h2>💬 代码问答</h2>
+                <p>输入自然语言问题，获取代码片段和解释</p>
+            </div>
+            <div id="chatMessages" class="chat-messages">
+                <div class="welcome-message">
+                    <div class="welcome-icon">🤖</div>
+                    <h3>欢迎使用 Code RAG 问答系统</h3>
+                    <p>请先在左侧面板建立代码索引，然后在此处提问。</p>
+                    <div class="example-questions">
+                        <p class="example-title">试试这些问题：</p>
+                        <button class="example-btn" onclick="askExample('登录逻辑在哪里？')">登录逻辑在哪里？</button>
+                        <button class="example-btn" onclick="askExample('数据库连接是如何配置的？')">数据库连接是如何配置的？</button>
+                        <button class="example-btn" onclick="askExample('错误处理是怎么做的？')">错误处理是怎么做的？</button>
+                        <button class="example-btn" onclick="askExample('主函数入口在哪个文件？')">主函数入口在哪个文件？</button>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <div class="input-wrapper">
+                    <textarea id="questionInput" placeholder="输入你的问题，如：登录逻辑在哪里？" rows="1" onkeydown="handleKeyDown(event)"></textarea>
+                    <button id="btnSend" class="btn-send" onclick="sendQuestion()">
+                        ➤
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="/static/app.js"></script>
+</body>
+</html>

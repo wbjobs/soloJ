@@ -1,0 +1,81 @@
+pipelines:
+  deploy:
+    description: "Production deployment pipeline"
+    steps:
+      - name: backup_db
+        plugin: db_backup
+        args:
+          host: localhost
+          database: myapp
+        on_error: stop
+
+      - name: pull_code
+        command: echo "Pulling code from origin/main..."
+        on_error: stop
+
+      - name: install_deps
+        command: echo "Installing dependencies..."
+        on_error: stop
+
+      - name: run_tests
+        command: echo "Running test suite..."
+        on_error: stop
+
+      - name: restart_service
+        command: echo "Restarting myapp service..."
+        on_error: retry
+        retry_count: 3
+        retry_delay: 2
+
+      - name: health_check
+        plugin: health_check
+        args:
+          url: http://localhost:8080/health
+          timeout: 10
+        on_error: retry
+        retry_count: 3
+        retry_delay: 5
+
+  rollback:
+    description: "Rollback to previous version"
+    steps:
+      - name: stop_service
+        command: echo "Stopping myapp service..."
+        on_error: skip
+
+      - name: restore_db
+        plugin: db_backup
+        args:
+          host: localhost
+          database: myapp
+          action: restore
+        on_error: stop
+
+      - name: start_service
+        command: echo "Starting myapp service..."
+        on_error: retry
+        retry_count: 3
+
+  backup_only:
+    description: "Database backup only"
+    steps:
+      - name: backup_db
+        plugin: db_backup
+        args:
+          host: localhost
+          database: myapp
+        on_error: stop
+
+      - name: notify
+        plugin: notify
+        args:
+          message: "Database backup completed"
+          channel: ops-alerts
+        on_error: skip
+
+plugin_dirs:
+  - ./examples/plugins
+
+global_env:
+  DEPLOY_ENV: production
+  APP_NAME: myapp

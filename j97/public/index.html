@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>蛋白质 3D 结构可视化</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h1>蛋白质 3D 查看器</h1>
+            
+            <div class="section">
+                <h2>加载数据</h2>
+                <div class="input-group">
+                    <label for="pdbFile">上传 PDB 文件:</label>
+                    <input type="file" id="pdbFile" accept=".pdb,.txt">
+                </div>
+                <div class="input-group">
+                    <label>或选择示例:</label>
+                    <select id="sampleSelect">
+                        <option value="">-- 选择示例 --</option>
+                    </select>
+                    <button id="loadSample" class="btn">加载示例</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>显示模式</h2>
+                <div class="mode-buttons">
+                    <button class="btn mode-btn active" data-mode="ballstick">球棍模型</button>
+                    <button class="btn mode-btn" data-mode="ribbon">带状模型</button>
+                    <button class="btn mode-btn" data-mode="spacefill">空间填充</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>原子颜色</h2>
+                <div class="color-legend">
+                    <div class="color-item">
+                        <span class="color-dot" style="background: #909090;"></span>
+                        <span>碳 (C)</span>
+                    </div>
+                    <div class="color-item">
+                        <span class="color-dot" style="background: #ffffff;"></span>
+                        <span>氢 (H)</span>
+                    </div>
+                    <div class="color-item">
+                        <span class="color-dot" style="background: #ff0d0d;"></span>
+                        <span>氧 (O)</span>
+                    </div>
+                    <div class="color-item">
+                        <span class="color-dot" style="background: #3050f8;"></span>
+                        <span>氮 (N)</span>
+                    </div>
+                    <div class="color-item">
+                        <span class="color-dot" style="background: #ffff30;"></span>
+                        <span>硫 (S)</span>
+                    </div>
+                    <div class="color-item">
+                        <span class="color-dot" style="background: #ff8000;"></span>
+                        <span>磷 (P)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>热运动模拟</h2>
+                <div class="input-group">
+                    <label for="temperature">温度: <span id="temperatureValue" style="color:#00d9ff;">0</span> K</label>
+                    <input type="range" id="temperature" min="0" max="3000" step="10" value="0">
+                    <div class="temp-presets">
+                        <button class="btn preset-btn" data-temp="0">0K</button>
+                        <button class="btn preset-btn" data-temp="77">77K</button>
+                        <button class="btn preset-btn" data-temp="298">298K</button>
+                        <button class="btn preset-btn" data-temp="1000">1000K</button>
+                        <button class="btn preset-btn" data-temp="3000">3000K</button>
+                    </div>
+                </div>
+                <div class="energy-display">
+                    <div class="energy-item">
+                        <span class="energy-label">平均动能/原子</span>
+                        <span class="energy-value" id="ekAtom">0.0000 eV</span>
+                    </div>
+                    <div class="energy-item">
+                        <span class="energy-label">摩尔动能</span>
+                        <span class="energy-value" id="ekMol">0.00 kJ/mol</span>
+                    </div>
+                    <div class="energy-item">
+                        <span class="energy-label">系统总动能</span>
+                        <span class="energy-value" id="ekTotal">0 J</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>显示选项</h2>
+                <div class="input-group">
+                    <label for="atomScale">原子大小: <span id="atomScaleValue">1.0</span></label>
+                    <input type="range" id="atomScale" min="0.1" max="3" step="0.1" value="1">
+                </div>
+                <div class="input-group">
+                    <label for="bondRadius">键粗细: <span id="bondRadiusValue">0.1</span></label>
+                    <input type="range" id="bondRadius" min="0.05" max="0.5" step="0.05" value="0.1">
+                </div>
+                <div class="input-group">
+                    <label>
+                        <input type="checkbox" id="showAxes" checked>
+                        显示坐标轴
+                    </label>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>统计信息</h2>
+                <div id="stats" class="stats">
+                    <p>请加载 PDB 文件</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>操作说明</h2>
+                <ul class="instructions">
+                    <li>左键拖动: 旋转</li>
+                    <li>右键拖动: 平移</li>
+                    <li>滚轮: 缩放</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="main">
+            <div id="canvas-container"></div>
+            <div id="loading" class="loading hidden">
+                <div class="spinner"></div>
+                <p>加载中...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

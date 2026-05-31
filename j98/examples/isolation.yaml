@@ -1,0 +1,82 @@
+pipelines:
+  isolated_build:
+    description: "Isolated build pipeline with Docker"
+    steps:
+      - name: check_env
+        command: |
+          echo "=== Container Environment ==="
+          cat /etc/os-release | head -3
+          echo ""
+          echo "Node: $(node --version)"
+          echo "Cores:  $(nproc)"
+          echo "Memory: $(free -h | grep Mem | awk '{print $2}')"
+          echo ""
+          echo "=== Simulating workload ==="
+          for i in 1 2 3; do
+            echo "Working... $i"
+            sleep 1
+          done
+          echo "Done!"
+        isolation:
+          enabled: true
+          backend: auto
+          image: node:26
+          limits:
+            cpu: 0.5
+            memory: 128m
+            network_disabled: false
+        on_error: stop
+
+      - name: stress_test
+        command: |
+          echo "=== Resource Limit Test ==="
+          echo "Generating CPU load (limited to 0.5 core)..."
+          node -e "
+          const start = Date.now();
+          while (Date.now() - start < 3000) {}
+          "
+          echo "CPU test complete"
+          echo ""
+          echo "Memory allocation test..."
+          node -e "
+          const size = 50 * 1024 * 1024;
+          const data = Buffer.alloc(size);
+          console.log('Allocated ' + (data.length / 1024 / 1024).toFixed(0) + 'MB successfully');
+          "
+        isolation:
+          enabled: true
+          backend: auto
+          image: node:26
+          limits:
+            cpu: 0.5
+            memory: 128m
+        on_error: stop
+
+  network_isolated:
+    description: "Test network isolation"
+    steps:
+      - name: no_network
+        command: |
+          echo "Testing network connectivity (should fail)..."
+          if curl -s --connect-timeout 2 https://www.google.com > /dev/null 2>&1; then
+            echo "ERROR: Network is accessible (should be isolated!)"
+            exit 1
+          else
+            echo "SUCCESS: Network is properly isolated"
+            exit 0
+          fi
+        isolation:
+          enabled: true
+          backend: auto
+          image: curlimages/curl:latest
+          limits:
+            cpu: 0.2
+            memory: 64m
+            network_disabled: true
+        on_error: stop
+
+plugin_dirs:
+  - ./examples/plugins
+
+global_env:
+  DEPLOY_ENV: production

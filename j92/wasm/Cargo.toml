@@ -1,0 +1,15 @@
+[package]
+name = "lsb_wasm"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+wasm-bindgen = "0.2.89"
+image = { version = "0.24.7", default-features = false, features = ["png"] }
+web-sys = { version = "0.3.66", features = ["ImageData"] }
+
+[profile.release]
+opt-level = "s"

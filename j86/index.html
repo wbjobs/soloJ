@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D 分子构建器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        .sidebar {
+            width: 320px;
+            background: rgba(26, 26, 46, 0.95);
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar h1 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #00d4ff;
+            text-align: center;
+        }
+        
+        .section {
+            margin-bottom: 25px;
+        }
+        
+        .section h2 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #00d4ff;
+            border-bottom: 2px solid #00d4ff;
+            padding-bottom: 5px;
+        }
+        
+        .atom-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        
+        .atom-btn {
+            padding: 10px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            color: #fff;
+        }
+        
+        .atom-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
+        
+        .atom-btn.selected {
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px #00d4ff;
+        }
+        
+        .atom-H { background: #ffffff; color: #333 !important; }
+        .atom-C { background: #333333; }
+        .atom-N { background: #3050f8; }
+        .atom-O { background: #ff0d0d; }
+        .atom-F { background: #90e050; color: #333 !important; }
+        .atom-P { background: #ff8000; }
+        .atom-S { background: #ffff30; color: #333 !important; }
+        .atom-Cl { background: #1ff01f; color: #333 !important; }
+        .atom-Br { background: #a62929; }
+        .atom-I { background: #940094; }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: #fff;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ff4444, #cc0000);
+            color: #fff;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 68, 68, 0.4);
+        }
+        
+        .btn-optimize {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: #fff;
+        }
+        
+        .btn-optimize:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(155, 89, 182, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        
+        .properties {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .prop-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .prop-item:last-child {
+            border-bottom: none;
+        }
+        
+        .prop-label {
+            color: #aaa;
+            font-size: 13px;
+        }
+        
+        .prop-value {
+            color: #00d4ff;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        
+        .smiles-box {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+            color: #0f0;
+        }
+        
+        .instructions {
+            font-size: 12px;
+            color: #888;
+            line-height: 1.6;
+        }
+        
+        .instructions p {
+            margin-bottom: 8px;
+        }
+        
+        .main-area {
+            flex: 1;
+            position: relative;
+        }
+        
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .status-bar {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #00d4ff;
+        }
+        
+        .atom-count {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .loading {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px 40px;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid #00d4ff;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h1>🔬 3D 分子构建器</h1>
+            
+            <div class="section">
+                <h2>选择原子</h2>
+                <div class="atom-grid">
+                    <button class="atom-btn atom-H selected" data-element="H">H</button>
+                    <button class="atom-btn atom-C" data-element="C">C</button>
+                    <button class="atom-btn atom-N" data-element="N">N</button>
+                    <button class="atom-btn atom-O" data-element="O">O</button>
+                    <button class="atom-btn atom-F" data-element="F">F</button>
+                    <button class="atom-btn atom-P" data-element="P">P</button>
+                    <button class="atom-btn atom-S" data-element="S">S</button>
+                    <button class="atom-btn atom-Cl" data-element="Cl">Cl</button>
+                    <button class="atom-btn atom-Br" data-element="Br">Br</button>
+                    <button class="atom-btn atom-I" data-element="I">I</button>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>操作</h2>
+                <div class="controls">
+                    <button class="btn btn-primary" id="calcBtn">计算化学属性</button>
+                    <button class="btn btn-optimize" id="optimizeBtn">✨ 优化结构</button>
+                    <button class="btn btn-danger" id="clearBtn">清除所有原子</button>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>分子属性</h2>
+                <div class="properties" id="properties">
+                    <div class="prop-item">
+                        <span class="prop-label">SMILES:</span>
+                        <span class="prop-value">-</span>
+                    </div>
+                    <div class="prop-item">
+                        <span class="prop-label">分子式:</span>
+                        <span class="prop-value">-</span>
+                    </div>
+                    <div class="prop-item">
+                        <span class="prop-label">分子量:</span>
+                        <span class="prop-value">-</span>
+                    </div>
+                    <div class="prop-item">
+                        <span class="prop-label">原子数:</span>
+                        <span class="prop-value">-</span>
+                    </div>
+                    <div class="prop-item">
+                        <span class="prop-label">化学键数:</span>
+                        <span class="prop-value">-</span>
+                    </div>
+                    <div class="prop-item">
+                        <span class="prop-label">LogP:</span>
+                        <span class="prop-value">-</span>
+                    </div>
+                    <div class="prop-item">
+                        <span class="prop-label">TPSA:</span>
+                        <span class="prop-value">-</span>
+                    </div>
+                    <div class="prop-item">
+                        <span class="prop-label">H供体:</span>
+                        <span class="prop-value">-</span>
+                    </div>
+                    <div class="prop-item">
+                        <span class="prop-label">H受体:</span>
+                        <span class="prop-value">-</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>使用说明</h2>
+                <div class="instructions">
+                    <p>🖱️ <strong>左键点击</strong> - 添加原子</p>
+                    <p>🖱️ <strong>左键拖拽</strong> - 移动原子</p>
+                    <p>🖱️ <strong>右键拖拽</strong> - 旋转视角</p>
+                    <p>🖱️ <strong>滚轮</strong> - 缩放</p>
+                    <p>🖱️ <strong>中键拖拽</strong> - 平移视角</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-area">
+            <div id="canvas-container"></div>
+            <div class="atom-count" id="atomCount">原子数: 0</div>
+            <div class="status-bar" id="statusBar">选择原子类型，点击场景添加</div>
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <div>计算中...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        const ATOM_COLORS = {
+            'H': 0xffffff,
+            'C': 0x333333,
+            'N': 0x3050f8,
+            'O': 0xff0d0d,
+            'F': 0x90e050,
+            'P': 0xff8000,
+            'S': 0xffff30,
+            'Cl': 0x1ff01f,
+            'Br': 0xa62929,
+            'I': 0x940094
+        };
+
+        const ATOM_RADII = {
+            'H': 0.4,
+            'C': 0.7,
+            'N': 0.65,
+            'O': 0.6,
+            'F': 0.55,
+            'P': 0.9,
+            'S': 0.85,
+            'Cl': 0.8,
+            'Br': 0.95,
+            'I': 1.1
+        };
+
+        const BOND_LENGTHS = {
+            'C-C': 1.54, 'C-H': 1.09, 'C-N': 1.47, 'C-O': 1.43,
+            'C-F': 1.35, 'C-Cl': 1.77, 'C-Br': 1.94, 'C-I': 2.14,
+            'C-S': 1.82, 'C-P': 1.84, 'N-H': 1.01, 'N-N': 1.45,
+            'N-O': 1.40, 'O-H': 0.96, 'O-O': 1.48, 'F-H': 0.92,
+            'S-H': 1.35, 'P-H': 1.42, 'S-O': 1.51, 'P-O': 1.63,
+            'Cl-H': 1.27, 'Br-H': 1.41, 'I-H': 1.61
+        };
+
+        let scene, camera, renderer, raycaster, mouse;
+        let atoms = [];
+        let bonds = [];
+        let selectedElement = 'H';
+        let isDragging = false;
+        let draggedAtom = null;
+        let dragPlane = new THREE.Plane();
+        let offset = new THREE.Vector3();
+        let intersection = new THREE.Vector3();
+        let mouseDownPos = { x: 0, y: 0 };
+        let isCameraRotating = false;
+        let potentialDragAtom = null;
+        const DRAG_THRESHOLD = 5;
+        const HIT_RADIUS_SCALE = 1.8;
+        let isAnimating = false;
+        let animationQueue = [];
+        let currentAnimationFrame = 0;
+        let eventSource = null;
+
+        function init() {
+            const container = document.getElementById('canvas-container');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1a1a2e);
+
+            camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
+            camera.position.set(8, 6, 12);
+            camera.lookAt(0, 0, 0);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+            container.appendChild(renderer.domElement);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(10, 10, 10);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+
+            const pointLight1 = new THREE.PointLight(0x00d4ff, 0.5, 50);
+            pointLight1.position.set(-10, 5, -10);
+            scene.add(pointLight1);
+
+            const pointLight2 = new THREE.PointLight(0xff6b6b, 0.5, 50);
+            pointLight2.position.set(10, -5, 10);
+            scene.add(pointLight2);
+
+            const gridHelper = new THREE.GridHelper(20, 20, 0x444444, 0x333333);
+            scene.add(gridHelper);
+
+            const axesHelper = new THREE.AxesHelper(5);
+            scene.add(axesHelper);
+
+            raycaster = new THREE.Raycaster();
+            raycaster.params.Mesh = { threshold: 0 };
+            mouse = new THREE.Vector2();
+
+            setupControls();
+            setupEventListeners();
+            animate();
+        }
+
+        function setupControls() {
+            let isRightMouseDown = false;
+            let isMiddleMouseDown = false;
+            let previousMousePosition = { x: 0, y: 0 };
+            let spherical = { theta: Math.PI / 4, phi: Math.PI / 3, radius: 15 };
+            let target = new THREE.Vector3(0, 0, 0);
+
+            renderer.domElement.addEventListener('mousedown', (e) => {
+                if (e.button === 2) {
+                    isRightMouseDown = true;
+                    isCameraRotating = true;
+                }
+                if (e.button === 1) isMiddleMouseDown = true;
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+            });
+
+            renderer.domElement.addEventListener('mouseup', (e) => {
+                if (e.button === 2) {
+                    isRightMouseDown = false;
+                    setTimeout(() => { isCameraRotating = false; }, 50);
+                }
+                if (e.button === 1) isMiddleMouseDown = false;
+            });
+
+            renderer.domElement.addEventListener('mousemove', (e) => {
+                const deltaX = e.clientX - previousMousePosition.x;
+                const deltaY = e.clientY - previousMousePosition.y;
+
+                if (isRightMouseDown) {
+                    spherical.theta -= deltaX * 0.01;
+                    spherical.phi -= deltaY * 0.01;
+                    spherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, spherical.phi));
+                    updateCameraPosition();
+                }
+
+                if (isMiddleMouseDown) {
+                    const right = new THREE.Vector3();
+                    const up = new THREE.Vector3(0, 1, 0);
+                    camera.getWorldDirection(right);
+                    right.cross(up).normalize();
+                    target.add(right.multiplyScalar(-deltaX * 0.02));
+                    target.y += deltaY * 0.02;
+                    updateCameraPosition();
+                }
+
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+            });
+
+            renderer.domElement.addEventListener('wheel', (e) => {
+                spherical.radius += e.deltaY * 0.02;
+                spherical.radius = Math.max(3, Math.min(50, spherical.radius));
+                updateCameraPosition();
+            });
+
+            function updateCameraPosition() {
+                camera.position.x = target.x + spherical.radius * Math.sin(spherical.phi) * Math.cos(spherical.theta);
+                camera.position.y = target.y + spherical.radius * Math.cos(spherical.phi);
+                camera.position.z = target.z + spherical.radius * Math.sin(spherical.phi) * Math.sin(spherical.theta);
+                camera.lookAt(target);
+            }
+
+            renderer.domElement.addEventListener('contextmenu', (e) => e.preventDefault());
+        }
+
+        function setupEventListeners() {
+            document.querySelectorAll('.atom-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.atom-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    selectedElement = btn.dataset.element;
+                    updateStatus(`已选择: ${selectedElement}`);
+                });
+            });
+
+            renderer.domElement.addEventListener('mousedown', onMouseDown);
+            renderer.domElement.addEventListener('mousemove', onMouseMove);
+            renderer.domElement.addEventListener('mouseup', onMouseUp);
+
+            document.getElementById('calcBtn').addEventListener('click', calculateProperties);
+            document.getElementById('optimizeBtn').addEventListener('click', optimizeStructure);
+            document.getElementById('clearBtn').addEventListener('click', clearAllAtoms);
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        function onMouseDown(e) {
+            if (e.button !== 0 || isCameraRotating || isAnimating) return;
+
+            mouseDownPos = { x: e.clientX, y: e.clientY };
+
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const hitMeshes = atoms.map(a => a.hitSphere);
+            const intersects = raycaster.intersectObjects(hitMeshes);
+
+            if (intersects.length > 0) {
+                potentialDragAtom = atoms.find(a => a.hitSphere === intersects[0].object);
+            } else {
+                potentialDragAtom = null;
+            }
+        }
+
+        function onMouseMove(e) {
+            if (isDragging && draggedAtom) {
+                const rect = renderer.domElement.getBoundingClientRect();
+                mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+                mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+                raycaster.setFromCamera(mouse, camera);
+                if (raycaster.ray.intersectPlane(dragPlane, intersection)) {
+                    draggedAtom.mesh.position.copy(intersection.add(offset));
+                    draggedAtom.hitSphere.position.copy(draggedAtom.mesh.position);
+                    draggedAtom.x = draggedAtom.mesh.position.x;
+                    draggedAtom.y = draggedAtom.mesh.position.y;
+                    draggedAtom.z = draggedAtom.mesh.position.z;
+                    updateBonds();
+                }
+                return;
+            }
+
+            if (potentialDragAtom && !isCameraRotating) {
+                const dx = e.clientX - mouseDownPos.x;
+                const dy = e.clientY - mouseDownPos.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist > DRAG_THRESHOLD) {
+                    isDragging = true;
+                    draggedAtom = potentialDragAtom;
+                    
+                    const normal = camera.getWorldDirection(new THREE.Vector3()).negate();
+                    dragPlane.setFromNormalAndCoplanarPoint(normal, draggedAtom.mesh.position);
+                    
+                    const rect = renderer.domElement.getBoundingClientRect();
+                    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+                    mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+                    raycaster.setFromCamera(mouse, camera);
+
+                    if (raycaster.ray.intersectPlane(dragPlane, intersection)) {
+                        offset.copy(draggedAtom.mesh.position).sub(intersection);
+                    }
+                    updateStatus(`正在移动: ${draggedAtom.element}`);
+                }
+            }
+        }
+
+        function onMouseUp(e) {
+            if (e.button !== 0) return;
+
+            if (isDragging) {
+                isDragging = false;
+                draggedAtom = null;
+                potentialDragAtom = null;
+                updateStatus('选择原子类型，点击场景添加');
+                return;
+            }
+
+            if (potentialDragAtom) {
+                potentialDragAtom = null;
+                return;
+            }
+
+            if (!isCameraRotating) {
+                const dx = e.clientX - mouseDownPos.x;
+                const dy = e.clientY - mouseDownPos.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < DRAG_THRESHOLD) {
+                    const rect = renderer.domElement.getBoundingClientRect();
+                    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+                    mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+                    raycaster.setFromCamera(mouse, camera);
+                    if (raycaster.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), intersection)) {
+                        addAtom(selectedElement, intersection.x, 1, intersection.z);
+                    }
+                }
+            }
+
+            potentialDragAtom = null;
+        }
+
+        function addAtom(element, x, y, z) {
+            const geometry = new THREE.SphereGeometry(ATOM_RADII[element], 32, 32);
+            const material = new THREE.MeshPhongMaterial({
+                color: ATOM_COLORS[element],
+                shininess: 100,
+                specular: 0x444444
+            });
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.position.set(x, y, z);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            scene.add(mesh);
+
+            const hitRadius = ATOM_RADII[element] * HIT_RADIUS_SCALE;
+            const hitGeometry = new THREE.SphereGeometry(hitRadius, 16, 16);
+            const hitMaterial = new THREE.MeshBasicMaterial({
+                visible: false
+            });
+            const hitSphere = new THREE.Mesh(hitGeometry, hitMaterial);
+            hitSphere.position.set(x, y, z);
+            scene.add(hitSphere);
+
+            const atom = { element, x, y, z, mesh, hitSphere };
+            atoms.push(atom);
+            updateAtomCount();
+            updateBonds();
+            updateStatus(`已添加 ${element} 原子`);
+        }
+
+        function getBondLength(e1, e2) {
+            const key = [e1, e2].sort().join('-');
+            return BOND_LENGTHS[key] || 1.5;
+        }
+
+        function updateBonds() {
+            bonds.forEach(bond => scene.remove(bond.mesh));
+            bonds = [];
+
+            for (let i = 0; i < atoms.length; i++) {
+                for (let j = i + 1; j < atoms.length; j++) {
+                    const a1 = atoms[i];
+                    const a2 = atoms[j];
+                    const dist = a1.mesh.position.distanceTo(a2.mesh.position);
+                    const bondLen = getBondLength(a1.element, a2.element);
+
+                    if (dist < bondLen * 1.3) {
+                        const direction = new THREE.Vector3()
+                            .subVectors(a2.mesh.position, a1.mesh.position);
+                        const length = direction.length();
+                        const midpoint = new THREE.Vector3()
+                            .addVectors(a1.mesh.position, a2.mesh.position)
+                            .multiplyScalar(0.5);
+
+                        const geometry = new THREE.CylinderGeometry(0.15, 0.15, length, 16);
+                        const material = new THREE.MeshPhongMaterial({
+                            color: 0x888888,
+                            shininess: 50
+                        });
+                        const mesh = new THREE.Mesh(geometry, material);
+                        mesh.position.copy(midpoint);
+                        mesh.quaternion.setFromUnitVectors(
+                            new THREE.Vector3(0, 1, 0),
+                            direction.clone().normalize()
+                        );
+                        mesh.castShadow = true;
+                        scene.add(mesh);
+
+                        bonds.push({ atom1: i, atom2: j, mesh });
+                    }
+                }
+            }
+        }
+
+        function clearAllAtoms() {
+            if (isAnimating) {
+                stopAnimation();
+            }
+            atoms.forEach(atom => {
+                scene.remove(atom.mesh);
+                scene.remove(atom.hitSphere);
+            });
+            bonds.forEach(bond => scene.remove(bond.mesh));
+            atoms = [];
+            bonds = [];
+            isDragging = false;
+            draggedAtom = null;
+            potentialDragAtom = null;
+            updateAtomCount();
+            clearProperties();
+            updateStatus('已清除所有原子');
+        }
+
+        async function calculateProperties() {
+            if (atoms.length === 0) {
+                updateStatus('请先添加原子');
+                return;
+            }
+
+            const loading = document.getElementById('loading');
+            loading.classList.add('show');
+
+            const atomData = atoms.map(a => ({
+                element: a.element,
+                x: a.mesh.position.x,
+                y: a.mesh.position.y,
+                z: a.mesh.position.z
+            }));
+
+            try {
+                const response = await fetch('/api/calculate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ atoms: atomData })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayProperties(data);
+                    updateStatus('计算完成');
+                } else if (data.partial) {
+                    displayProperties(data);
+                    updateStatus('⚠️ ' + data.error);
+                } else {
+                    updateStatus('计算失败: ' + data.error);
+                }
+            } catch (error) {
+                updateStatus('连接服务器失败');
+                console.error(error);
+            } finally {
+                loading.classList.remove('show');
+            }
+        }
+
+        async function optimizeStructure() {
+            if (atoms.length === 0) {
+                updateStatus('请先添加原子');
+                return;
+            }
+            if (isAnimating) {
+                stopAnimation();
+                return;
+            }
+
+            const optimizeBtn = document.getElementById('optimizeBtn');
+            optimizeBtn.disabled = true;
+            optimizeBtn.textContent = '⏹ 停止优化';
+            document.getElementById('calcBtn').disabled = true;
+            document.getElementById('clearBtn').disabled = true;
+
+            const atomData = atoms.map(a => ({
+                element: a.element,
+                x: a.mesh.position.x,
+                y: a.mesh.position.y,
+                z: a.mesh.position.z
+            }));
+
+            isAnimating = true;
+            animationQueue = [];
+            currentAnimationFrame = 0;
+
+            try {
+                const response = await fetch('/api/optimize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ atoms: atomData })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    updateStatus('优化失败: ' + errorData.error);
+                    resetOptimizeButton();
+                    return;
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+
+                updateStatus('⚡ 正在进行力场优化...');
+
+                while (isAnimating) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop();
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const jsonStr = line.slice(6);
+                            if (jsonStr === '[DONE]') {
+                                isAnimating = false;
+                                break;
+                            }
+                            try {
+                                const frameData = JSON.parse(jsonStr);
+                                if (frameData.error) {
+                                    updateStatus('优化失败: ' + frameData.error);
+                                    isAnimating = false;
+                                    break;
+                                }
+                                if (frameData.type === 'progress') {
+                                    updateStatus(`⚡ 优化中... 能量: ${frameData.energy.toFixed(2)} kJ/mol (${frameData.step}/${frameData.total_steps})`);
+                                    if (frameData.positions) {
+                                        animationQueue.push(frameData.positions);
+                                    }
+                                } else if (frameData.type === 'complete') {
+                                    updateStatus(`✨ 优化完成! 最终能量: ${frameData.energy.toFixed(2)} kJ/mol`);
+                                    if (frameData.positions) {
+                                        animationQueue.push(frameData.positions);
+                                    }
+                                    isAnimating = false;
+                                }
+                            } catch (e) {
+                                console.error('Parse SSE error:', e);
+                            }
+                        }
+                    }
+                }
+
+                if (animationQueue.length > 0) {
+                    playAnimation();
+                } else {
+                    resetOptimizeButton();
+                }
+
+            } catch (error) {
+                updateStatus('连接服务器失败');
+                console.error(error);
+                resetOptimizeButton();
+            }
+        }
+
+        function stopAnimation() {
+            isAnimating = false;
+            if (eventSource) {
+                eventSource.close();
+                eventSource = null;
+            }
+            animationQueue = [];
+            currentAnimationFrame = 0;
+            resetOptimizeButton();
+            updateStatus('已停止优化');
+        }
+
+        function resetOptimizeButton() {
+            const optimizeBtn = document.getElementById('optimizeBtn');
+            optimizeBtn.disabled = false;
+            optimizeBtn.textContent = '✨ 优化结构';
+            document.getElementById('calcBtn').disabled = false;
+            document.getElementById('clearBtn').disabled = false;
+        }
+
+        function playAnimation() {
+            if (animationQueue.length === 0) {
+                resetOptimizeButton();
+                return;
+            }
+
+            const totalFrames = animationQueue.length;
+            let frameIdx = 0;
+            const fps = 30;
+            const frameInterval = 1000 / fps;
+
+            function renderFrame() {
+                if (frameIdx >= totalFrames) {
+                    applyFramePositions(animationQueue[totalFrames - 1]);
+                    updateBonds();
+                    resetOptimizeButton();
+                    updateStatus('✨ 优化完成');
+                    return;
+                }
+
+                const positions = animationQueue[frameIdx];
+                applyFramePositions(positions);
+                updateBonds();
+
+                frameIdx++;
+                setTimeout(renderFrame, frameInterval);
+            }
+
+            updateStatus(`🎬 播放优化动画 (${totalFrames} 帧)`);
+            renderFrame();
+        }
+
+        function applyFramePositions(positions) {
+            for (let i = 0; i < Math.min(atoms.length, positions.length); i++) {
+                const pos = positions[i];
+                atoms[i].mesh.position.set(pos[0], pos[1], pos[2]);
+                atoms[i].hitSphere.position.set(pos[0], pos[1], pos[2]);
+                atoms[i].x = pos[0];
+                atoms[i].y = pos[1];
+                atoms[i].z = pos[2];
+            }
+        }
+
+        function displayProperties(data) {
+            const props = document.getElementById('properties');
+            props.innerHTML = `
+                <div class="prop-item">
+                    <span class="prop-label">SMILES:</span>
+                </div>
+                <div class="smiles-box">${data.smiles}</div>
+                <div class="prop-item">
+                    <span class="prop-label">分子式:</span>
+                    <span class="prop-value">${data.formula}</span>
+                </div>
+                <div class="prop-item">
+                    <span class="prop-label">分子量:</span>
+                    <span class="prop-value">${data.molecular_weight} g/mol</span>
+                </div>
+                <div class="prop-item">
+                    <span class="prop-label">原子数:</span>
+                    <span class="prop-value">${data.num_atoms}</span>
+                </div>
+                <div class="prop-item">
+                    <span class="prop-label">化学键数:</span>
+                    <span class="prop-value">${data.num_bonds}</span>
+                </div>
+                <div class="prop-item">
+                    <span class="prop-label">LogP:</span>
+                    <span class="prop-value">${data.logp}</span>
+                </div>
+                <div class="prop-item">
+                    <span class="prop-label">TPSA:</span>
+                    <span class="prop-value">${data.tpsa} Å²</span>
+                </div>
+                <div class="prop-item">
+                    <span class="prop-label">H供体:</span>
+                    <span class="prop-value">${data.h_donors}</span>
+                </div>
+                <div class="prop-item">
+                    <span class="prop-label">H受体:</span>
+                    <span class="prop-value">${data.h_acceptors}</span>
+                </div>
+                <div class="prop-item">
+                    <span class="prop-label">可旋转键:</span>
+                    <span class="prop-value">${data.rotatable_bonds}</span>
+                </div>
+            `;
+        }
+
+        function clearProperties() {
+            const props = document.getElementById('properties');
+            props.innerHTML = `
+                <div class="prop-item">
+                    <span class="prop-label">SMILES:</span>
+                    <span class="prop-value">-</span>
+                </div>
+                <div class="prop-item">
+                    <span class="prop-label">分子式:</span>
+                    <span class="prop-value">-</span>
+                </div>
+                <div class="prop-item">
+                    <span class="prop-label">分子量:</span>
+                    <span class="prop-value">-</span>
+                </div>
+                <div class="prop-item">
+                    <span class="prop-label">原子数:</span>
+                    <span class="prop-value">-</span>
+                </div>
+                <div class="prop-item">
+                    <span class="prop-label">化学键数:</span>
+                    <span class="prop-value">-</span>
+                </div>
+                <div class="prop-item">
+                    <span class="prop-label">LogP:</span>
+                    <span class="prop-value">-</span>
+                </div>
+                <div class="prop-item">
+                    <span class="prop-label">TPSA:</span>
+                    <span class="prop-value">-</span>
+                </div>
+                <div class="prop-item">
+                    <span class="prop-label">H供体:</span>
+                    <span class="prop-value">-</span>
+                </div>
+                <div class="prop-item">
+                    <span class="prop-label">H受体:</span>
+                    <span class="prop-value">-</span>
+                </div>
+            `;
+        }
+
+        function updateAtomCount() {
+            document.getElementById('atomCount').textContent = `原子数: ${atoms.length}`;
+        }
+
+        function updateStatus(text) {
+            document.getElementById('statusBar').textContent = text;
+        }
+
+        function onWindowResize() {
+            const container = document.getElementById('canvas-container');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>日志处理网关 - 实时监控</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f1923;
+      color: #d4e0ed;
+      min-height: 100vh;
+    }
+    .header {
+      background: linear-gradient(135deg, #1a2a3a 0%, #0f1923 100%);
+      border-bottom: 1px solid #2a3a4a;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header h1 { font-size: 20px; font-weight: 600; color: #4fc3f7; }
+    .status-badge { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: #666; transition: background 0.3s;
+    }
+    .status-dot.connected { background: #4caf50; box-shadow: 0 0 6px #4caf50; }
+    .status-dot.disconnected { background: #f44336; }
+    .stats-bar {
+      display: flex; gap: 24px; padding: 12px 32px;
+      background: #141f2b; border-bottom: 1px solid #1e2d3d;
+    }
+    .stat-item { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+    .stat-label { color: #7a8fa0; }
+    .stat-value { color: #4fc3f7; font-weight: 600; font-size: 15px; }
+    .dashboard {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 24px 32px;
+    }
+    .chart-card {
+      background: #141f2b; border: 1px solid #1e2d3d; border-radius: 8px; overflow: hidden;
+    }
+    .chart-card-header {
+      padding: 14px 20px; border-bottom: 1px solid #1e2d3d;
+      font-size: 14px; font-weight: 600; color: #b0c4d8;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .chart-card-header .icon { width: 4px; height: 14px; border-radius: 2px; }
+    .chart-card-header .icon.blue { background: #4fc3f7; }
+    .chart-card-header .icon.orange { background: #ff9800; }
+    .chart-card-header .icon.purple { background: #ab47bc; }
+    .chart-container { width: 100%; height: 380px; }
+    .chart-container.small { height: 260px; }
+    .log-panel {
+      grid-column: 1 / -1; background: #141f2b;
+      border: 1px solid #1e2d3d; border-radius: 8px; overflow: hidden;
+    }
+    .log-list {
+      height: 240px; overflow-y: auto; padding: 12px 20px;
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      font-size: 12px; line-height: 1.8;
+    }
+    .log-list::-webkit-scrollbar { width: 6px; }
+    .log-list::-webkit-scrollbar-track { background: transparent; }
+    .log-list::-webkit-scrollbar-thumb { background: #2a3a4a; border-radius: 3px; }
+    .log-entry { display: flex; gap: 12px; flex-wrap: wrap; }
+    .log-time { color: #5a7a8a; white-space: nowrap; }
+    .log-source {
+      padding: 1px 6px; border-radius: 3px; font-size: 11px;
+      font-weight: 600; text-transform: uppercase; white-space: nowrap;
+    }
+    .log-source.nginx { background: #1b3a2a; color: #4caf50; }
+    .log-source.syslog { background: #2a2a1b; color: #ff9800; }
+    .log-msg { color: #8aa0b4; word-break: break-all; }
+    .log-status {
+      padding: 1px 6px; border-radius: 3px; font-size: 11px;
+      font-weight: 600; white-space: nowrap;
+    }
+    .log-status.s2xx { background: #1b3a2a; color: #4caf50; }
+    .log-status.s3xx { background: #1b2a3a; color: #4fc3f7; }
+    .log-status.s4xx { background: #3a2a1b; color: #ff9800; }
+    .log-status.s5xx { background: #3a1b1b; color: #f44336; }
+    .log-custom {
+      padding: 1px 6px; border-radius: 3px; font-size: 11px;
+      font-weight: 600; white-space: nowrap; background: #2a1b3a; color: #ab47bc;
+    }
+    .rule-panel {
+      grid-column: 1 / -1; background: #141f2b;
+      border: 1px solid #1e2d3d; border-radius: 8px; overflow: hidden;
+    }
+    .rule-form {
+      display: flex; gap: 10px; padding: 14px 20px; border-bottom: 1px solid #1e2d3d;
+      align-items: flex-end; flex-wrap: wrap;
+    }
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .form-group label { font-size: 11px; color: #7a8fa0; text-transform: uppercase; font-weight: 600; }
+    .form-group input, .form-group select {
+      background: #0f1923; border: 1px solid #2a3a4a; border-radius: 4px;
+      color: #d4e0ed; padding: 7px 10px; font-size: 13px; outline: none;
+      font-family: inherit;
+    }
+    .form-group input:focus, .form-group select:focus { border-color: #4fc3f7; }
+    .form-group input.wide { width: 340px; }
+    .form-group input.name-input { width: 140px; }
+    .form-group select { width: 100px; }
+    .btn {
+      padding: 7px 16px; border-radius: 4px; border: none; font-size: 13px;
+      font-weight: 600; cursor: pointer; transition: background 0.2s;
+    }
+    .btn-primary { background: #1e6e3e; color: #b0ddb0; }
+    .btn-primary:hover { background: #267d4d; }
+    .btn-danger { background: #6e1e1e; color: #ddb0b0; }
+    .btn-danger:hover { background: #7d2626; }
+    .rule-list { padding: 10px 20px; }
+    .rule-item {
+      display: flex; align-items: center; gap: 12px; padding: 8px 0;
+      border-bottom: 1px solid #1a2530;
+    }
+    .rule-item:last-child { border-bottom: none; }
+    .rule-name { font-weight: 600; color: #ab47bc; font-size: 13px; min-width: 80px; }
+    .rule-pattern {
+      font-family: 'Cascadia Code', 'Fira Code', monospace;
+      font-size: 12px; color: #7a8fa0; flex: 1;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .rule-source-badge {
+      padding: 2px 6px; border-radius: 3px; font-size: 10px;
+      font-weight: 600; text-transform: uppercase;
+    }
+    .rule-source-badge.both { background: #1b2a3a; color: #4fc3f7; }
+    .rule-source-badge.nginx { background: #1b3a2a; color: #4caf50; }
+    .rule-source-badge.syslog { background: #2a2a1b; color: #ff9800; }
+    .rule-error {
+      color: #f44336; font-size: 12px; padding: 6px 20px;
+      background: #1a1010; border-bottom: 1px solid #2a1a1a;
+    }
+    .dim-grid {
+      grid-column: 1 / -1; display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px;
+    }
+    .empty-hint {
+      grid-column: 1 / -1; text-align: center; padding: 32px; color: #3a4a5a; font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>⬡ 日志处理网关</h1>
+    <div class="status-badge">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText">连接中...</span>
+    </div>
+  </div>
+  <div class="stats-bar">
+    <div class="stat-item">
+      <span class="stat-label">总日志数</span>
+      <span class="stat-value" id="totalCount">0</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Nginx</span>
+      <span class="stat-value" id="nginxCount">0</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Syslog</span>
+      <span class="stat-value" id="syslogCount">0</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">当前 QPS</span>
+      <span class="stat-value" id="currentQps">0</span>
+    </div>
+  </div>
+  <div class="dashboard">
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <span class="icon blue"></span>
+        QPS 趋势
+      </div>
+      <div class="chart-container" id="qpsChart"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <span class="icon orange"></span>
+        错误码分布
+      </div>
+      <div class="chart-container" id="errorChart"></div>
+    </div>
+    <div class="rule-panel">
+      <div class="chart-card-header">
+        <span class="icon purple"></span>
+        自定义提取规则
+      </div>
+      <div class="rule-form">
+        <div class="form-group">
+          <label>规则名称</label>
+          <input class="name-input" id="ruleName" placeholder="UserID" maxlength="64" />
+        </div>
+        <div class="form-group">
+          <label>正则表达式（需含命名组）</label>
+          <input class="wide" id="rulePattern" placeholder='user_id=(?<userid>\w+)' maxlength="512" />
+        </div>
+        <div class="form-group">
+          <label>来源</label>
+          <select id="ruleSource">
+            <option value="both">全部</option>
+            <option value="nginx">Nginx</option>
+            <option value="syslog">Syslog</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" id="addRuleBtn">添加规则</button>
+      </div>
+      <div id="ruleError"></div>
+      <div class="rule-list" id="ruleList"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <span class="icon blue"></span>
+        实时日志流
+      </div>
+      <div class="log-list" id="logList"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <span class="icon purple"></span>
+        自定义维度分布
+      </div>
+      <div class="chart-container small" id="dimChart"></div>
+    </div>
+  </div>
+
+  <script>
+    const qpsChart = echarts.init(document.getElementById('qpsChart'));
+    const errorChart = echarts.init(document.getElementById('errorChart'));
+    const dimChart = echarts.init(document.getElementById('dimChart'));
+
+    const MAX_QPS_POINTS = 60;
+    const qpsLabels = [];
+    const qpsData = [];
+
+    const errorDistribution = {};
+    const dimDistribution = {};
+    let activeRules = [];
+    let totalCount = 0;
+    let nginxCount = 0;
+    let syslogCount = 0;
+    let secondCount = 0;
+
+    const statusClassMap = { 2: 's2xx', 3: 's3xx', 4: 's4xx', 5: 's5xx' };
+
+    const DIM_COLORS = ['#ab47bc', '#e040fb', '#7c4dff', '#536dfe', '#448aff', '#40c4ff', '#18ffff', '#64ffda', '#69f0ae', '#b2ff59'];
+
+    function escapeHtml(str) {
+      if (typeof str !== 'string') return '';
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function getStatusClass(code) {
+      return statusClassMap[Math.floor(code / 100)] || 's2xx';
+    }
+
+    const pendingLogs = [];
+    let flushScheduled = false;
+
+    function scheduleFlush() {
+      if (flushScheduled) return;
+      flushScheduled = true;
+      requestAnimationFrame(() => {
+        flushScheduled = false;
+        const batch = pendingLogs.splice(0, pendingLogs.length);
+        processBatch(batch);
+      });
+    }
+
+    function processBatch(batch) {
+      const list = document.getElementById('logList');
+      const fragment = document.createDocumentFragment();
+
+      for (let i = 0; i < batch.length; i++) {
+        const log = batch[i];
+        totalCount++;
+        if (log.source === 'nginx') {
+          nginxCount++;
+          const cls = Math.floor(log.status / 100) + 'xx';
+          errorDistribution[cls] = (errorDistribution[cls] || 0) + 1;
+        } else {
+          syslogCount++;
+        }
+        secondCount++;
+
+        if (log.custom) {
+          for (const [key, val] of Object.entries(log.custom)) {
+            if (!dimDistribution[key]) dimDistribution[key] = {};
+            dimDistribution[key][val] = (dimDistribution[key][val] || 0) + 1;
+          }
+        }
+
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+
+        let inner = `<span class="log-time">${new Date().toLocaleTimeString('zh-CN', { hour12: false })}</span>`;
+        inner += `<span class="log-source ${log.source}">${log.source}</span>`;
+
+        if (log.source === 'nginx') {
+          inner += `<span class="log-status ${getStatusClass(log.status)}">${log.status}</span>`;
+          inner += `<span class="log-msg">${escapeHtml(log.method)} ${escapeHtml(log.uri)} — ${escapeHtml(log.ip)}</span>`;
+        } else {
+          inner += `<span class="log-status s3xx">SEV${log.severity}</span>`;
+          inner += `<span class="log-msg">${escapeHtml(log.host)} ${escapeHtml(log.app)}: ${escapeHtml(log.message)}</span>`;
+        }
+
+        if (log.custom) {
+          for (const [key, val] of Object.entries(log.custom)) {
+            inner += `<span class="log-custom">${escapeHtml(key)}=${escapeHtml(val)}</span>`;
+          }
+        }
+
+        entry.innerHTML = inner;
+        fragment.appendChild(entry);
+      }
+
+      list.appendChild(fragment);
+      while (list.children.length > 200) list.removeChild(list.firstChild);
+      list.scrollTop = list.scrollHeight;
+
+      document.getElementById('totalCount').textContent = totalCount;
+      document.getElementById('nginxCount').textContent = nginxCount;
+      document.getElementById('syslogCount').textContent = syslogCount;
+      updateErrorChart();
+      updateDimChart();
+    }
+
+    function initQpsChart() {
+      qpsChart.setOption({
+        backgroundColor: 'transparent',
+        tooltip: { trigger: 'axis', backgroundColor: '#1a2a3a', borderColor: '#2a3a4a', textStyle: { color: '#d4e0ed' } },
+        grid: { left: 50, right: 20, top: 20, bottom: 30 },
+        xAxis: { type: 'category', data: qpsLabels, axisLine: { lineStyle: { color: '#2a3a4a' } }, axisLabel: { color: '#5a7a8a', fontSize: 11 } },
+        yAxis: { type: 'value', axisLine: { show: false }, axisLabel: { color: '#5a7a8a', fontSize: 11 }, splitLine: { lineStyle: { color: '#1e2d3d' } } },
+        series: [{
+          type: 'line', data: qpsData, smooth: true, symbol: 'none',
+          lineStyle: { color: '#4fc3f7', width: 2 },
+          areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: 'rgba(79,195,247,0.3)' },
+            { offset: 1, color: 'rgba(79,195,247,0.02)' }
+          ])},
+        }],
+      });
+    }
+
+    function initErrorChart() {
+      errorChart.setOption({
+        backgroundColor: 'transparent',
+        tooltip: { trigger: 'item', backgroundColor: '#1a2a3a', borderColor: '#2a3a4a', textStyle: { color: '#d4e0ed' } },
+        legend: { bottom: 10, textStyle: { color: '#7a8fa0', fontSize: 12 }, itemWidth: 12, itemHeight: 12 },
+        series: [{
+          type: 'pie', radius: ['40%', '70%'], center: ['50%', '45%'],
+          avoidLabelOverlap: true,
+          itemStyle: { borderRadius: 4, borderColor: '#141f2b', borderWidth: 2 },
+          label: { show: true, color: '#b0c4d8', fontSize: 12 },
+          data: [],
+        }],
+      });
+    }
+
+    function initDimChart() {
+      dimChart.setOption({
+        backgroundColor: 'transparent',
+        tooltip: { trigger: 'item', backgroundColor: '#1a2a3a', borderColor: '#2a3a4a', textStyle: { color: '#d4e0ed' } },
+        legend: { bottom: 0, textStyle: { color: '#7a8fa0', fontSize: 11 }, itemWidth: 10, itemHeight: 10, type: 'scroll' },
+        series: [{
+          type: 'pie', radius: ['35%', '65%'], center: ['50%', '42%'],
+          avoidLabelOverlap: true,
+          itemStyle: { borderRadius: 4, borderColor: '#141f2b', borderWidth: 2 },
+          label: { show: true, color: '#b0c4d8', fontSize: 11 },
+          data: [],
+        }],
+        graphic: [{
+          type: 'text', left: 'center', top: 'middle',
+          style: { text: '添加规则后展示', fill: '#3a4a5a', fontSize: 13 },
+        }],
+      });
+    }
+
+    initQpsChart();
+    initErrorChart();
+    initDimChart();
+
+    setInterval(() => {
+      const label = new Date().toLocaleTimeString('zh-CN', { hour12: false });
+      qpsLabels.push(label);
+      qpsData.push(secondCount);
+      if (qpsLabels.length > MAX_QPS_POINTS) { qpsLabels.shift(); qpsData.shift(); }
+      document.getElementById('currentQps').textContent = secondCount;
+      secondCount = 0;
+      qpsChart.setOption({ xAxis: { data: qpsLabels }, series: [{ data: qpsData }] });
+    }, 1000);
+
+    function updateErrorChart() {
+      const data = Object.entries(errorDistribution)
+        .map(([name, value]) => ({ name, value }))
+        .sort((a, b) => b.value - a.value);
+      const colors = { '2xx': '#4caf50', '3xx': '#4fc3f7', '4xx': '#ff9800', '5xx': '#f44336' };
+      errorChart.setOption({
+        series: [{ data: data.map(d => ({ ...d, itemStyle: { color: colors[d.name] || '#7a8fa0' } })) }],
+      });
+    }
+
+    function updateDimChart() {
+      const allFields = {};
+      for (const rule of activeRules) {
+        for (const field of rule.fields) {
+          allFields[field] = rule.name;
+        }
+      }
+
+      const hasData = Object.keys(allFields).some(f => dimDistribution[f] && Object.keys(dimDistribution[f]).length > 0);
+
+      if (!hasData && activeRules.length === 0) {
+        dimChart.setOption({
+          series: [{ data: [] }],
+          graphic: [{ type: 'text', left: 'center', top: 'middle', style: { text: '添加规则后展示', fill: '#3a4a5a', fontSize: 13 } }],
+        });
+        return;
+      }
+
+      const chartData = [];
+      let colorIdx = 0;
+      for (const field of Object.keys(allFields)) {
+        const dist = dimDistribution[field];
+        if (!dist) continue;
+        for (const [val, count] of Object.entries(dist)) {
+          chartData.push({
+            name: `${field}=${val}`,
+            value: count,
+            itemStyle: { color: DIM_COLORS[colorIdx % DIM_COLORS.length] },
+          });
+        }
+        colorIdx++;
+      }
+
+      chartData.sort((a, b) => b.value - a.value);
+
+      const topN = chartData.slice(0, 30);
+
+      dimChart.setOption({
+        series: [{ data: topN }],
+        graphic: topN.length > 0 ? [] : [{ type: 'text', left: 'center', top: 'middle', style: { text: '等待匹配数据...', fill: '#3a4a5a', fontSize: 13 } }],
+      });
+    }
+
+    function renderRuleList() {
+      const container = document.getElementById('ruleList');
+      container.innerHTML = '';
+      if (activeRules.length === 0) {
+        container.innerHTML = '<div style="color:#3a4a5a;font-size:12px;padding:8px 0;">暂无自定义规则，添加后即可实时提取日志维度</div>';
+        return;
+      }
+      for (const rule of activeRules) {
+        const item = document.createElement('div');
+        item.className = 'rule-item';
+        const srcBadge = rule.source === 'both' ? 'both' : rule.source;
+        const srcLabel = rule.source === 'both' ? '全部' : rule.source === 'nginx' ? 'Nginx' : 'Syslog';
+        item.innerHTML = `
+          <span class="rule-name">${escapeHtml(rule.name)}</span>
+          <span class="rule-pattern">${escapeHtml(rule.pattern)}</span>
+          <span class="rule-source-badge ${srcBadge}">${srcLabel}</span>
+          <button class="btn btn-danger" data-id="${rule.id}" data-action="delete">删除</button>
+        `;
+        container.appendChild(item);
+      }
+    }
+
+    document.getElementById('ruleList').addEventListener('click', async (e) => {
+      const btn = e.target.closest('[data-action="delete"]');
+      if (!btn) return;
+      const id = btn.dataset.id;
+      try {
+        const res = await fetch('/api/rules/' + id, { method: 'DELETE' });
+        if (res.ok) {
+          activeRules = activeRules.filter(r => r.id !== id);
+          renderRuleList();
+          updateDimChart();
+        }
+      } catch (_) {}
+    });
+
+    document.getElementById('addRuleBtn').addEventListener('click', async () => {
+      const nameEl = document.getElementById('ruleName');
+      const patternEl = document.getElementById('rulePattern');
+      const sourceEl = document.getElementById('ruleSource');
+      const errorEl = document.getElementById('ruleError');
+      errorEl.textContent = '';
+
+      const name = nameEl.value.trim();
+      const pattern = patternEl.value.trim();
+      const source = sourceEl.value;
+
+      if (!name) { errorEl.textContent = '请输入规则名称'; return; }
+      if (!pattern) { errorEl.textContent = '请输入正则表达式'; return; }
+
+      try {
+        const res = await fetch('/api/rules', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, pattern, source }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errorEl.textContent = data.error || '添加失败';
+          return;
+        }
+        nameEl.value = '';
+        patternEl.value = '';
+      } catch (err) {
+        errorEl.textContent = '网络请求失败';
+      }
+    });
+
+    async function fetchRules() {
+      try {
+        const res = await fetch('/api/rules');
+        const data = await res.json();
+        activeRules = data.rules || [];
+        renderRuleList();
+      } catch (_) {}
+    }
+
+    fetchRules();
+
+    const ws = new WebSocket(`ws://${location.host}`);
+
+    ws.onopen = () => {
+      document.getElementById('statusDot').className = 'status-dot connected';
+      document.getElementById('statusText').textContent = '已连接';
+    };
+
+    ws.onclose = () => {
+      document.getElementById('statusDot').className = 'status-dot disconnected';
+      document.getElementById('statusText').textContent = '已断开';
+    };
+
+    ws.onmessage = (event) => {
+      try {
+        const msg = JSON.parse(event.data);
+        if (msg.type === 'batch' && Array.isArray(msg.data)) {
+          for (let i = 0; i < msg.data.length; i++) {
+            pendingLogs.push(msg.data[i]);
+          }
+          scheduleFlush();
+        } else if (msg.type === 'log' && msg.data) {
+          pendingLogs.push(msg.data);
+          scheduleFlush();
+        } else if (msg.type === 'rules_update') {
+          activeRules = msg.rules || [];
+          renderRuleList();
+        }
+      } catch (_) {}
+    };
+
+    ws.onerror = () => {
+      document.getElementById('statusDot').className = 'status-dot disconnected';
+      document.getElementById('statusText').textContent = '连接错误';
+    };
+
+    window.addEventListener('resize', () => {
+      qpsChart.resize();
+      errorChart.resize();
+      dimChart.resize();
+    });
+  </script>
+</body>
+</html>

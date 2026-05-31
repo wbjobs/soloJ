@@ -1,0 +1,1 @@
+{"rustc":6313536168557467772,"features":"","declared_features":"","target":0,"profile":0,"path":0,"deps":[[8578586876803397814,"build_script_build",false,11298134628687195035]],"local":[{"RerunIfChanged":{"output":"debug\\build\\serde_json-1b0c73441c40e0ae\\output","paths":["build.rs"]}}],"rustflags":["-C","link-arg=-LC:\\msys64\\mingw64\\lib"],"config":0,"compile_kind":0}

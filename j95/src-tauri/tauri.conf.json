@@ -1,0 +1,38 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nicehash/Tauri/dev/crates/tauri-config-schema/schema.json",
+  "productName": "MD MindMap Editor",
+  "version": "1.0.0",
+  "identifier": "com.md-mindmap-editor.app",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:5173",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "MD MindMap Editor",
+        "width": 1280,
+        "height": 800,
+        "minWidth": 900,
+        "minHeight": 600
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "plugins": {
+    "fs": {
+      "scope": {
+        "allow": ["**"],
+        "deny": []
+      }
+    },
+    "dialog": {
+      "open": true,
+      "save": true
+    }
+  }
+}
