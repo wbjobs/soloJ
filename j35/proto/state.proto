@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package state;
+
+option go_package = "github.com/mmorpg/state;state";
+
+import "combat.proto";
+
+message PlayerState {
+  uint64 player_id = 1;
+  combat.UnitState unit_state = 2;
+  repeated uint32 active_skills = 3;
+  int32 team_id = 4;
+  int64 last_update_ms = 5;
+}
+
+message StateUpdate {
+  uint64 sequence_number = 1;
+  uint64 player_id = 2;
+  combat.UnitState unit_state = 3;
+  int64 timestamp_ms = 4;
+}
+
+message StateSnapshot {
+  uint64 sequence_number = 1;
+  uint64 frame_number = 2;
+  repeated PlayerState players = 3;
+  int64 timestamp_ms = 4;
+}
+
+message SubscribeRequest {
+  string player_id = 1;
+  uint64 last_acked_frame = 2;
+  repeated uint64 player_ids = 3;
+  int32 team_id = 4;
+}
+
+message BattleLog {
+  uint64 battle_id = 1;
+  uint64 frame_number = 2;
+  int64 timestamp_ms = 3;
+  repeated combat.DamageResult damage_results = 4;
+  repeated combat.UnitMovement movements = 5;
+}
+
+message BattleLogRequest {
+  uint64 battle_id = 1;
+  uint64 from_frame = 2;
+  uint64 to_frame = 3;
+}
+
+message BattleLogResponse {
+  repeated BattleLog logs = 1;
+}
+
+service StateService {
+  rpc UpdateState(stream StateUpdate) returns (StateSnapshot);
+  rpc SubscribeState(SubscribeRequest) returns (stream StateSnapshot);
+  rpc GetSnapshot(SubscribeRequest) returns (StateSnapshot);
+  rpc SaveBattleLog(BattleLog) returns (bool);
+  rpc QueryBattleLog(BattleLogRequest) returns (BattleLogResponse);
+}

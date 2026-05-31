@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+package collision;
+
+option go_package = "github.com/mmorpg/collision;collision";
+
+message Vector2 {
+  float x = 1;
+  float y = 2;
+}
+
+message Vector3 {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+}
+
+enum SkillType {
+  SKILL_TYPE_AOE_CIRCLE = 0;
+  SKILL_TYPE_AOE_RECT = 1;
+  SKILL_TYPE_AOE_SECTOR = 2;
+  SKILL_TYPE_PROJECTILE = 3;
+}
+
+message UnitInfo {
+  uint64 unit_id = 1;
+  Vector2 position = 2;
+  float heading = 3;
+  float radius = 4;
+  int32 faction = 5;
+}
+
+message SkillCast {
+  uint64 caster_id = 1;
+  uint32 skill_id = 2;
+  SkillType skill_type = 3;
+  Vector2 origin = 4;
+  Vector2 direction = 5;
+  float range = 6;
+  float radius = 7;
+  float width = 8;
+  float height = 9;
+  float angle = 10;
+  float speed = 11;
+  int32 base_damage = 12;
+  uint64 frame_number = 13;
+}
+
+message HitResult {
+  uint64 target_id = 1;
+  uint32 skill_id = 2;
+  bool hit = 3;
+  float distance = 4;
+}
+
+message CollisionRequest {
+  uint64 frame_number = 1;
+  repeated UnitInfo units = 2;
+  repeated SkillCast casts = 3;
+}
+
+message CollisionResponse {
+  uint64 frame_number = 1;
+  repeated HitResult results = 2;
+  int64 processing_time_us = 3;
+}
+
+message UnitMovement {
+  uint64 unit_id = 1;
+  Vector2 position = 2;
+  float heading = 3;
+}
+
+message FrameUpdate {
+  uint64 frame_number = 1;
+  int64 timestamp_ms = 2;
+  repeated UnitMovement movements = 3;
+  repeated SkillCast casts = 4;
+}
+
+message FrameResult {
+  uint64 frame_number = 1;
+  int64 timestamp_ms = 2;
+  repeated HitResult hits = 3;
+}
+
+service CollisionService {
+  rpc CheckCollision(CollisionRequest) returns (CollisionResponse);
+  rpc StreamFrames(stream FrameUpdate) returns (stream FrameResult);
+}

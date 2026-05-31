@@ -1,0 +1,106 @@
+syntax = "proto3";
+
+package damage_arbiter;
+
+service DamageArbiterService {
+  rpc ArbitrateDamage (ArbitrateRequest) returns (ArbitrateResponse);
+  rpc GetUnitState (UnitStateRequest) returns (UnitStateResponse);
+}
+
+message Vec3 {
+  double x = 1;
+  double y = 2;
+  double z = 3;
+}
+
+message UnitState {
+  uint64 unit_id = 1;
+  double hp = 2;
+  double max_hp = 3;
+  Vec3 position = 4;
+  Vec3 facing = 5;
+  double strength = 6;
+  double agility = 7;
+  double intelligence = 8;
+  double critical_rate = 9;
+  double critical_damage = 10;
+  double dodge_rate = 11;
+  repeated BuffInfo buffs = 12;
+  bool is_moving = 13;
+  uint32 team_id = 14;
+  uint32 block_count = 15;
+  uint64 last_block_time = 16;
+  uint64 last_dodge_time = 17;
+}
+
+message BuffInfo {
+  uint32 buff_id = 1;
+  string buff_name = 2;
+  double duration = 3;
+  double remaining = 4;
+  repeated BuffEffect effects = 5;
+}
+
+message BuffEffect {
+  string effect_type = 1;
+  double value = 2;
+}
+
+message SkillCast {
+  uint32 skill_id = 1;
+  uint64 caster_id = 2;
+  uint64 target_id = 3;
+  uint32 priority = 4;
+  uint64 timestamp = 5;
+  double damage_base = 6;
+  string skill_type = 7;
+  uint32 skill_level = 8;
+  Vec3 attack_direction = 9;
+}
+
+message CollisionHit {
+  uint64 attacker_id = 1;
+  uint64 target_id = 2;
+  uint32 skill_id = 3;
+  Vec3 hit_point = 4;
+  Vec3 attack_direction = 5;
+  double damage_base = 6;
+}
+
+message ArbitrateRequest {
+  repeated CollisionHit hits = 1;
+  repeated UnitState units = 2;
+  repeated SkillCast skills = 3;
+  uint64 current_time = 4;
+}
+
+message DamageResult {
+  uint64 target_id = 1;
+  uint64 source_id = 2;
+  uint32 skill_id = 3;
+  double raw_damage = 4;
+  double final_damage = 5;
+  bool is_critical = 6;
+  bool is_blocked = 7;
+  bool is_dodged = 8;
+  bool is_perfect_block = 9;
+  bool is_damage_shared = 10;
+  double damage_reduction = 11;
+  repeated uint64 share_targets = 12;
+  string arbiter_log = 13;
+}
+
+message ArbitrateResponse {
+  repeated DamageResult results = 1;
+  bool success = 2;
+  string error_message = 3;
+}
+
+message UnitStateRequest {
+  uint64 unit_id = 1;
+}
+
+message UnitStateResponse {
+  UnitState state = 1;
+  bool found = 2;
+}

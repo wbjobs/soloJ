@@ -1,0 +1,169 @@
+syntax = "proto3";
+
+package combat;
+
+option go_package = "github.com/mmorpg/combat;combat";
+
+message Vector3 {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+}
+
+message UnitState {
+  uint64 unit_id = 1;
+  Vector3 position = 2;
+  float heading = 3;
+  int32 hp = 4;
+  int32 max_hp = 5;
+  repeated Buff buffs = 6;
+  uint64 last_frame = 7;
+}
+
+message Buff {
+  uint32 buff_id = 1;
+  int32 stacks = 2;
+  int64 expire_time_ms = 3;
+}
+
+enum SkillType {
+  SKILL_TYPE_MELEE = 0;
+  SKILL_TYPE_AOE_CIRCLE = 1;
+  SKILL_TYPE_AOE_RECT = 2;
+  SKILL_TYPE_AOE_SECTOR = 3;
+  SKILL_TYPE_PROJECTILE = 4;
+}
+
+message SkillCast {
+  uint64 caster_id = 1;
+  uint32 skill_id = 2;
+  SkillType skill_type = 3;
+  Vector3 origin = 4;
+  Vector3 direction = 5;
+  float range = 6;
+  float radius = 7;
+  float width = 8;
+  float angle = 9;
+  int32 base_damage = 10;
+  uint64 frame_number = 11;
+  int64 timestamp_ms = 12;
+}
+
+message HitResult {
+  uint64 target_id = 1;
+  uint32 skill_id = 2;
+  bool hit = 3;
+  float distance = 4;
+}
+
+message CollisionCheckRequest {
+  SkillCast cast = 1;
+  repeated UnitState units = 2;
+}
+
+message CollisionCheckResponse {
+  repeated HitResult results = 1;
+  uint64 frame_number = 2;
+  int64 processing_time_us = 3;
+}
+
+message FrameUpdate {
+  uint64 frame_number = 1;
+  int64 timestamp_ms = 2;
+  repeated UnitMovement movements = 3;
+  repeated SkillCast casts = 4;
+}
+
+message UnitMovement {
+  uint64 unit_id = 1;
+  Vector3 position = 2;
+  float heading = 3;
+}
+
+message DamageResult {
+  uint64 target_id = 1;
+  uint64 source_id = 2;
+  uint32 skill_id = 3;
+  int32 raw_damage = 4;
+  int32 final_damage = 5;
+  bool blocked = 6;
+  bool dodged = 7;
+  bool critical = 8;
+  DamageShareInfo share_info = 9;
+}
+
+message DamageShareInfo {
+  repeated SharedDamage shares = 1;
+}
+
+message SharedDamage {
+  uint64 unit_id = 1;
+  int32 damage_taken = 2;
+}
+
+message DamageArbitrationRequest {
+  repeated HitResult hits = 1;
+  SkillCast cast = 2;
+  map<uint64, UnitState> unit_states = 3;
+}
+
+message DamageArbitrationResponse {
+  repeated DamageResult results = 1;
+  int64 processing_time_us = 2;
+}
+
+service CollisionService {
+  rpc CheckCollision(CollisionCheckRequest) returns (CollisionCheckResponse);
+  rpc StreamFrameUpdates(stream FrameUpdate) returns (stream FrameUpdate);
+}
+
+service DamageArbiterService {
+  rpc ArbitrateDamage(DamageArbitrationRequest) returns (DamageArbitrationResponse);
+}
+
+message SkillPredictionRequest {
+  uint64 player_id = 1;
+  repeated PlayerAction actions = 2;
+}
+
+message PlayerAction {
+  uint32 skill_id = 1;
+  float pos_delta_x = 2;
+  float pos_delta_y = 3;
+  float target_distance = 4;
+  float cooldown_ratio = 5;
+  float hp_percent = 6;
+}
+
+message SkillPredictionResponse {
+  repeated PredictedSkill top_predictions = 1;
+  int64 inference_time_us = 2;
+}
+
+message PredictedSkill {
+  uint32 skill_id = 1;
+  float probability = 2;
+}
+
+message PreallocateRequest {
+  uint64 player_id = 1;
+  repeated PredictedSkill predictions = 2;
+  Vector3 position = 3;
+  float heading = 4;
+}
+
+message PreallocateResponse {
+  bool success = 1;
+  repeated PreallocatedRegion regions = 2;
+}
+
+message PreallocatedRegion {
+  uint32 skill_id = 1;
+  Vector3 region_center = 2;
+  float region_radius = 3;
+}
+
+service PredictionService {
+  rpc PredictSkill(SkillPredictionRequest) returns (SkillPredictionResponse);
+  rpc PreallocateResources(PreallocateRequest) returns (PreallocateResponse);
+}

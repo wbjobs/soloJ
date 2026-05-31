@@ -1,0 +1,11 @@
+{
+  "name": "com.mmorpg.testclient",
+  "version": "1.0.0",
+  "displayName": "MMORPG Stress Test Client",
+  "description": "Unity test client for MMORPG combat system stress testing",
+  "unity": "2022.3",
+  "dependencies": {
+    "com.unity.nuget.grpc": "2.52.0",
+    "com.unity.nuget.google-protobuf": "3.24.0"
+  }
+}
