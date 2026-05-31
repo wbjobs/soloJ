@@ -1,0 +1,83 @@
+version: "3.8"
+
+services:
+  influxdb:
+    image: influxdb:2.7
+    ports:
+      - "8086:8086"
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: adminpassword
+      DOCKER_INFLUXDB_INIT_ORG: vibration
+      DOCKER_INFLUXDB_INIT_BUCKET: raw_signals
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: my-super-secret-token
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+
+  postgres:
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: vibration
+      POSTGRES_PASSWORD: vibration
+      POSTGRES_DB: vibration_diag
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zk_data:/var/lib/zookeeper/data
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      INFLUXDB_URL: http://influxdb:8086
+      INFLUXDB_TOKEN: my-super-secret-token
+      INFLUXDB_ORG: vibration
+      INFLUXDB_BUCKET: raw_signals
+      POSTGRES_DSN: postgresql+asyncpg://vibration:vibration@postgres:5432/vibration_diag
+    depends_on:
+      - influxdb
+      - postgres
+      - kafka
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  influxdb_data:
+  postgres_data:
+  zk_data:
+  kafka_data:
