@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>本地文档语义搜索助手</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>📚 本地文档语义搜索助手</h1>
+            <p class="subtitle">基于 sentence-transformers + FAISS 的智能语义搜索系统</p>
+            <div class="stats-bar" id="statsBar">
+                <div class="stat-item">
+                    <span class="stat-value" id="docCount">0</span>
+                    <span class="stat-label">文档</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="chunkCount">0</span>
+                    <span class="stat-label">文本块</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="dimCount">384</span>
+                    <span class="stat-label">向量维度</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <section class="upload-section">
+                <div class="upload-card">
+                    <h2>📁 上传文档</h2>
+                    <p class="upload-hint">支持 .txt 和 .md / .markdown 格式文件</p>
+                    
+                    <div class="upload-area" id="uploadArea">
+                        <input type="file" id="fileInput" accept=".txt,.md,.markdown" multiple hidden>
+                        <div class="upload-icon">⬆️</div>
+                        <p class="upload-text">点击或拖拽文件到此处上传</p>
+                        <button class="btn-primary" id="selectBtn">选择文件</button>
+                    </div>
+
+                    <div class="file-list" id="fileList"></div>
+                    <div class="progress-bar" id="progressBar" style="display: none;">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="documents-card">
+                    <h2>📋 已上传文档</h2>
+                    <div class="documents-list" id="documentsList">
+                        <p class="empty-state">暂无文档，请先上传</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="search-section">
+                <div class="search-card">
+                    <h2>🔍 语义搜索</h2>
+                    <div class="search-box">
+                        <input 
+                            type="text" 
+                            id="searchInput" 
+                            placeholder="输入你的问题，系统将自动匹配最相关的文本片段..."
+                            autocomplete="off"
+                        >
+                        <select id="topKSelect">
+                            <option value="3">Top 3</option>
+                            <option value="5" selected>Top 5</option>
+                            <option value="10">Top 10</option>
+                        </select>
+                        <button class="btn-primary" id="searchBtn">搜索</button>
+                    </div>
+                </div>
+
+                <div class="results-card">
+                    <h2>📊 搜索结果</h2>
+                    <div class="results-list" id="resultsList">
+                        <p class="empty-state">在上方输入问题开始搜索</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <div class="toast" id="toast"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
