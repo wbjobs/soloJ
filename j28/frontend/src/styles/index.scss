@@ -1,0 +1,55 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #app {
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+body {
+  background: #f5f6fa;
+}
+
+.page-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.status-pending {
+  color: #e6a23c;
+}
+
+.status-approved {
+  color: #409eff;
+}
+
+.status-running {
+  color: #67c23a;
+}
+
+.status-completed {
+  color: #2f7f5e;
+}
+
+.status-failed {
+  color: #f56c6c;
+}
+
+.status-rolled-back {
+  color: #909399;
+}
+
+.status-rejected {
+  color: #c0392b;
+}
+
+.metric-chart {
+  height: 300px;
+  width: 100%;
+}
