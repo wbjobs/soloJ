@@ -1,0 +1,30 @@
+api:
+  rest_port: 8080
+  grpc_port: 50051
+  enabled: true
+
+redis:
+  address: "127.0.0.1:6379"
+  database: 0
+  pool_size: 50
+  max_retries: 5
+
+scheduler:
+  targets:
+    - "127.0.0.1"
+  interval_ms: 1000
+  malformed_rate: 30
+  health_check_interval_ms: 5000
+  max_local_queue_size: 10000
+  backup_dir: "./data"
+
+worker:
+  count: 2
+  max_concurrent_tasks: 10
+  max_conn_per_target: 5
+  conn_idle_timeout_s: 30
+
+plc:
+  listen_addr: "127.0.0.1:502"
+  simulate_crash: false
+  crash_after_packets: 50

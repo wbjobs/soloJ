@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package fuzzapi;
+
+option go_package = "modbus-fuzzer/api/proto";
+
+message MutationRule {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    MutationType type = 4;
+    int32 weight = 5;
+    bool enabled = 6;
+    map<string, string> parameters = 7;
+    int64 created_at = 8;
+    int64 updated_at = 9;
+}
+
+enum MutationType {
+    UNKNOWN = 0;
+    INVALID_FUNCTION_CODE = 1;
+    INVALID_DATA_LENGTH = 2;
+    OVERFLOW_DATA = 3;
+    INVALID_PROTOCOL_ID = 4;
+    INVALID_UNIT_ID = 5;
+    BOUNDARY_VALUE = 6;
+    MALFORMED_PACKET = 7;
+    FUZZY_BYTES = 8;
+    REVERSED_BYTES = 9;
+    CUSTOM = 10;
+}
+
+message CoverageData {
+    string worker_id = 1;
+    string target_ip = 2;
+    int64 total_packets_sent = 3;
+    int64 normal_packets = 4;
+    int64 malformed_packets = 5;
+    int64 successful_responses = 6;
+    int64 crashes_detected = 7;
+    int64 timeouts = 8;
+    int64 errors = 9;
+    map<string, int64> function_code_coverage = 10;
+    map<string, int64> mutation_rule_coverage = 11;
+    double avg_response_time_ms = 12;
+    int64 started_at = 13;
+    int64 last_updated = 14;
+}
+
+message GetCoverageRequest {
+    string worker_id = 1;
+    string target_ip = 2;
+}
+
+message GetCoverageResponse {
+    repeated CoverageData coverage = 1;
+    int64 timestamp = 2;
+}
+
+message StreamCoverageRequest {
+    string worker_id = 1;
+    int32 interval_seconds = 2;
+}
+
+service FuzzingService {
+    rpc GetCoverage(GetCoverageRequest) returns (GetCoverageResponse);
+    rpc StreamCoverage(StreamCoverageRequest) returns (stream CoverageData);
+}
