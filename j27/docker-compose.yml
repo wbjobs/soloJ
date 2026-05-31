@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6
+    container_name: pointcloud-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: pointcloud
+    volumes:
+      - mongodb_data:/data/db
+
+  minio:
+    image: minio/minio:latest
+    container_name: pointcloud-minio
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+
+  backend:
+    build: ./backend
+    container_name: pointcloud-backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      MONGODB_URI: mongodb://mongodb:27017/pointcloud
+      S3_ENDPOINT: http://minio:9000
+      S3_ACCESS_KEY: minioadmin
+      S3_SECRET_KEY: minioadmin
+      S3_BUCKET: pointcloud-chunks
+      S3_USE_SSL: "false"
+      MAX_POINTS_PER_CHUNK: 65536
+      MAX_LOD_LEVEL: 8
+      MEMORY_LIMIT_GB: 2
+    depends_on:
+      - mongodb
+      - minio
+    volumes:
+      - ./backend/uploads:/tmp/uploads
+
+volumes:
+  mongodb_data:
+  minio_data:
