@@ -1,0 +1,40 @@
+{
+  "models": [
+    {
+      "name": "emotion_detection",
+      "file": "emotion_detection.tflite",
+      "type": "emotion_detection",
+      "input_width": 48,
+      "input_height": 48,
+      "input_channels": 1,
+      "mean": 0.5,
+      "std": 0.5,
+      "use_gpu": false,
+      "num_threads": 4
+    },
+    {
+      "name": "sentiment_analysis",
+      "file": "sentiment_analysis.tflite",
+      "type": "sentiment_analysis",
+      "input_width": 256,
+      "input_height": 1,
+      "input_channels": 1,
+      "mean": 0.0,
+      "std": 1.0,
+      "use_gpu": false,
+      "num_threads": 4
+    },
+    {
+      "name": "image_classification",
+      "file": "mobilenet_v2.tflite",
+      "type": "image_classification",
+      "input_width": 224,
+      "input_height": 224,
+      "input_channels": 3,
+      "mean": 0.485,
+      "std": 0.456,
+      "use_gpu": true,
+      "num_threads": 4
+    }
+  ]
+}

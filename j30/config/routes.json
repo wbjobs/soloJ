@@ -1,0 +1,48 @@
+{
+  "rules": [
+    {
+      "id": "emotion_detection_upload",
+      "path_pattern": "/upload",
+      "method": "POST",
+      "model_name": "emotion_detection",
+      "input_source": "body",
+      "output_mode": "header",
+      "header_name": "X-Inference-Result",
+      "enabled": true,
+      "priority": 100
+    },
+    {
+      "id": "sentiment_analysis_analyze",
+      "path_pattern": "/analyze",
+      "method": "POST",
+      "model_name": "sentiment_analysis",
+      "input_source": "body",
+      "output_mode": "body",
+      "header_name": "X-Inference-Result",
+      "enabled": true,
+      "priority": 90
+    },
+    {
+      "id": "image_classification_api",
+      "path_pattern": "/api/classify",
+      "method": "POST",
+      "model_name": "image_classification",
+      "input_source": "body",
+      "output_mode": "header",
+      "header_name": "X-Image-Class",
+      "enabled": true,
+      "priority": 80
+    },
+    {
+      "id": "header_based_inference",
+      "path_pattern": "/api/quick",
+      "method": "GET",
+      "model_name": "quick_model",
+      "input_source": "headers",
+      "output_mode": "header",
+      "header_name": "X-Quick-Result",
+      "enabled": false,
+      "priority": 50
+    }
+  ]
+}

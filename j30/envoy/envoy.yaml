@@ -1,0 +1,105 @@
+static_resources:
+  listeners:
+  - name: main_listener
+    address:
+      socket_address:
+        address: 0.0.0.0
+        port_value: 8080
+    filter_chains:
+    - filters:
+      - name: envoy.filters.network.http_connection_manager
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+          stat_prefix: ingress_http
+          access_log:
+          - name: envoy.access_loggers.stdout
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.access_loggers.stream.v3.StdoutAccessLog
+          http_filters:
+          - name: envoy.filters.http.wasm
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm
+              config:
+                name: ai_gateway_filter
+                root_id: smart_gateway.AIGatewayFilter
+                configuration:
+                  "@type": type.googleapis.com/google.protobuf.StringValue
+                  value: |
+                    {
+                      "models_dir": "/models",
+                      "config_file": "/config/routes.json"
+                    }
+                vm_config:
+                  vm_id: ai_gateway_vm
+                  runtime: envoy.wasm.runtime.v8
+                  code:
+                    local:
+                      filename: /etc/envoy/ai_gateway_filter.wasm
+          - name: envoy.filters.http.router
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+          route_config:
+            name: all_routes
+            virtual_hosts:
+            - name: all_hosts
+              domains:
+              - "*"
+              routes:
+              - match:
+                  prefix: "/upload"
+                route:
+                  cluster: backend_service
+              - match:
+                  prefix: "/analyze"
+                route:
+                  cluster: backend_service
+              - match:
+                  prefix: "/api"
+                route:
+                  cluster: backend_service
+              - match:
+                  prefix: "/"
+                route:
+                  cluster: management_api
+
+  clusters:
+  - name: backend_service
+    connect_timeout: 0.25s
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+    load_assignment:
+      cluster_name: backend_service
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: backend
+                port_value: 8081
+  - name: management_api
+    connect_timeout: 0.25s
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+    load_assignment:
+      cluster_name: management_api
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: management-api
+                port_value: 8082
+
+admin:
+  address:
+    socket_address:
+      address: 0.0.0.0
+      port_value: 9901
+
+layered_runtime:
+  layers:
+  - name: static_layer
+    static_layer:
+      envoy:
+        reloadable_features:
+          hot_restart_enabled: true

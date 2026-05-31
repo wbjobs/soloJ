@@ -1,0 +1,101 @@
+{
+  "pipelines": [
+    {
+      "id": "object_detection_then_classification",
+      "name": "目标检测后分类",
+      "path_pattern": "/api/detect-and-classify",
+      "method": "POST",
+      "enabled": true,
+      "priority": 100,
+      "description": "先执行目标检测，根据检测结果再进行分类",
+      "step_order": ["detection", "check_confidence", "classification"],
+      "steps": {
+        "detection": {
+          "type": "single_model",
+          "model_names": ["object_detection"],
+          "input_source": "body",
+          "output_mode": "header",
+          "header_name": "X-Detection-Result",
+          "enabled": true,
+          "timeout_ms": 5000,
+          "cache_enabled": true,
+          "cache_ttl_seconds": 300
+        },
+        "check_confidence": {
+          "type": "conditional",
+          "model_names": [],
+          "input_source": "body",
+          "output_mode": "header",
+          "header_name": "X-Condition-Result",
+          "enabled": true,
+          "condition": {
+            "source_step": "detection",
+            "field": "person",
+            "op": "GREATER_THAN",
+            "threshold": 0.7
+          },
+          "true_branch": "classification",
+          "false_branch": ""
+        },
+        "classification": {
+          "type": "single_model",
+          "model_names": ["image_classification"],
+          "input_source": "body",
+          "output_mode": "header",
+          "header_name": "X-Classification-Result",
+          "enabled": true,
+          "timeout_ms": 5000,
+          "cache_enabled": true,
+          "cache_ttl_seconds": 300
+        }
+      }
+    },
+    {
+      "id": "model_ab_test",
+      "name": "模型AB测试",
+      "path_pattern": "/api/ab-test",
+      "method": "POST",
+      "enabled": true,
+      "priority": 50,
+      "description": "同时运行两个模型进行AB测试，按流量分配",
+      "step_order": ["ab_comparison"],
+      "steps": {
+        "ab_comparison": {
+          "type": "ab_test",
+          "model_names": ["model_v1", "model_v2"],
+          "input_source": "body",
+          "output_mode": "header",
+          "header_name": "X-AB-Test-Result",
+          "enabled": true,
+          "ab_test_id": "model_v1_vs_v2",
+          "traffic_split": 0.5,
+          "timeout_ms": 5000,
+          "cache_enabled": false
+        }
+      }
+    },
+    {
+      "id": "parallel_inference",
+      "name": "并行多模型推理",
+      "path_pattern": "/api/parallel-infer",
+      "method": "POST",
+      "enabled": true,
+      "priority": 80,
+      "description": "同时运行多个模型，收集所有结果",
+      "step_order": ["parallel_models"],
+      "steps": {
+        "parallel_models": {
+          "type": "parallel",
+          "model_names": ["sentiment_analysis", "topic_classification", "toxicity_detection"],
+          "input_source": "body",
+          "output_mode": "header",
+          "header_name": "X-Parallel-Results",
+          "enabled": true,
+          "timeout_ms": 10000,
+          "cache_enabled": true,
+          "cache_ttl_seconds": 600
+        }
+      }
+    }
+  ]
+}

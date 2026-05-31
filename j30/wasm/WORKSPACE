@@ -1,0 +1,36 @@
+workspace(name = "smart_gateway_wasm")
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "proxy_wasm_cpp_sdk",
+    strip_prefix = "proxy-wasm-cpp-sdk-0.2.1",
+    url = "https://github.com/proxy-wasm/proxy-wasm-cpp-sdk/archive/refs/tags/v0.2.1.tar.gz",
+)
+
+load("@proxy_wasm_cpp_sdk//bazel:repositories.bzl", "proxy_wasm_cpp_sdk_repositories")
+
+proxy_wasm_cpp_sdk_repositories()
+
+http_archive(
+    name = "com_google_tensorflow",
+    strip_prefix = "tensorflow-2.13.0",
+    url = "https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.13.0.tar.gz",
+)
+
+http_archive(
+    name = "com_github_nlohmann_json",
+    build_file = "@//:third_party/nlohmann_json.BUILD",
+    strip_prefix = "json-3.11.2",
+    url = "https://github.com/nlohmann/json/archive/refs/tags/v3.11.2.tar.gz",
+)
+
+http_archive(
+    name = "com_google_absl",
+    url = "https://github.com/abseil/abseil-cpp/archive/refs/tags/20230802.0.tar.gz",
+    strip_prefix = "abseil-cpp-20230802.0",
+)
+
+load("@com_google_absl//absl:repositories.bzl", "absl_deps")
+
+absl_deps()
