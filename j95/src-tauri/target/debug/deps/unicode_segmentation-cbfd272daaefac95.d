@@ -1,0 +1,9 @@
+E:\soloJ\j95\src-tauri\target\debug\deps\unicode_segmentation-cbfd272daaefac95.d: C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unicode-segmentation-1.13.2\src\lib.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unicode-segmentation-1.13.2\src\grapheme.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unicode-segmentation-1.13.2\src\sentence.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unicode-segmentation-1.13.2\src\word.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unicode-segmentation-1.13.2\src\tables.rs
+
+E:\soloJ\j95\src-tauri\target\debug\deps\libunicode_segmentation-cbfd272daaefac95.rmeta: C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unicode-segmentation-1.13.2\src\lib.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unicode-segmentation-1.13.2\src\grapheme.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unicode-segmentation-1.13.2\src\sentence.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unicode-segmentation-1.13.2\src\word.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unicode-segmentation-1.13.2\src\tables.rs
+
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unicode-segmentation-1.13.2\src\lib.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unicode-segmentation-1.13.2\src\grapheme.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unicode-segmentation-1.13.2\src\sentence.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unicode-segmentation-1.13.2\src\word.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unicode-segmentation-1.13.2\src\tables.rs:

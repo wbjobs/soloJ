@@ -1,0 +1,12 @@
+E:\soloJ\j95\src-tauri\target\release\deps\ico-5ba6a3846dd58535.d: C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\ico-0.5.0\src\lib.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\ico-0.5.0\src\macros.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\ico-0.5.0\src\bmpdepth.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\ico-0.5.0\src\icondir.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\ico-0.5.0\src\image.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\ico-0.5.0\src\restype.rs
+
+E:\soloJ\j95\src-tauri\target\release\deps\libico-5ba6a3846dd58535.rlib: C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\ico-0.5.0\src\lib.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\ico-0.5.0\src\macros.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\ico-0.5.0\src\bmpdepth.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\ico-0.5.0\src\icondir.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\ico-0.5.0\src\image.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\ico-0.5.0\src\restype.rs
+
+E:\soloJ\j95\src-tauri\target\release\deps\libico-5ba6a3846dd58535.rmeta: C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\ico-0.5.0\src\lib.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\ico-0.5.0\src\macros.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\ico-0.5.0\src\bmpdepth.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\ico-0.5.0\src\icondir.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\ico-0.5.0\src\image.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\ico-0.5.0\src\restype.rs
+
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\ico-0.5.0\src\lib.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\ico-0.5.0\src\macros.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\ico-0.5.0\src\bmpdepth.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\ico-0.5.0\src\icondir.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\ico-0.5.0\src\image.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\ico-0.5.0\src\restype.rs:

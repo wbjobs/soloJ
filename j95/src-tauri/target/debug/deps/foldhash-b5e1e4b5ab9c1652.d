@@ -1,0 +1,11 @@
+E:\soloJ\j95\src-tauri\target\debug\deps\foldhash-b5e1e4b5ab9c1652.d: C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\foldhash-0.2.0\src\lib.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\foldhash-0.2.0\src\fast.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\foldhash-0.2.0\src\quality.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\foldhash-0.2.0\src\seed.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\foldhash-0.2.0\src\convenience.rs
+
+E:\soloJ\j95\src-tauri\target\debug\deps\libfoldhash-b5e1e4b5ab9c1652.rlib: C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\foldhash-0.2.0\src\lib.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\foldhash-0.2.0\src\fast.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\foldhash-0.2.0\src\quality.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\foldhash-0.2.0\src\seed.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\foldhash-0.2.0\src\convenience.rs
+
+E:\soloJ\j95\src-tauri\target\debug\deps\libfoldhash-b5e1e4b5ab9c1652.rmeta: C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\foldhash-0.2.0\src\lib.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\foldhash-0.2.0\src\fast.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\foldhash-0.2.0\src\quality.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\foldhash-0.2.0\src\seed.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\foldhash-0.2.0\src\convenience.rs
+
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\foldhash-0.2.0\src\lib.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\foldhash-0.2.0\src\fast.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\foldhash-0.2.0\src\quality.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\foldhash-0.2.0\src\seed.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\foldhash-0.2.0\src\convenience.rs:

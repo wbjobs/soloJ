@@ -1,0 +1,10 @@
+E:\soloJ\j95\src-tauri\target\release\deps\windows_threading-8731eec8df86a44d.d: C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\windows-threading-0.1.0\src\lib.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\windows-threading-0.1.0\src\bindings.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\windows-threading-0.1.0\src\pool.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\windows-threading-0.1.0\src\../readme.md
+
+E:\soloJ\j95\src-tauri\target\release\deps\libwindows_threading-8731eec8df86a44d.rlib: C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\windows-threading-0.1.0\src\lib.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\windows-threading-0.1.0\src\bindings.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\windows-threading-0.1.0\src\pool.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\windows-threading-0.1.0\src\../readme.md
+
+E:\soloJ\j95\src-tauri\target\release\deps\libwindows_threading-8731eec8df86a44d.rmeta: C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\windows-threading-0.1.0\src\lib.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\windows-threading-0.1.0\src\bindings.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\windows-threading-0.1.0\src\pool.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\windows-threading-0.1.0\src\../readme.md
+
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\windows-threading-0.1.0\src\lib.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\windows-threading-0.1.0\src\bindings.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\windows-threading-0.1.0\src\pool.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\windows-threading-0.1.0\src\../readme.md:

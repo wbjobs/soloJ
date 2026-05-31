@@ -1,0 +1,17 @@
+E:\soloJ\j95\src-tauri\target\debug\deps\unic_ucd_ident-d4b28529d84e341b.d: C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unic-ucd-ident-0.9.0\src\lib.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unic-ucd-ident-0.9.0\src\pkg_info.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unic-ucd-ident-0.9.0\src\xid.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unic-ucd-ident-0.9.0\src\id.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unic-ucd-ident-0.9.0\src\../tables/xid_start.rsv C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unic-ucd-ident-0.9.0\src\../tables/xid_continue.rsv C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unic-ucd-ident-0.9.0\src\../tables/id_start.rsv C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unic-ucd-ident-0.9.0\src\../tables/id_continue.rsv C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unic-ucd-ident-0.9.0\src\../tables/unicode_version.rsv
+
+E:\soloJ\j95\src-tauri\target\debug\deps\libunic_ucd_ident-d4b28529d84e341b.rmeta: C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unic-ucd-ident-0.9.0\src\lib.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unic-ucd-ident-0.9.0\src\pkg_info.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unic-ucd-ident-0.9.0\src\xid.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unic-ucd-ident-0.9.0\src\id.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unic-ucd-ident-0.9.0\src\../tables/xid_start.rsv C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unic-ucd-ident-0.9.0\src\../tables/xid_continue.rsv C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unic-ucd-ident-0.9.0\src\../tables/id_start.rsv C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unic-ucd-ident-0.9.0\src\../tables/id_continue.rsv C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unic-ucd-ident-0.9.0\src\../tables/unicode_version.rsv
+
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unic-ucd-ident-0.9.0\src\lib.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unic-ucd-ident-0.9.0\src\pkg_info.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unic-ucd-ident-0.9.0\src\xid.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unic-ucd-ident-0.9.0\src\id.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unic-ucd-ident-0.9.0\src\../tables/xid_start.rsv:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unic-ucd-ident-0.9.0\src\../tables/xid_continue.rsv:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unic-ucd-ident-0.9.0\src\../tables/id_start.rsv:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unic-ucd-ident-0.9.0\src\../tables/id_continue.rsv:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\unic-ucd-ident-0.9.0\src\../tables/unicode_version.rsv:
+
+# env-dep:CARGO_PKG_DESCRIPTION=UNIC — Unicode Character Database — Identifier Properties
+# env-dep:CARGO_PKG_NAME=unic-ucd-ident
+# env-dep:CARGO_PKG_VERSION=0.9.0

@@ -1,0 +1,1 @@
+{"rustc":6313536168557467772,"features":"","declared_features":"","target":0,"profile":0,"path":0,"deps":[[17197543669922348608,"build_script_build",false,1756170511643875433]],"local":[{"Precalculated":"0.2.4"}],"rustflags":["-C","link-arg=-LC:\\msys64\\mingw64\\lib"],"config":0,"compile_kind":0}

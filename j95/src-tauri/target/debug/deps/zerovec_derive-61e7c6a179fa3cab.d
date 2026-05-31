@@ -1,0 +1,10 @@
+E:\soloJ\j95\src-tauri\target\debug\deps\zerovec_derive-61e7c6a179fa3cab.d: C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\zerovec-derive-0.11.3\src\lib.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\zerovec-derive-0.11.3\src\make_ule.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\zerovec-derive-0.11.3\src\make_varule.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\zerovec-derive-0.11.3\src\ule.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\zerovec-derive-0.11.3\src\utils.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\zerovec-derive-0.11.3\src\varule.rs
+
+E:\soloJ\j95\src-tauri\target\debug\deps\zerovec_derive-61e7c6a179fa3cab.dll: C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\zerovec-derive-0.11.3\src\lib.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\zerovec-derive-0.11.3\src\make_ule.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\zerovec-derive-0.11.3\src\make_varule.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\zerovec-derive-0.11.3\src\ule.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\zerovec-derive-0.11.3\src\utils.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\zerovec-derive-0.11.3\src\varule.rs
+
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\zerovec-derive-0.11.3\src\lib.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\zerovec-derive-0.11.3\src\make_ule.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\zerovec-derive-0.11.3\src\make_varule.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\zerovec-derive-0.11.3\src\ule.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\zerovec-derive-0.11.3\src\utils.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\zerovec-derive-0.11.3\src\varule.rs:
