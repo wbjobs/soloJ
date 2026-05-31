@@ -1,0 +1,52 @@
+{
+    "name": "HTTP",
+    "protocol_type": "http",
+    "initial_state": "initial",
+    "fields": [
+        {
+            "name": "method",
+            "field_type": "string",
+            "default": "GET"
+        },
+        {
+            "name": "path",
+            "field_type": "string",
+            "default": "/"
+        },
+        {
+            "name": "host",
+            "field_type": "string",
+            "default": "localhost"
+        },
+        {
+            "name": "headers",
+            "field_type": "bytes"
+        },
+        {
+            "name": "body",
+            "field_type": "bytes"
+        }
+    ],
+    "states": [
+        {
+            "name": "initial",
+            "transitions": ["request_sent", "error"]
+        },
+        {
+            "name": "request_sent",
+            "transitions": ["response_received", "error"]
+        },
+        {
+            "name": "response_received",
+            "transitions": ["initial", "done"]
+        },
+        {
+            "name": "error",
+            "transitions": ["initial"]
+        },
+        {
+            "name": "done",
+            "transitions": []
+        }
+    ]
+}

@@ -1,0 +1,61 @@
+GET
+POST
+PUT
+DELETE
+HEAD
+OPTIONS
+PATCH
+HTTP/1.0
+HTTP/1.1
+HTTP/2.0
+Host:
+User-Agent:
+Accept:
+Accept-Language:
+Accept-Encoding:
+Content-Type:
+Content-Length:
+Connection:
+Set-Cookie:
+Cookie:
+Authorization:
+Referer:
+Cache-Control:
+Pragma:
+Location:
+Server:
+Date:
+Expires:
+Last-Modified:
+ETag:
+Accept-Ranges:
+Content-Range:
+X-Forwarded-For:
+X-Real-IP:
+localhost
+/admin
+/login
+/api
+/v1
+/v2
+/../../etc/passwd
+<script>alert(1)</script>
+../../../../
+%00
+..%2f
+%2e%2e%2f
+../../../../etc/passwd
+OR 1=1
+' OR '1'='1
+UNION SELECT
+' UNION SELECT
+DROP TABLE
+../../windows/system32
+.php
+.asp
+.aspx
+.jsp
+.js
+.json
+.xml
+.sql
