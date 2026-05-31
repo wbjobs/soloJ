@@ -1,0 +1,12 @@
+django>=4.2
+djangorestframework>=3.14
+djangorestframework-simplejwt>=5.3
+django-cors-headers>=4.3
+celery>=5.3
+redis>=5.0
+pymongo>=4.6
+psycopg2-binary>=2.9
+pysam>=0.22
+requests>=2.31
+gunicorn>=21.2
+openpyxl>=3.1
