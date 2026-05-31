@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: mds-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+      MONGO_INITDB_DATABASE: mds_db
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - mds-network
+
+  redis:
+    image: redis:7.0-alpine
+    container_name: mds-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass redis123
+    volumes:
+      - redis_data:/data
+    networks:
+      - mds-network
+
+  backend:
+    build: ./backend
+    container_name: mds-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGODB_URL=mongodb://admin:admin123@mongodb:27017/mds_db
+      - REDIS_URL=redis://:redis123@redis:6379/0
+    depends_on:
+      - mongodb
+      - redis
+    volumes:
+      - ./backend:/app
+    networks:
+      - mds-network
+
+  frontend:
+    build: ./frontend
+    container_name: mds-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+    networks:
+      - mds-network
+
+volumes:
+  mongodb_data:
+  redis_data:
+
+networks:
+  mds-network:
+    driver: bridge
