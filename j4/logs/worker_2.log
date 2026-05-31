@@ -1,0 +1,44 @@
+2026-05-26 06:58:04 - worker_2 - INFO - Worker 2 starting...
+2026-05-26 06:58:04 - worker_2 - INFO - Worker 2 connected to tcp://localhost:5555
+2026-05-26 06:59:38 - worker_2 - INFO - Worker 2 starting...
+2026-05-26 06:59:38 - worker_2 - INFO - Worker 2 connected to tcp://127.0.0.1:5555
+2026-05-26 07:00:58 - worker_2 - INFO - Worker 2 starting...
+2026-05-26 07:00:58 - worker_2 - INFO - Worker 2 PULL connected to tcp://localhost:5555
+2026-05-26 07:00:58 - worker_2 - INFO - Worker 2 PUSH connected to tcp://localhost:5556
+2026-05-26 07:01:09 - worker_2 - INFO - Worker 2 received chunk 2 with 1237 pairs
+2026-05-26 07:01:09 - worker_2 - INFO - Worker 2 completed chunk 2 in 0.001s, potential: 13606.174352
+2026-05-26 07:04:26 - worker_2 - INFO - Worker 2 starting...
+2026-05-26 07:04:26 - worker_2 - INFO - Worker 2 connected to tcp://localhost:5555
+2026-05-26 07:04:26 - worker_2 - INFO - Worker 2 sent register message
+2026-05-26 07:04:41 - worker_2 - INFO - Worker 2 interrupted
+2026-05-26 07:04:41 - worker_2 - INFO - Worker 2 stopped
+2026-05-26 07:20:36 - worker_2 - INFO - Worker 2 starting with speed factor: 0.5
+2026-05-26 07:20:36 - worker_2 - INFO - Worker 2 connected to tcp://localhost:5555
+2026-05-26 07:20:36 - worker_2 - INFO - Worker 2 sent register message
+2026-05-26 07:22:37 - worker_2 - INFO - Worker 2 received chunk 2 with 1237 pairs
+2026-05-26 07:22:37 - worker_2 - INFO - Worker 2 completed chunk 2 in 0.005s, potential: -12.759289
+2026-05-26 07:29:11 - worker_2 - INFO - Worker 2 starting with speed factor: 0.5
+2026-05-26 07:29:11 - worker_2 - INFO - Worker 2 connected to tcp://localhost:5555
+2026-05-26 07:29:11 - worker_2 - INFO - Worker 2 sent register message
+2026-05-26 07:32:44 - worker_2 - INFO - Worker 2 starting with speed factor: 0.5
+2026-05-26 07:32:44 - worker_2 - INFO - Worker 2 connected to tcp://localhost:5555
+2026-05-26 07:32:44 - worker_2 - INFO - Worker 2 sent register message
+2026-05-26 07:34:26 - worker_2 - INFO - Worker 2 interrupted
+2026-05-26 07:34:26 - worker_2 - INFO - Worker 2 stopped
+2026-05-26 07:34:27 - worker_2 - INFO - Worker 2 starting with speed factor: 0.5
+2026-05-26 07:34:27 - worker_2 - INFO - Worker 2 connected to tcp://localhost:5555
+2026-05-26 07:34:27 - worker_2 - INFO - Worker 2 sent register message
+2026-05-26 07:34:47 - worker_2 - INFO - Worker 2 interrupted
+2026-05-26 07:34:47 - worker_2 - INFO - Worker 2 stopped
+2026-05-26 07:37:04 - worker_2 - INFO - Worker 2 starting with speed factor: 0.5
+2026-05-26 07:37:04 - worker_2 - INFO - Worker 2 connected to tcp://localhost:5555
+2026-05-26 07:37:04 - worker_2 - INFO - Worker 2 sent register message
+2026-05-26 08:09:53 - worker_2 - INFO - Worker 2 starting with speed factor: 0.5
+2026-05-26 08:09:53 - worker_2 - INFO - Worker 2 connected to tcp://localhost:5555
+2026-05-26 08:09:53 - worker_2 - INFO - Worker 2 sent register message
+2026-05-26 08:11:53 - worker_2 - INFO - Worker 2 starting with speed factor: 0.5
+2026-05-26 08:11:53 - worker_2 - INFO - Worker 2 connected to tcp://localhost:5555
+2026-05-26 08:11:53 - worker_2 - INFO - Worker 2 sent register message
+2026-05-26 08:14:52 - worker_2 - INFO - Worker 2 starting with speed factor: 0.5
+2026-05-26 08:14:52 - worker_2 - INFO - Worker 2 connected to tcp://localhost:5555
+2026-05-26 08:14:52 - worker_2 - INFO - Worker 2 sent register message

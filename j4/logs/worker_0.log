@@ -1,0 +1,78 @@
+2026-05-26 06:57:47 - worker_0 - INFO - Worker 0 starting...
+2026-05-26 06:57:47 - worker_0 - INFO - Worker 0 connected to tcp://localhost:5555
+2026-05-26 06:59:35 - worker_0 - INFO - Worker 0 starting...
+2026-05-26 06:59:35 - worker_0 - INFO - Worker 0 connected to tcp://127.0.0.1:5555
+2026-05-26 07:00:55 - worker_0 - INFO - Worker 0 starting...
+2026-05-26 07:00:55 - worker_0 - INFO - Worker 0 PULL connected to tcp://localhost:5555
+2026-05-26 07:00:55 - worker_0 - INFO - Worker 0 PUSH connected to tcp://localhost:5556
+2026-05-26 07:01:09 - worker_0 - INFO - Worker 0 received chunk 0 with 1237 pairs
+2026-05-26 07:01:09 - worker_0 - INFO - Worker 0 completed chunk 0 in 0.000s, potential: 1654092695.393194
+2026-05-26 07:01:09 - worker_0 - INFO - Worker 0 received chunk 3 with 1239 pairs
+2026-05-26 07:01:09 - worker_0 - INFO - Worker 0 completed chunk 3 in 0.000s, potential: 747001.311311
+2026-05-26 07:04:22 - worker_0 - INFO - Worker 0 starting...
+2026-05-26 07:04:22 - worker_0 - INFO - Worker 0 connected to tcp://localhost:5555
+2026-05-26 07:04:22 - worker_0 - INFO - Worker 0 sent register message
+2026-05-26 07:04:44 - worker_0 - INFO - Worker 0 received chunk 0 with 1237 pairs
+2026-05-26 07:04:44 - worker_0 - INFO - Worker 0 completed chunk 0 in 0.001s, potential: 16.574114
+2026-05-26 07:04:47 - worker_0 - INFO - Worker 0 received chunk 2 with 1237 pairs
+2026-05-26 07:04:47 - worker_0 - INFO - Worker 0 completed chunk 2 in 0.001s, potential: 3377.152223
+2026-05-26 07:05:38 - worker_0 - INFO - Worker 0 received chunk 0 with 1237 pairs
+2026-05-26 07:05:38 - worker_0 - INFO - Worker 0 completed chunk 0 in 0.001s, potential: 3077462.653788
+2026-05-26 07:05:38 - worker_0 - INFO - Worker 0 received chunk 3 with 1239 pairs
+2026-05-26 07:05:38 - worker_0 - INFO - Worker 0 completed chunk 3 in 0.000s, potential: 1920.291946
+2026-05-26 07:05:40 - worker_0 - INFO - Worker 0 received chunk 0 with 1237 pairs
+2026-05-26 07:05:40 - worker_0 - INFO - Worker 0 completed chunk 0 in 0.001s, potential: 3527465.978854
+2026-05-26 07:05:40 - worker_0 - INFO - Worker 0 received chunk 3 with 1239 pairs
+2026-05-26 07:05:40 - worker_0 - INFO - Worker 0 completed chunk 3 in 0.002s, potential: 3654998.143572
+2026-05-26 07:05:42 - worker_0 - INFO - Worker 0 received chunk 0 with 1237 pairs
+2026-05-26 07:05:42 - worker_0 - INFO - Worker 0 completed chunk 0 in 0.000s, potential: 9148761.449524
+2026-05-26 07:05:42 - worker_0 - INFO - Worker 0 received chunk 3 with 1239 pairs
+2026-05-26 07:05:42 - worker_0 - INFO - Worker 0 completed chunk 3 in 0.001s, potential: 1366.303554
+2026-05-26 07:05:44 - worker_0 - INFO - Worker 0 received chunk 0 with 1237 pairs
+2026-05-26 07:05:44 - worker_0 - INFO - Worker 0 completed chunk 0 in 0.001s, potential: 1899273173652.334473
+2026-05-26 07:05:44 - worker_0 - INFO - Worker 0 received chunk 3 with 1239 pairs
+2026-05-26 07:05:44 - worker_0 - INFO - Worker 0 completed chunk 3 in 0.002s, potential: 9374.031916
+2026-05-26 07:05:46 - worker_0 - INFO - Worker 0 received chunk 0 with 1237 pairs
+2026-05-26 07:05:46 - worker_0 - INFO - Worker 0 completed chunk 0 in 0.003s, potential: 787.735820
+2026-05-26 07:05:46 - worker_0 - INFO - Worker 0 received chunk 3 with 1239 pairs
+2026-05-26 07:05:46 - worker_0 - INFO - Worker 0 completed chunk 3 in 0.001s, potential: 4123.201246
+2026-05-26 07:20:32 - worker_0 - INFO - Worker 0 starting...
+2026-05-26 07:20:32 - worker_0 - INFO - Worker 0 connected to tcp://localhost:5555
+2026-05-26 07:20:32 - worker_0 - INFO - Worker 0 sent register message
+2026-05-26 07:22:32 - worker_0 - INFO - Worker 0 interrupted
+2026-05-26 07:22:32 - worker_0 - INFO - Worker 0 stopped
+2026-05-26 07:29:07 - worker_0 - INFO - Worker 0 starting...
+2026-05-26 07:29:07 - worker_0 - INFO - Worker 0 connected to tcp://localhost:5555
+2026-05-26 07:29:07 - worker_0 - INFO - Worker 0 sent register message
+2026-05-26 07:32:41 - worker_0 - INFO - Worker 0 starting...
+2026-05-26 07:32:41 - worker_0 - INFO - Worker 0 connected to tcp://localhost:5555
+2026-05-26 07:32:41 - worker_0 - INFO - Worker 0 sent register message
+2026-05-26 07:34:24 - worker_0 - INFO - Worker 0 interrupted
+2026-05-26 07:34:24 - worker_0 - INFO - Worker 0 stopped
+2026-05-26 07:34:24 - worker_0 - INFO - Worker 0 starting...
+2026-05-26 07:34:24 - worker_0 - INFO - Worker 0 connected to tcp://localhost:5555
+2026-05-26 07:34:24 - worker_0 - INFO - Worker 0 sent register message
+2026-05-26 07:37:01 - worker_0 - INFO - Worker 0 starting...
+2026-05-26 07:37:01 - worker_0 - INFO - Worker 0 connected to tcp://localhost:5555
+2026-05-26 07:37:01 - worker_0 - INFO - Worker 0 sent register message
+2026-05-26 07:38:20 - worker_0 - INFO - Worker 0 starting...
+2026-05-26 07:38:20 - worker_0 - INFO - Worker 0 connected to tcp://localhost:5555
+2026-05-26 07:38:20 - worker_0 - INFO - Worker 0 sent register message
+2026-05-26 08:09:49 - worker_0 - INFO - Worker 0 starting...
+2026-05-26 08:09:49 - worker_0 - INFO - Worker 0 connected to tcp://localhost:5555
+2026-05-26 08:09:49 - worker_0 - INFO - Worker 0 sent register message
+2026-05-26 08:11:49 - worker_0 - INFO - Worker 0 starting...
+2026-05-26 08:11:49 - worker_0 - INFO - Worker 0 connected to tcp://localhost:5555
+2026-05-26 08:11:49 - worker_0 - INFO - Worker 0 sent register message
+2026-05-26 08:14:49 - worker_0 - INFO - Worker 0 starting...
+2026-05-26 08:14:49 - worker_0 - INFO - Worker 0 connected to tcp://localhost:5555
+2026-05-26 08:14:49 - worker_0 - INFO - Worker 0 sent register message
+2026-05-26 08:20:42 - worker_0 - INFO - Worker 0 starting...
+2026-05-26 08:20:42 - worker_0 - INFO - Worker 0 connected to tcp://localhost:5555
+2026-05-26 08:20:42 - worker_0 - INFO - Worker 0 sent register message
+2026-05-26 08:24:06 - worker_0 - INFO - Worker 0 received chunk 0 with 2475 pairs
+2026-05-26 08:24:06 - worker_0 - INFO - Worker 0 completed chunk 0 in 0.003s, potential: 755834054.665737
+2026-05-26 08:24:21 - worker_0 - INFO - Worker 0 received chunk 0 with 4850 pairs
+2026-05-26 08:24:21 - worker_0 - INFO - Worker 0 completed chunk 0 in 0.020s, potential: 755860807.049700
+2026-05-26 08:24:35 - worker_0 - INFO - Worker 0 received chunk 0 with 4850 pairs
+2026-05-26 08:24:35 - worker_0 - INFO - Worker 0 completed chunk 0 in 0.019s, potential: 755860807.049700

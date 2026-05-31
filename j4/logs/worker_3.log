@@ -1,0 +1,56 @@
+2026-05-26 06:57:50 - worker_3 - INFO - Worker 3 starting...
+2026-05-26 06:57:50 - worker_3 - INFO - Worker 3 connected to tcp://localhost:5555
+2026-05-26 06:58:04 - worker_3 - INFO - Worker 3 interrupted
+2026-05-26 06:58:04 - worker_3 - INFO - Worker 3 stopped
+2026-05-26 06:59:39 - worker_3 - INFO - Worker 3 starting...
+2026-05-26 06:59:39 - worker_3 - INFO - Worker 3 connected to tcp://127.0.0.1:5555
+2026-05-26 06:59:53 - worker_3 - INFO - Worker 3 interrupted
+2026-05-26 06:59:53 - worker_3 - INFO - Worker 3 stopped
+2026-05-26 07:00:59 - worker_3 - INFO - Worker 3 starting...
+2026-05-26 07:00:59 - worker_3 - INFO - Worker 3 PULL connected to tcp://localhost:5555
+2026-05-26 07:00:59 - worker_3 - INFO - Worker 3 PUSH connected to tcp://localhost:5556
+2026-05-26 07:01:07 - worker_3 - INFO - Worker 3 interrupted
+2026-05-26 07:01:07 - worker_3 - INFO - Worker 3 stopped
+2026-05-26 07:04:27 - worker_3 - INFO - Worker 3 starting...
+2026-05-26 07:04:27 - worker_3 - INFO - Worker 3 connected to tcp://localhost:5555
+2026-05-26 07:04:27 - worker_3 - INFO - Worker 3 sent register message
+2026-05-26 07:04:44 - worker_3 - INFO - Worker 3 received chunk 3 with 1239 pairs
+2026-05-26 07:04:44 - worker_3 - INFO - Worker 3 completed chunk 3 in 0.003s, potential: 34709203.169501
+2026-05-26 07:05:38 - worker_3 - INFO - Worker 3 received chunk 1 with 1237 pairs
+2026-05-26 07:05:38 - worker_3 - INFO - Worker 3 completed chunk 1 in 0.001s, potential: 304.599680
+2026-05-26 07:05:40 - worker_3 - INFO - Worker 3 received chunk 1 with 1237 pairs
+2026-05-26 07:05:40 - worker_3 - INFO - Worker 3 completed chunk 1 in 0.002s, potential: 20093455.525833
+2026-05-26 07:05:42 - worker_3 - INFO - Worker 3 received chunk 2 with 1237 pairs
+2026-05-26 07:05:42 - worker_3 - INFO - Worker 3 completed chunk 2 in 0.001s, potential: 80808.108379
+2026-05-26 07:05:44 - worker_3 - INFO - Worker 3 received chunk 1 with 1237 pairs
+2026-05-26 07:05:44 - worker_3 - INFO - Worker 3 completed chunk 1 in 0.002s, potential: 57.676186
+2026-05-26 07:05:46 - worker_3 - INFO - Worker 3 received chunk 1 with 1237 pairs
+2026-05-26 07:05:46 - worker_3 - INFO - Worker 3 completed chunk 1 in 0.002s, potential: 5324.500624
+2026-05-26 07:20:37 - worker_3 - INFO - Worker 3 starting with speed factor: 0.3
+2026-05-26 07:20:37 - worker_3 - INFO - Worker 3 connected to tcp://localhost:5555
+2026-05-26 07:20:37 - worker_3 - INFO - Worker 3 sent register message
+2026-05-26 07:22:37 - worker_3 - INFO - Worker 3 received chunk 1 with 1237 pairs
+2026-05-26 07:22:37 - worker_3 - INFO - Worker 3 completed chunk 1 in 0.006s, potential: 755832909.160084
+2026-05-26 07:29:12 - worker_3 - INFO - Worker 3 starting with speed factor: 0.3
+2026-05-26 07:29:12 - worker_3 - INFO - Worker 3 connected to tcp://localhost:5555
+2026-05-26 07:29:12 - worker_3 - INFO - Worker 3 sent register message
+2026-05-26 07:32:45 - worker_3 - INFO - Worker 3 starting with speed factor: 0.3
+2026-05-26 07:32:45 - worker_3 - INFO - Worker 3 connected to tcp://localhost:5555
+2026-05-26 07:32:45 - worker_3 - INFO - Worker 3 sent register message
+2026-05-26 07:34:27 - worker_3 - INFO - Worker 3 interrupted
+2026-05-26 07:34:27 - worker_3 - INFO - Worker 3 stopped
+2026-05-26 07:34:28 - worker_3 - INFO - Worker 3 starting with speed factor: 0.3
+2026-05-26 07:34:28 - worker_3 - INFO - Worker 3 connected to tcp://localhost:5555
+2026-05-26 07:34:28 - worker_3 - INFO - Worker 3 sent register message
+2026-05-26 07:37:05 - worker_3 - INFO - Worker 3 starting with speed factor: 0.3
+2026-05-26 07:37:05 - worker_3 - INFO - Worker 3 connected to tcp://localhost:5555
+2026-05-26 07:37:05 - worker_3 - INFO - Worker 3 sent register message
+2026-05-26 08:11:15 - worker_3 - INFO - Worker 3 starting with speed factor: 0.3
+2026-05-26 08:11:15 - worker_3 - INFO - Worker 3 connected to tcp://localhost:5555
+2026-05-26 08:11:15 - worker_3 - INFO - Worker 3 sent register message
+2026-05-26 08:11:53 - worker_3 - INFO - Worker 3 starting with speed factor: 0.3
+2026-05-26 08:11:53 - worker_3 - INFO - Worker 3 connected to tcp://localhost:5555
+2026-05-26 08:11:53 - worker_3 - INFO - Worker 3 sent register message
+2026-05-26 08:14:54 - worker_3 - INFO - Worker 3 starting with speed factor: 0.3
+2026-05-26 08:14:54 - worker_3 - INFO - Worker 3 connected to tcp://localhost:5555
+2026-05-26 08:14:54 - worker_3 - INFO - Worker 3 sent register message
