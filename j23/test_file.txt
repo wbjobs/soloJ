@@ -1,0 +1,35 @@
+This is a test file for UDP reliable transport protocol testing. It contains some sample data to transfer over the network with simulated packet loss, delay, and jitter conditions. The file is used to verify the reliability features including:
+- Three-way handshake connection establishment
+- Adaptive RTO calculation
+- Sliding window flow control
+- CUBIC congestion control
+- Packet retransmission
+
+Let's add more content to make the file larger and test with different sizes to see how the protocol handles various network conditions.
+
+0123456789
+abcdefghijklmnopqrstuvwxyz
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
+
+Repeating content to make the file bigger.
+Repeating content to make the file bigger.
+Repeating content to make the file bigger.
+Repeating content to make the file bigger.
+Repeating content to make the file bigger.
+Repeating content to make the file bigger.
+Repeating content to make the file bigger.
+Repeating content to make the file bigger.
+Repeating content to make the file bigger.
+Repeating content to make the file bigger.
+Repeating content to make the file bigger.
+Repeating content to make the file bigger.
+Repeating content to make the file bigger.
+Repeating content to make the file bigger.
+Repeating content to make the file bigger.
+Repeating content to make the file bigger.
+Repeating content to make the file bigger.
+Repeating content to make the file bigger.
+Repeating content to make the file bigger.
+Repeating content to make the file bigger.
+
+End of test file.

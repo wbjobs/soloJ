@@ -1,0 +1,42 @@
+[network]
+loss_rate = 0.05
+base_delay_ms = 50
+jitter_ms = 20
+
+[protocol]
+mss = 1400
+initial_window = 10
+max_window = 1000
+initial_rto_ms = 1000
+min_rto_ms = 500
+max_rto_ms = 60000
+handshake_timeout_ms = 3000
+max_retries = 15
+
+[multipath]
+enabled = false
+scheduler = "rtt_weighted"
+
+[[multipath.paths]]
+name = "WiFi"
+bind_addr = "0.0.0.0:8081"
+remote_addr = "127.0.0.1:8081"
+loss_rate = 0.08
+base_delay_ms = 80
+jitter_ms = 30
+
+[[multipath.paths]]
+name = "Ethernet"
+bind_addr = "0.0.0.0:8082"
+remote_addr = "127.0.0.1:8082"
+loss_rate = 0.01
+base_delay_ms = 20
+jitter_ms = 5
+
+[[multipath.paths]]
+name = "4G"
+bind_addr = "0.0.0.0:8083"
+remote_addr = "127.0.0.1:8083"
+loss_rate = 0.15
+base_delay_ms = 150
+jitter_ms = 50
