@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>康威生命游戏 - 高并发模拟器</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <h1>🧬 康威生命游戏</h1>
+            <div class="stats">
+                <div class="stat">
+                    <span class="label">世代</span>
+                    <span id="generation" class="value">0</span>
+                </div>
+                <div class="stat">
+                    <span class="label">服务器 FPS</span>
+                    <span id="server-fps" class="value">0</span>
+                </div>
+                <div class="stat">
+                    <span class="label">渲染 FPS</span>
+                    <span id="render-fps" class="value">0</span>
+                </div>
+                <div class="stat">
+                    <span class="label">状态</span>
+                    <span id="status" class="value status-stopped">已停止</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="main">
+            <aside class="sidebar">
+                <div class="controls">
+                    <h2>控制</h2>
+                    <div class="control-group">
+                        <button id="btn-start" class="btn btn-primary">▶ 开始</button>
+                        <button id="btn-stop" class="btn btn-secondary">⏸ 停止</button>
+                        <button id="btn-step" class="btn btn-secondary">⏭ 单步</button>
+                    </div>
+                    <div class="control-group">
+                        <button id="btn-clear" class="btn btn-danger">🗑 清除</button>
+                        <button id="btn-random" class="btn btn-secondary">🎲 随机</button>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>
+                            <input type="checkbox" id="auto-fit" checked>
+                            自动适应窗口
+                        </label>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>缩放: <span id="zoom-value">1.0</span>x</label>
+                        <input type="range" id="zoom" min="0.1" max="3" step="0.1" value="1">
+                    </div>
+                </div>
+
+                <div class="patterns">
+                    <h2>预设图案</h2>
+                    <div class="control-group">
+                        <select id="pattern-select" class="pattern-select">
+                            <option value="">-- 选择图案 --</option>
+                        </select>
+                        <button id="btn-load-pattern" class="btn btn-primary pattern-load-btn">加载</button>
+                    </div>
+                    <div id="pattern-list" class="pattern-list"></div>
+                </div>
+
+                <div class="history-controls">
+                    <h2>历史回放</h2>
+                    <div class="control-group">
+                        <label>世代: <span id="history-current">0</span> / <span id="history-latest">0</span></label>
+                        <input type="range" id="history-slider" min="0" max="0" value="0" step="1">
+                    </div>
+                    <div class="control-group">
+                        <button id="btn-history-play" class="btn btn-secondary btn-sm">▶ 回放</button>
+                        <button id="btn-history-stop" class="btn btn-secondary btn-sm">⏹ 停止</button>
+                        <button id="btn-history-live" class="btn btn-secondary btn-sm">📡 实时</button>
+                    </div>
+                </div>
+
+                <div class="info">
+                    <h2>操作说明</h2>
+                    <ul>
+                        <li>🖱 左键点击：复活细胞</li>
+                        <li>🖱 右键点击：杀死细胞</li>
+                        <li>🖱 拖拽：平移视图</li>
+                        <li>🖱 滚轮：缩放视图</li>
+                    </ul>
+                </div>
+
+                <div class="legend">
+                    <h2>图例</h2>
+                    <div class="legend-item">
+                        <span class="legend-color alive"></span>
+                        <span>活细胞</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color dead"></span>
+                        <span>死细胞</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color grid"></span>
+                        <span>网格线</span>
+                    </div>
+                </div>
+            </aside>
+
+            <div class="canvas-container">
+                <canvas id="game-canvas"></canvas>
+                <div class="coordinates" id="coordinates">x: 0, y: 0</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "name": "game-of-life",
+  "version": "1.0.0",
+  "description": "高并发康威生命游戏模拟器",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js",
+    "benchmark": "node benchmark.js",
+    "test": "node benchmark.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "ws": "^8.21.0"
+  }
+}
