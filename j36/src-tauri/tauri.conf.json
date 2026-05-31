@@ -1,0 +1,111 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build",
+    "devPath": "http://localhost:1420",
+    "distDir": "../dist",
+    "withGlobalTauri": false
+  },
+  "package": {
+    "productName": "Ebook DRM Styler",
+    "version": "1.0.0"
+  },
+  "tauri": {
+    "allowlist": {
+      "all": false,
+      "shell": {
+        "all": false,
+        "open": true,
+        "execute": true,
+        "sidecar": true,
+        "scope": [
+          {
+            "name": "calibre",
+            "cmd": "ebook-convert",
+            "args": true,
+            "sidecar": false
+          }
+        ]
+      },
+      "dialog": {
+        "all": true,
+        "open": true,
+        "save": true
+      },
+      "fs": {
+        "all": true,
+        "readFile": true,
+        "writeFile": true,
+        "readDir": true,
+        "createDir": true,
+        "removeFile": true,
+        "removeDir": true,
+        "renameFile": true,
+        "scope": ["**"]
+      },
+      "window": {
+        "all": true
+      },
+      "notification": {
+        "all": true
+      }
+    },
+    "bundle": {
+      "active": true,
+      "category": "Productivity",
+      "shortDescription": "Ebook DRM Removal and Style Rearrangement Tool",
+      "longDescription": "A tool for removing DRM from ebooks and rearranging their styles for better reading experience. Supports PDF, EPUB, AZW3, and MOBI formats.",
+      "copyright": "© 2024 Ebook Styler Team. For legal backup purposes only.",
+      "minSystemVersion": "10.13",
+      "windows": {
+        "certificateThumbprint": null,
+        "digestAlgorithm": "sha256",
+        "timestampUrl": ""
+      },
+      "macOS": {
+        "entitlements": null,
+        "exceptionDomain": "",
+        "frameworks": [],
+        "providerShortName": null,
+        "signingIdentity": null
+      },
+      "linux": {
+        "deb": {
+          "depends": [
+            "libwebkit2gtk-4.0-37",
+            "libgtk-3-0",
+            "libayatana-appindicator3-1"
+          ]
+        }
+      },
+      "resources": ["resources/**/*"],
+      "targets": "all",
+      "icon": [
+        "icons/32x32.png",
+        "icons/128x128.png",
+        "icons/icon.icns",
+        "icons/icon.ico"
+      ]
+    },
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' data: asset: https://asset.localhost; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' data:;"
+    },
+    "updater": {
+      "active": false
+    },
+    "windows": [
+      {
+        "fullscreen": false,
+        "height": 900,
+        "resizable": true,
+        "title": "Ebook DRM Styler",
+        "width": 1400,
+        "minWidth": 1000,
+        "minHeight": 700,
+        "decorations": true,
+        "transparent": false
+      }
+    ]
+  }
+}

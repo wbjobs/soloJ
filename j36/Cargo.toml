@@ -1,0 +1,53 @@
+[package]
+name = "ebook-drm-styler"
+version = "1.0.0"
+description = "Ebook DRM Removal and Smart Style Rearrangement Tool"
+authors = ["Ebook Styler Team"]
+edition = "2021"
+
+[lib]
+name = "ebook_styler_core"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[dependencies]
+tauri = { version = "1.6", features = ["shell-open", "dialog-open", "dialog-save", "fs-all"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "1.0"
+tokio = { version = "1.0", features = ["full"] }
+anyhow = "1.0"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+pdf-extract = { version = "0.7", optional = true }
+epub = "1.2"
+mobi = "0.3"
+
+rusqlite = { version = "0.31", features = ["bundled", "fts5", "chrono"] }
+jieba-rs = { version = "0.6", features = ["default"] }
+
+walkdir = "2.4"
+zip = { version = "0.6", default-features = false, features = ["deflate", "write"] }
+xml-rs = "0.8"
+regex = "1.10"
+lazy_static = "1.4"
+uuid = { version = "1.6", features = ["v4", "serde"] }
+which = "6.0"
+dirs-next = "2.0"
+filetime = "0.2"
+tokio = { version = "1.0", features = ["full"] }
+
+[build-dependencies]
+cc = "1.0"
+pkg-config = "0.3"
+
+[features]
+default = ["pdf-parsing"]
+pdf-parsing = ["pdf-extract"]
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
