@@ -1,0 +1,116 @@
+syntax = "proto3";
+
+package renderfarm;
+
+service MasterService {
+  rpc RegisterWorker(RegisterWorkerRequest) returns (RegisterWorkerResponse);
+  rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse);
+  rpc RequestTask(RequestTaskRequest) returns (RequestTaskResponse);
+  rpc SubmitTaskResult(SubmitTaskResultRequest) returns (SubmitTaskResultResponse);
+}
+
+message Vec3 {
+  double x = 1;
+  double y = 2;
+  double z = 3;
+}
+
+message Sphere {
+  Vec3 center = 1;
+  double radius = 2;
+  Vec3 color = 3;
+  double reflection = 4;
+}
+
+message Cube {
+  Vec3 min = 1;
+  Vec3 max = 2;
+  Vec3 color = 3;
+  double reflection = 4;
+}
+
+message Light {
+  Vec3 position = 1;
+  Vec3 color = 2;
+  double intensity = 3;
+}
+
+message Camera {
+  Vec3 position = 1;
+  Vec3 look_at = 2;
+  double fov = 3;
+}
+
+message Scene {
+  repeated Sphere spheres = 1;
+  repeated Cube cubes = 2;
+  repeated Light lights = 3;
+  Camera camera = 4;
+  int32 width = 5;
+  int32 height = 6;
+  int32 samples_per_pixel = 7;
+}
+
+message TaskBlock {
+  string task_id = 1;
+  int32 block_id = 2;
+  int32 start_x = 3;
+  int32 start_y = 4;
+  int32 end_x = 5;
+  int32 end_y = 6;
+  Scene scene = 7;
+}
+
+message PixelData {
+  int32 x = 1;
+  int32 y = 2;
+  int32 r = 3;
+  int32 g = 4;
+  int32 b = 5;
+  int32 samples = 6;
+}
+
+message RegisterWorkerRequest {
+  string worker_id = 1;
+  string address = 2;
+  int32 cores = 3;
+}
+
+message RegisterWorkerResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message HeartbeatRequest {
+  string worker_id = 1;
+  int32 current_load = 2;
+  string current_task_id = 3;
+}
+
+message HeartbeatResponse {
+  bool alive = 1;
+}
+
+message RequestTaskRequest {
+  string worker_id = 1;
+}
+
+message RequestTaskResponse {
+  bool has_task = 1;
+  TaskBlock task = 2;
+  string message = 3;
+}
+
+message SubmitTaskResultRequest {
+  string task_id = 1;
+  int32 block_id = 2;
+  string worker_id = 3;
+  repeated PixelData pixels = 4;
+  double render_time_ms = 5;
+  int32 total_samples = 6;
+}
+
+message SubmitTaskResultResponse {
+  bool success = 1;
+  string message = 2;
+}
