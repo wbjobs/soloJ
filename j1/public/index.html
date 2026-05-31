@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>同步乐谱 - Sync Score</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; padding: 20px; background: #f5f5f5; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .controls { display: flex; gap: 12px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+    .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; }
+    .btn-primary { background: #2563eb; color: white; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-success { background: #059669; color: white; }
+    .btn-success:hover { background: #047857; }
+    .btn-danger { background: #dc2626; color: white; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .input { padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
+    .room-info { padding: 12px 16px; background: white; border-radius: 6px; border: 1px solid #e5e7eb; }
+    .score-container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; overflow-x: auto; }
+    .note { cursor: pointer; transition: all 0.15s ease; }
+    .note:hover { filter: brightness(1.1); }
+    .note.highlighted { fill: #fbbf24 !important; }
+    .annotation-controls { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; }
+    .color-picker { width: 40px; height: 36px; border: none; border-radius: 6px; cursor: pointer; }
+    .status { padding: 8px 16px; border-radius: 6px; font-size: 13px; }
+    .status.connected { background: #dcfce7; color: #166534; }
+    .status.disconnected { background: #fee2e2; color: #991b1b; }
+    .members { display: flex; gap: 8px; align-items: center; }
+    .member-badge { padding: 4px 10px; background: #e0e7ff; color: #3730a3; border-radius: 12px; font-size: 12px; }
+    .beat-indicator { width: 24px; height: 24px; border-radius: 50%; background: #e5e7eb; transition: background 0.05s; }
+    .beat-indicator.active { background: #ef4444; }
+    .validation-result {
+      margin-left: auto;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      display: none;
+      max-width: 400px;
+    }
+    .validation-result.error {
+      background: #fee2e2;
+      color: #991b1b;
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    .validation-result.success {
+      background: #dcfce7;
+      color: #166534;
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .note.error-mark .note-head {
+      stroke: #ef4444;
+      stroke-width: 3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="controls">
+      <button id="createRoomBtn" class="btn btn-primary">创建房间</button>
+      <input id="roomIdInput" class="input" type="text" placeholder="输入房间号">
+      <button id="joinRoomBtn" class="btn btn-primary">加入房间</button>
+      <div class="room-info" id="roomInfo" style="display:none;">
+        房间号: <strong id="roomIdDisplay"></strong> | 你是: <span id="roleDisplay"></span>
+      </div>
+      <div class="members" id="membersList"></div>
+      <div id="connectionStatus" class="status disconnected">未连接</div>
+    </div>
+
+    <div class="controls">
+      <button id="startBeatBtn" class="btn btn-success">开始节拍</button>
+      <button id="stopBeatBtn" class="btn btn-danger" disabled>停止节拍</button>
+      <input id="bpmInput" class="input" type="number" value="120" min="40" max="240" style="width: 80px;">
+      <span style="color: #6b7280;">BPM</span>
+      <div class="beat-indicator" id="beatIndicator"></div>
+    </div>
+
+    <div class="annotation-controls">
+      <span style="color: #4b5563;">标注颜色:</span>
+      <input id="annotationColor" class="color-picker" type="color" value="#ef4444">
+      <span style="color: #6b7280; font-size: 13px;">点击音符即可标注</span>
+      <button id="clearAnnotationsBtn" class="btn" style="background: #6b7280; color: white;">清除标注</button>
+      <div id="validationResult" class="validation-result"></div>
+    </div>
+
+    <div class="score-container">
+      <svg id="scoreSvg" width="1000" height="200" viewBox="0 0 1000 200">
+        <defs>
+          <style>
+            .staff-line { stroke: #1f2937; stroke-width: 1.5; }
+            .note-head { fill: #1f2937; }
+            .note-stem { stroke: #1f2937; stroke-width: 2; }
+            .annotation-marker { opacity: 0.8; }
+          </style>
+        </defs>
+        
+        <line class="staff-line" x1="50" y1="60" x2="950" y2="60"/>
+        <line class="staff-line" x1="50" y1="75" x2="950" y2="75"/>
+        <line class="staff-line" x1="50" y1="90" x2="950" y2="90"/>
+        <line class="staff-line" x1="50" y1="105" x2="950" y2="105"/>
+        <line class="staff-line" x1="50" y1="120" x2="950" y2="120"/>
+        
+        <text x="70" y="100" font-size="40" fill="#1f2937">𝄞</text>
+        
+        <g id="notes"></g>
+        <g id="annotations"></g>
+        <line id="playhead" x1="80" y1="50" x2="80" y2="130" stroke="#ef4444" stroke-width="2" opacity="0"/>
+      </svg>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
