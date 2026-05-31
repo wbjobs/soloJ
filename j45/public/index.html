@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>网页截图预览工具</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .main-content {
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .control-panel {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      height: fit-content;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .device-options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .device-btn {
+      padding: 10px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .device-btn:hover {
+      border-color: #667eea;
+      background: #f8f9ff;
+    }
+
+    .device-btn.active {
+      border-color: #667eea;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      cursor: pointer;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      accent-color: #667eea;
+    }
+
+    .checkbox-group label {
+      cursor: pointer;
+      font-weight: 500;
+      color: #555;
+      margin: 0;
+    }
+
+    .btn-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .btn {
+      padding: 14px 24px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #333;
+    }
+
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .preview-section {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .preview-header h2 {
+      font-size: 1.3rem;
+      color: #333;
+    }
+
+    .status-badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .status-badge.ready {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status-badge.loading {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .preview-frame-container {
+      background: #f5f5f5;
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      overflow: auto;
+      max-height: 700px;
+      min-height: 400px;
+    }
+
+    .device-wrapper {
+      background: #1a1a1a;
+      border-radius: 20px;
+      padding: 8px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .device-wrapper.mobile {
+      border-radius: 30px;
+      padding: 12px;
+    }
+
+    .device-wrapper.mobile::before {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 4px;
+      background: #333;
+      border-radius: 2px;
+      margin: 0 auto 8px;
+    }
+
+    .preview-iframe {
+      border: none;
+      background: white;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .result-section {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 2px solid #e0e0e0;
+    }
+
+    .result-section h3 {
+      font-size: 1.1rem;
+      color: #333;
+      margin-bottom: 15px;
+    }
+
+    .result-image {
+      max-width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      display: none;
+    }
+
+    .result-image.show {
+      display: block;
+    }
+
+    .loading-spinner {
+      display: none;
+      text-align: center;
+      padding: 40px;
+      color: #667eea;
+    }
+
+    .loading-spinner.show {
+      display: block;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #e0e0e0;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error-message {
+      background: #fee;
+      border: 1px solid #fcc;
+      border-radius: 8px;
+      padding: 12px;
+      color: #c33;
+      margin-top: 15px;
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    .info-box {
+      background: #e8f4fd;
+      border-left: 4px solid #3498db;
+      padding: 12px 16px;
+      border-radius: 6px;
+      margin-top: 15px;
+      font-size: 0.9rem;
+      color: #2980b9;
+    }
+
+    .preset-sizes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .preset-btn {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background: #f9f9f9;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .preset-btn:hover {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+
+    .textarea-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      resize: vertical;
+      min-height: 80px;
+      outline: none;
+    }
+
+    .textarea-group textarea:focus {
+      border-color: #667eea;
+    }
+
+    .download-btn {
+      display: none;
+      margin-top: 15px;
+      width: 100%;
+      padding: 12px;
+      background: #27ae60;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .download-btn.show {
+      display: block;
+    }
+
+    .download-btn:hover {
+      background: #219a52;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>网页截图预览工具</h1>
+      <p>模拟移动端视口，预览后生成高清截图</p>
+    </div>
+
+    <div class="main-content">
+      <div class="control-panel">
+        <div class="form-group">
+          <label for="url">网页 URL</label>
+          <input type="url" id="url" placeholder="https://example.com" value="https://example.com">
+        </div>
+
+        <div class="form-group">
+          <label>设备类型</label>
+          <div class="device-options">
+            <button class="device-btn active" data-device="desktop">
+              <span>💻</span> 桌面
+            </button>
+            <button class="device-btn" data-device="iphone">
+              <span>📱</span> iPhone
+            </button>
+            <button class="device-btn" data-device="android">
+              <span>📱</span> Android
+            </button>
+            <button class="device-btn" data-device="ipad">
+              <span>📱</span> iPad
+            </button>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="width">宽度 (px)</label>
+            <input type="number" id="width" value="1920" min="320" max="3840">
+          </div>
+          <div class="form-group">
+            <label for="height">高度 (px)</label>
+            <input type="number" id="height" value="1080" min="320" max="2160">
+          </div>
+        </div>
+
+        <div class="preset-sizes">
+          <button class="preset-btn" data-width="375" data-height="667">iPhone 6/7/8</button>
+          <button class="preset-btn" data-width="414" data-height="896">iPhone 11 Pro</button>
+          <button class="preset-btn" data-width="360" data-height="640">Android</button>
+          <button class="preset-btn" data-width="768" data-height="1024">iPad</button>
+          <button class="preset-btn" data-width="1440" data-height="900">Laptop</button>
+          <button class="preset-btn" data-width="1920" data-height="1080">Desktop</button>
+        </div>
+
+        <div class="form-group">
+          <label for="format">图片格式</label>
+          <select id="format">
+            <option value="png">PNG</option>
+            <option value="jpeg">JPEG</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="quality-group" style="display: none;">
+          <label for="quality">JPEG 质量</label>
+          <input type="range" id="quality" min="10" max="100" value="80">
+          <span id="quality-value">80%</span>
+        </div>
+
+        <div class="checkbox-group">
+          <input type="checkbox" id="autoFullPage" checked>
+          <label for="autoFullPage">自动截取完整长图</label>
+        </div>
+
+        <div class="checkbox-group">
+          <input type="checkbox" id="waitForNetworkIdle">
+          <label for="waitForNetworkIdle">等待网络空闲</label>
+        </div>
+
+        <div class="form-group textarea-group">
+          <label for="customCss">自定义 CSS</label>
+          <textarea id="customCss" placeholder="body { background: red !important; }"></textarea>
+        </div>
+
+        <div class="form-group textarea-group">
+          <label for="customJs">自定义 JS</label>
+          <textarea id="customJs" placeholder="console.log('hello')"></textarea>
+        </div>
+
+        <div class="btn-group">
+          <button class="btn btn-secondary" id="previewBtn">预览</button>
+          <button class="btn btn-primary" id="screenshotBtn">生成截图</button>
+        </div>
+
+        <div class="info-box">
+          💡 提示：预览使用 iframe 模拟，实际截图使用 Playwright 服务端渲染，结果可能更准确。
+        </div>
+      </div>
+
+      <div class="preview-section">
+        <div class="preview-header">
+          <h2>预览窗口</h2>
+          <span class="status-badge ready" id="statusBadge">准备就绪</span>
+        </div>
+
+        <div class="preview-frame-container">
+          <div class="device-wrapper" id="deviceWrapper">
+            <iframe class="preview-iframe" id="previewFrame" width="1920" height="1080" src="about:blank"></iframe>
+          </div>
+        </div>
+
+        <div class="result-section">
+          <h3>生成结果</h3>
+          <div class="loading-spinner" id="loadingSpinner">
+            <div class="spinner"></div>
+            <p>正在生成截图，请稍候...</p>
+          </div>
+          <img class="result-image" id="resultImage" alt="Screenshot Result">
+          <button class="download-btn" id="downloadBtn">下载截图</button>
+          <div class="error-message" id="errorMessage"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const DEVICE_CONFIGS = {
+      desktop: { width: 1920, height: 1080, isMobile: false },
+      iphone: { width: 375, height: 812, isMobile: true },
+      android: { width: 360, height: 640, isMobile: true },
+      ipad: { width: 768, height: 1024, isMobile: false }
+    };
+
+    const urlInput = document.getElementById('url');
+    const widthInput = document.getElementById('width');
+    const heightInput = document.getElementById('height');
+    const formatSelect = document.getElementById('format');
+    const qualityGroup = document.getElementById('quality-group');
+    const qualityInput = document.getElementById('quality');
+    const qualityValue = document.getElementById('quality-value');
+    const autoFullPageInput = document.getElementById('autoFullPage');
+    const waitForNetworkIdleInput = document.getElementById('waitForNetworkIdle');
+    const customCssInput = document.getElementById('customCss');
+    const customJsInput = document.getElementById('customJs');
+    const previewBtn = document.getElementById('previewBtn');
+    const screenshotBtn = document.getElementById('screenshotBtn');
+    const previewFrame = document.getElementById('previewFrame');
+    const deviceWrapper = document.getElementById('deviceWrapper');
+    const statusBadge = document.getElementById('statusBadge');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const resultImage = document.getElementById('resultImage');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const errorMessage = document.getElementById('errorMessage');
+    const deviceBtns = document.querySelectorAll('.device-btn');
+    const presetBtns = document.querySelectorAll('.preset-btn');
+
+    let currentDevice = 'desktop';
+    let currentImageUrl = null;
+
+    deviceBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        deviceBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentDevice = btn.dataset.device;
+        const config = DEVICE_CONFIGS[currentDevice];
+        widthInput.value = config.width;
+        heightInput.value = config.height;
+        updateDeviceWrapper();
+      });
+    });
+
+    presetBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        widthInput.value = btn.dataset.width;
+        heightInput.value = btn.dataset.height;
+        updateDeviceWrapper();
+      });
+    });
+
+    formatSelect.addEventListener('change', () => {
+      qualityGroup.style.display = formatSelect.value === 'jpeg' ? 'block' : 'none';
+    });
+
+    qualityInput.addEventListener('input', () => {
+      qualityValue.textContent = qualityInput.value + '%';
+    });
+
+    function updateDeviceWrapper() {
+      const width = parseInt(widthInput.value);
+      const height = parseInt(heightInput.value);
+      const isMobile = DEVICE_CONFIGS[currentDevice]?.isMobile;
+
+      if (isMobile) {
+        deviceWrapper.classList.add('mobile');
+      } else {
+        deviceWrapper.classList.remove('mobile');
+      }
+
+      const maxWidth = Math.min(window.innerWidth - 100, 800);
+      const scale = width > maxWidth ? maxWidth / width : 1;
+
+      previewFrame.style.width = width + 'px';
+      previewFrame.style.height = height + 'px';
+      previewFrame.style.transform = `scale(${scale})`;
+      previewFrame.style.transformOrigin = 'top center';
+
+      deviceWrapper.style.width = (width * scale + 24) + 'px';
+      deviceWrapper.style.height = (height * scale + 24) + 'px';
+    }
+
+    function updateStatus(status, text) {
+      statusBadge.className = `status-badge ${status}`;
+      statusBadge.textContent = text;
+    }
+
+    function showError(message) {
+      errorMessage.textContent = '❌ ' + message;
+      errorMessage.classList.add('show');
+      setTimeout(() => {
+        errorMessage.classList.remove('show');
+      }, 5000);
+    }
+
+    previewBtn.addEventListener('click', () => {
+      const url = urlInput.value.trim();
+      if (!url) {
+        showError('请输入网页 URL');
+        return;
+      }
+
+      updateStatus('loading', '加载中...');
+      updateDeviceWrapper();
+
+      previewFrame.onload = () => {
+        updateStatus('ready', '预览就绪');
+      };
+
+      previewFrame.onerror = () => {
+        updateStatus('ready', '加载失败');
+        showError('无法加载预览页面，可能是目标网站禁止了 iframe 嵌入');
+      };
+
+      try {
+        previewFrame.src = url;
+      } catch (e) {
+        showError('预览加载失败: ' + e.message);
+      }
+    });
+
+    screenshotBtn.addEventListener('click', async () => {
+      const url = urlInput.value.trim();
+      if (!url) {
+        showError('请输入网页 URL');
+        return;
+      }
+
+      updateStatus('loading', '生成中...');
+      loadingSpinner.classList.add('show');
+      resultImage.classList.remove('show');
+      downloadBtn.classList.remove('show');
+      errorMessage.classList.remove('show');
+      screenshotBtn.disabled = true;
+      previewBtn.disabled = true;
+
+      try {
+        const params = {
+          url: url,
+          width: parseInt(widthInput.value),
+          height: parseInt(heightInput.value),
+          format: formatSelect.value,
+          device: currentDevice,
+          autoFullPage: autoFullPageInput.checked,
+          waitForNetworkIdle: waitForNetworkIdleInput.checked
+        };
+
+        if (formatSelect.value === 'jpeg') {
+          params.quality = parseInt(qualityInput.value);
+        }
+
+        if (customCssInput.value.trim()) {
+          params.customCss = customCssInput.value.trim();
+        }
+
+        if (customJsInput.value.trim()) {
+          params.customJs = customJsInput.value.trim();
+        }
+
+        const queryString = new URLSearchParams();
+        for (const [key, value] of Object.entries(params)) {
+          if (typeof value === 'boolean') {
+            queryString.append(key, value ? 'true' : 'false');
+          } else {
+            queryString.append(key, value);
+          }
+        }
+
+        const response = await fetch('/screenshot?' + queryString.toString(), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(params)
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          if (response.status === 408) {
+            throw new Error('请求超时 (10秒)，请稍后重试');
+          }
+          throw new Error(errorData.error || `HTTP ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        currentImageUrl = URL.createObjectURL(blob);
+        
+        resultImage.src = currentImageUrl;
+        resultImage.classList.add('show');
+        downloadBtn.classList.add('show');
+        updateStatus('ready', '生成成功');
+
+      } catch (error) {
+        updateStatus('ready', '生成失败');
+        showError(error.message);
+      } finally {
+        loadingSpinner.classList.remove('show');
+        screenshotBtn.disabled = false;
+        previewBtn.disabled = false;
+      }
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      if (!currentImageUrl) return;
+      
+      const a = document.createElement('a');
+      a.href = currentImageUrl;
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const ext = formatSelect.value === 'jpeg' ? 'jpg' : 'png';
+      a.download = `screenshot_${timestamp}.${ext}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    });
+
+    updateDeviceWrapper();
+    window.addEventListener('resize', updateDeviceWrapper);
+  </script>
+</body>
+</html>
