@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package federated;
+
+option py_generic_services = false;
+
+message Tensor {
+  string name = 1;
+  bytes data = 2;
+  repeated int64 shape = 3;
+  string dtype = 4;
+}
+
+message ClientInfo {
+  string client_id = 1;
+  int32 dataset_size = 2;
+  int32 training_steps = 3;
+}
+
+message UploadWeightsRequest {
+  string client_id = 1;
+  int32 round = 2;
+  repeated Tensor weights = 3;
+  int32 samples_count = 4;
+  float train_loss = 5;
+  float train_accuracy = 6;
+}
+
+message UploadWeightsResponse {
+  bool accepted = 1;
+  string message = 2;
+  int32 current_round = 3;
+}
+
+message DownloadWeightsRequest {
+  string client_id = 1;
+  int32 current_round = 2;
+}
+
+message DownloadWeightsResponse {
+  int32 round = 1;
+  repeated Tensor weights = 2;
+  bool ready = 3;
+  bool should_stop = 4;
+  string global_model_version = 5;
+}
+
+message StartRoundRequest {
+  int32 round = 1;
+  int32 expected_clients = 2;
+}
+
+message StartRoundResponse {
+  bool started = 1;
+  string message = 2;
+}
+
+service FederatedService {
+  rpc UploadWeights(UploadWeightsRequest) returns (UploadWeightsResponse);
+  rpc DownloadWeights(DownloadWeightsRequest) returns (DownloadWeightsResponse);
+  rpc StartTrainingRound(StartRoundRequest) returns (StartRoundResponse);
+}

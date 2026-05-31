@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package videoservice;
+
+option py_generic_services = false;
+
+message FaceAnnotation {
+  int32 x = 1;
+  int32 y = 2;
+  int32 width = 3;
+  int32 height = 4;
+  string gender = 5;
+  int32 age = 6;
+  float confidence = 7;
+}
+
+message FrameRequest {
+  bytes frame_data = 1;
+  int64 timestamp = 2;
+  int32 frame_id = 3;
+}
+
+message FrameResponse {
+  bytes frame_data = 1;
+  int64 timestamp = 2;
+  int32 frame_id = 3;
+  repeated FaceAnnotation faces = 4;
+}
+
+service VideoService {
+  rpc ProcessVideo(stream FrameRequest) returns (stream FrameResponse);
+}
