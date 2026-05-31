@@ -1,0 +1,34 @@
+{
+  "name": "electron-note-app",
+  "version": "1.0.0",
+  "description": "A note-taking application with Electron, Express, and MongoDB",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "concurrently \"npm run server\" \"npm run electron\"",
+    "server": "node src/server/server.js",
+    "electron": "electron .",
+    "install-deps": "npm install"
+  },
+  "keywords": [
+    "electron",
+    "notes",
+    "mongodb",
+    "editor"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "electron": "^28.0.0"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^8.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "axios": "^1.6.2",
+    "monaco-editor": "^0.44.0",
+    "markdown-it": "^13.0.2"
+  }
+}
