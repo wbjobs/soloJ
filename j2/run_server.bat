@@ -1,0 +1,3 @@
+@echo off
+echo Starting FastProto TCP Server on :8888...
+bin\server.exe
