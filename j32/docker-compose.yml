@@ -1,0 +1,48 @@
+services:
+  tidb:
+    image: pingcap/tidb:v7.5
+    command: ["--store=mocktikv", "--path=/tmp/tidb"]
+    ports:
+      - "4000:4000"
+      - "10080:10080"
+    volumes:
+      - tidb_data:/tmp/tidb
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-P", "4000"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  node-manager:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    environment:
+      - NODE_MANAGER_ADDR=:8080
+      - GRPC_ADDR=:9090
+      - TIDB_DSN=root@tcp(tidb:4000)/dcdn?charset=utf8mb4&parseTime=True
+      - HEARTBEAT_TTL_MS=5000
+      - RAFT_NODE_ID=node-1
+      - RAFT_CLUSTER=node-manager:9090,node-manager-2:9090,node-manager-3:9090
+      - REGION=us-east-1
+    ports:
+      - "8080:8080"
+      - "9090:9090"
+    depends_on:
+      tidb:
+        condition: service_healthy
+
+  scoring:
+    build:
+      context: ./scoring
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      - TIDB_DSN=mysql://root@tcp(tidb:4000)/dcdn
+    depends_on:
+      tidb:
+        condition: service_healthy
+
+volumes:
+  tidb_data:

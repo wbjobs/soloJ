@@ -1,0 +1,101 @@
+syntax = "proto3";
+
+package dcdn;
+
+option go_package = "github.com/dcdn/proto/pb;dcdnpb";
+
+// 节点元信息
+message NodeInfo {
+  string id = 1;
+  string address = 2;       // host:port
+  string region = 3;
+  double bandwidth_cap = 4; // Mbps
+  int64 registered_at = 5;
+}
+
+// 心跳请求
+message HeartbeatReq {
+  string node_id = 1;
+  double cpu_usage = 2;
+  double mem_usage = 3;
+  double bw_usage = 4;   // 当前使用带宽
+  double lat_ms = 5;     // 延迟
+  int64 ts = 6;
+}
+
+message HeartbeatResp {
+  bool accepted = 1;
+  int64 next_interval_ms = 2;
+}
+
+// 健康度评分（由评分引擎产出）
+message HealthScore {
+  string node_id = 1;
+  double elo = 2;
+  double availability = 3;
+  double bandwidth_contrib = 4;
+  double uptime_ratio = 5;
+  int64 computed_at = 6;
+  int64 version = 7;
+}
+
+// 黑板报条目（多节点评分快照）
+message BoardEntry {
+  repeated HealthScore scores = 1;
+  int64 term = 2;
+  int64 index = 3;
+  string proposer = 4;
+  bytes  signature = 5;
+}
+
+// 评分遗产转移请求
+message HeritageTransfer {
+  string from_node_id = 1;
+  repeated string to_node_ids = 2;
+  double total_elo = 3;
+  repeated double weights = 4;
+  int64 ts = 5;
+}
+
+// 调度请求
+message ScheduleReq {
+  string file_hash = 1;
+  string client_region = 2;
+  int32 top_k = 3;
+  string strategy = 4; // random_weight | deterministic
+}
+
+message ScheduleResp {
+  repeated string node_ids = 1;
+  repeated string addresses = 2;
+  repeated double scores = 3;
+  int64 ts = 4;
+}
+
+// Raft日志条目
+message RaftLog {
+  int64 term = 1;
+  int64 index = 2;
+  string type = 3; // score_update | heritage_transfer | config_change
+  bytes  payload = 4;
+}
+
+// gRPC 服务
+service EdgeNodeService {
+  rpc ReportHeartbeat(HeartbeatReq) returns (HeartbeatResp);
+  rpc PullBoard(BoardEntry) returns (stream BoardEntry);
+  rpc PushBoard(BoardEntry) returns (HeartbeatResp);
+  rpc TransferHeritage(HeritageTransfer) returns (HeartbeatResp);
+  rpc RequestVote(RaftLog) returns (HeartbeatResp);
+  rpc AppendEntries(stream RaftLog) returns (HeartbeatResp);
+}
+
+service SchedulerService {
+  rpc Schedule(ScheduleReq) returns (ScheduleResp);
+  rpc UpdateHealth(HealthScore) returns (HeartbeatResp);
+}
+
+service ScoringService {
+  rpc ComputeScore(HeartbeatReq) returns (HealthScore);
+  rpc GetScore(string) returns (HealthScore);
+}

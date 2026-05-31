@@ -1,0 +1,22 @@
+[package]
+name = "dcdn-scoring"
+version = "0.1.0"
+edition = "2021"
+description = "Health Score Engine for dCDN edge nodes (Actix + Elo variant)"
+
+[dependencies]
+actix-web = "4"
+actix-rt = "2"
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sqlx = { version = "0.7", features = ["runtime-tokio", "tls-rustls", "mysql"] }
+anyhow = "1"
+thiserror = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+parking_lot = "0.12"
+rand = "0.8"
+clap = { version = "4", features = ["derive"] }
