@@ -1,0 +1,14 @@
+E:\soloJ\j82\rust\target\wasm32-unknown-unknown\release\deps\serde-208e0e346ad3630e.d: C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\serde-1.0.228\src\lib.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\serde-1.0.228\src\integer128.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\serde-1.0.228\src\private\mod.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\serde-1.0.228\src\private\de.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\serde-1.0.228\src\private\ser.rs E:\soloJ\j82\rust\target\wasm32-unknown-unknown\release\build\serde-7074ef66dff55b9b\out/private.rs
+
+E:\soloJ\j82\rust\target\wasm32-unknown-unknown\release\deps\libserde-208e0e346ad3630e.rlib: C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\serde-1.0.228\src\lib.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\serde-1.0.228\src\integer128.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\serde-1.0.228\src\private\mod.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\serde-1.0.228\src\private\de.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\serde-1.0.228\src\private\ser.rs E:\soloJ\j82\rust\target\wasm32-unknown-unknown\release\build\serde-7074ef66dff55b9b\out/private.rs
+
+E:\soloJ\j82\rust\target\wasm32-unknown-unknown\release\deps\libserde-208e0e346ad3630e.rmeta: C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\serde-1.0.228\src\lib.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\serde-1.0.228\src\integer128.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\serde-1.0.228\src\private\mod.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\serde-1.0.228\src\private\de.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\serde-1.0.228\src\private\ser.rs E:\soloJ\j82\rust\target\wasm32-unknown-unknown\release\build\serde-7074ef66dff55b9b\out/private.rs
+
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\serde-1.0.228\src\lib.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\serde-1.0.228\src\integer128.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\serde-1.0.228\src\private\mod.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\serde-1.0.228\src\private\de.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\serde-1.0.228\src\private\ser.rs:
+E:\soloJ\j82\rust\target\wasm32-unknown-unknown\release\build\serde-7074ef66dff55b9b\out/private.rs:
+
+# env-dep:OUT_DIR=E:\\soloJ\\j82\\rust\\target\\wasm32-unknown-unknown\\release\\build\\serde-7074ef66dff55b9b\\out

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音频频谱分析仪 - Rust + WebAssembly</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🎵 音频频谱分析仪</h1>
+            <p class="subtitle">Rust FFT 算法 · WebAssembly 高性能计算</p>
+        </header>
+
+        <div class="upload-section">
+            <div class="upload-area" id="uploadArea">
+                <input type="file" id="fileInput" accept=".mp3,.wav" hidden>
+                <div class="upload-content">
+                    <div class="upload-icon">📁</div>
+                    <p class="upload-text">点击或拖拽音频文件到此处</p>
+                    <p class="upload-hint">支持 MP3、WAV 格式</p>
+                </div>
+            </div>
+            <div class="file-info" id="fileInfo" style="display: none;">
+                <span class="file-name" id="fileName"></span>
+                <span class="file-size" id="fileSize"></span>
+                <button class="btn-remove" id="btnRemove">✕</button>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <div class="control-group">
+                <label for="fftSize">FFT 大小:</label>
+                <select id="fftSize">
+                    <option value="512">512</option>
+                    <option value="1024">1024</option>
+                    <option value="2048" selected>2048</option>
+                    <option value="4096">4096</option>
+                    <option value="8192">8192</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="visualMode">显示模式:</label>
+                <select id="visualMode">
+                    <option value="bars" selected>柱状图</option>
+                    <option value="line">折线图</option>
+                    <option value="spectrogram">频谱图</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="colorScheme">配色方案:</label>
+                <select id="colorScheme">
+                    <option value="rainbow" selected>彩虹</option>
+                    <option value="fire">火焰</option>
+                    <option value="ocean">海洋</option>
+                    <option value="neon">霓虹</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="logScale" checked>
+                    对数频率轴
+                </label>
+            </div>
+            <div class="control-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="smooth" checked>
+                    平滑显示
+                </label>
+            </div>
+        </div>
+
+        <div class="filter-section" id="filterSection" style="display: none;">
+            <div class="filter-header">
+                <label class="checkbox-label filter-toggle">
+                    <input type="checkbox" id="filterEnabled">
+                    🔧 低通滤波器
+                </label>
+                <span class="filter-status" id="filterStatus">已关闭</span>
+            </div>
+            <div class="filter-controls" id="filterControls" style="display: none;">
+                <div class="filter-slider-group">
+                    <label for="cutoffSlider">截止频率:</label>
+                    <input type="range" id="cutoffSlider" min="100" max="20000" step="10" value="2000" class="filter-slider">
+                    <span class="filter-value" id="cutoffValue">2000 Hz</span>
+                </div>
+                <div class="filter-info">
+                    <span class="filter-hint">拖动滑块调节截止频率，频谱将实时对比显示滤波前后的效果</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="player-section" id="playerSection" style="display: none;">
+            <div class="player-controls">
+                <button class="btn-play" id="btnPlay">▶️ 播放</button>
+                <button class="btn-pause" id="btnPause" style="display: none;">⏸️ 暂停</button>
+                <button class="btn-stop" id="btnStop">⏹️ 停止</button>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <span class="time-display">
+                        <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+                    </span>
+                </div>
+            </div>
+            <div class="volume-control">
+                <label>🔊 音量:</label>
+                <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
+            </div>
+        </div>
+
+        <div class="visualizer-section">
+            <div class="canvas-container">
+                <canvas id="spectrumCanvas" width="900" height="400"></canvas>
+                <canvas id="spectrogramCanvas" width="900" height="200" style="display: none;"></canvas>
+                <div class="spectrum-legend" id="spectrumLegend" style="display: none;">
+                    <span class="legend-item"><span class="legend-dot legend-original"></span>原始频谱</span>
+                    <span class="legend-item"><span class="legend-dot legend-filtered"></span>滤波后</span>
+                    <span class="legend-item"><span class="legend-line-cutoff"></span>截止频率</span>
+                </div>
+            </div>
+            <div class="stats-panel">
+                <div class="stat-item">
+                    <span class="stat-label">采样率</span>
+                    <span class="stat-value" id="statSampleRate">-</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">声道数</span>
+                    <span class="stat-value" id="statChannels">-</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">FFT 大小</span>
+                    <span class="stat-value" id="statFftSize">-</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">峰值频率</span>
+                    <span class="stat-value" id="statPeakFreq">-</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">处理耗时</span>
+                    <span class="stat-value" id="statProcessTime">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="frequency-axis" id="frequencyAxis">
+            <span id="freqLabel0">20Hz</span>
+            <span id="freqLabel1">100Hz</span>
+            <span id="freqLabel2">500Hz</span>
+            <span id="freqLabel3">1kHz</span>
+            <span id="freqLabel4">5kHz</span>
+            <span id="freqLabel5">10kHz</span>
+            <span id="freqLabel6">20kHz</span>
+        </div>
+
+        <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+            <div class="loading-content">
+                <div class="spinner"></div>
+                <p id="loadingText">正在加载 WebAssembly 模块...</p>
+            </div>
+        </div>
+
+        <div class="error-message" id="errorMessage" style="display: none;">
+            <span id="errorText"></span>
+            <button class="btn-close-error" id="btnCloseError">✕</button>
+        </div>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>

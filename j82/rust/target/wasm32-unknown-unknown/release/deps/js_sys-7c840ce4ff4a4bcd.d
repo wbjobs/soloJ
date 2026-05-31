@@ -1,0 +1,10 @@
+E:\soloJ\j82\rust\target\wasm32-unknown-unknown\release\deps\js_sys-7c840ce4ff4a4bcd.d: C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\js-sys-0.3.99\src\lib.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\js-sys-0.3.99\src\futures\mod.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\js-sys-0.3.99\src\futures\queue.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\js-sys-0.3.99\src\futures\task\singlethread.rs
+
+E:\soloJ\j82\rust\target\wasm32-unknown-unknown\release\deps\libjs_sys-7c840ce4ff4a4bcd.rlib: C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\js-sys-0.3.99\src\lib.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\js-sys-0.3.99\src\futures\mod.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\js-sys-0.3.99\src\futures\queue.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\js-sys-0.3.99\src\futures\task\singlethread.rs
+
+E:\soloJ\j82\rust\target\wasm32-unknown-unknown\release\deps\libjs_sys-7c840ce4ff4a4bcd.rmeta: C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\js-sys-0.3.99\src\lib.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\js-sys-0.3.99\src\futures\mod.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\js-sys-0.3.99\src\futures\queue.rs C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\js-sys-0.3.99\src\futures\task\singlethread.rs
+
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\js-sys-0.3.99\src\lib.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\js-sys-0.3.99\src\futures\mod.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\js-sys-0.3.99\src\futures\queue.rs:
+C:\Users\Lenovo\.cargo\registry\src\mirrors.ustc.edu.cn-38d0e5eb5da2abae\js-sys-0.3.99\src\futures\task\singlethread.rs:
