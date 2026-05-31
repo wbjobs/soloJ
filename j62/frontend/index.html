@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LSB 隐写术 - 图片信息隐藏</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.4rem;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle {
+            text-align: center;
+            color: #999;
+            margin-bottom: 40px;
+            font-size: 0.95rem;
+        }
+        .card {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 28px;
+            backdrop-filter: blur(10px);
+        }
+        .card h2 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #b8b0ff;
+        }
+        .upload-zone {
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .upload-zone:hover {
+            border-color: #667eea;
+            background: rgba(102,126,234,0.08);
+        }
+        .upload-zone.dragover {
+            border-color: #764ba2;
+            background: rgba(118,75,162,0.12);
+        }
+        .upload-zone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .upload-zone svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 12px;
+            opacity: 0.6;
+        }
+        .upload-zone p {
+            color: #aaa;
+            font-size: 0.95rem;
+        }
+        .preview-area {
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+        .preview-area img {
+            max-width: 100%;
+            max-height: 320px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .preview-area .filename {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: #888;
+        }
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
+            padding: 14px;
+            color: #e0e0e0;
+            font-size: 0.95rem;
+            resize: vertical;
+            font-family: inherit;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .char-count {
+            text-align: right;
+            font-size: 0.8rem;
+            color: #777;
+            margin-top: 6px;
+        }
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        button {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+        .btn-encode {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+        }
+        .btn-encode:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102,126,234,0.4); }
+        .btn-decode {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: #fff;
+        }
+        .btn-decode:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245,87,108,0.4); }
+        button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        .result-card {
+            display: none;
+        }
+        .result-card.visible { display: block; }
+        .result-card canvas { display: none; }
+        .result-img-container {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .result-img-container img {
+            max-width: 100%;
+            max-height: 320px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .decoded-text {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
+            padding: 16px;
+            min-height: 60px;
+            word-break: break-all;
+            color: #a8e6cf;
+            font-size: 1rem;
+        }
+        .btn-download {
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+            color: #1a1a2e;
+            margin-top: 16px;
+        }
+        .btn-download:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(67,233,123,0.4); }
+        .status-bar {
+            text-align: center;
+            padding: 10px;
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 12px;
+        }
+        .status-bar.error { color: #f5576c; }
+        .status-bar.success { color: #43e97b; }
+        .wasm-status {
+            text-align: center;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            margin-bottom: 20px;
+        }
+        .wasm-status.loaded { background: rgba(67,233,123,0.15); color: #43e97b; }
+        .wasm-status.fallback { background: rgba(255,193,7,0.15); color: #ffc107; }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            gap: 4px;
+        }
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px 10px 0 0;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+        .tab.active {
+            background: rgba(102,126,234,0.2);
+            border-color: #667eea;
+            color: #fff;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .password-input {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
+            padding: 14px;
+            color: #e0e0e0;
+            font-size: 0.95rem;
+            font-family: inherit;
+            margin-top: 16px;
+        }
+        .password-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .password-label {
+            font-size: 0.9rem;
+            color: #b8b0ff;
+            margin-top: 16px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔏 LSB 隐写术</h1>
+        <p class="subtitle">将秘密信息隐藏在图片的最低有效位中 — 由 Rust/WASM 驱动</p>
+
+        <div id="wasmStatus" class="wasm-status fallback">⏳ 正在加载 WASM 模块...</div>
+
+        <div class="card">
+            <h2>📷 选择图片</h2>
+            <div class="upload-zone" id="uploadZone">
+                <input type="file" id="fileInput" accept="image/png,image/jpeg,image/bmp,image/webp">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M12 16V4m0 0l-4 4m4-4l4 4M4 20h16"/>
+                </svg>
+                <p>点击或拖拽图片到此处上传</p>
+                <p style="font-size:0.8rem;margin-top:4px;color:#666;">支持 PNG / JPEG / BMP / WebP</p>
+            </div>
+            <div class="preview-area" id="previewArea">
+                <img id="previewImg" alt="预览">
+                <p class="filename" id="fileName"></p>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="encode">🔒 加密隐藏</div>
+            <div class="tab" data-tab="decode">🔓 解密提取</div>
+        </div>
+
+        <div class="card">
+            <div class="tab-content active" id="encodeTab">
+                <h2>✍️ 输入要隐藏的文本</h2>
+                <textarea id="secretText" placeholder="在此输入你的秘密信息..."></textarea>
+                <p class="char-count">已输入 <span id="charCount">0</span> 字符</p>
+                <label class="password-label">🔐 加密密码</label>
+                <input type="password" id="encodePassword" class="password-input" placeholder="输入密码用于加密（可选，留空则不加密）">
+                <div class="btn-group">
+                    <button class="btn-encode" id="encodeBtn" disabled>加密并隐藏到图片</button>
+                </div>
+            </div>
+            <div class="tab-content" id="decodeTab">
+                <h2>🔍 从图片中提取隐藏信息</h2>
+                <p style="color:#999;margin-bottom:16px;font-size:0.9rem;">上传一张已含隐藏信息的图片，输入密码后提取</p>
+                <label class="password-label">🔐 解密密码</label>
+                <input type="password" id="decodePassword" class="password-input" placeholder="输入加密时使用的密码">
+                <div class="btn-group">
+                    <button class="btn-decode" id="decodeBtn" disabled>解密提取信息</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card result-card" id="resultCard">
+            <h2 id="resultTitle">✅ 结果</h2>
+            <div class="result-img-container" id="resultImgContainer">
+                <img id="resultImg" alt="结果图片">
+            </div>
+            <div class="decoded-text" id="decodedText" style="display:none;"></div>
+            <canvas id="resultCanvas"></canvas>
+            <button class="btn-download" id="downloadBtn" style="display:none;">💾 下载生成的图片</button>
+        </div>
+
+        <div class="status-bar" id="statusBar"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
