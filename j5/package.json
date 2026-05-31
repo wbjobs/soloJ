@@ -1,0 +1,11 @@
+{
+  "name": "zombie-game",
+  "version": "1.0.0",
+  "description": "植物大战僵尸 - ECS 架构网络游戏",
+  "main": "src/server/index.js",
+  "scripts": {
+    "start": "node src/server/index.js",
+    "client": "node src/client/index.js"
+  },
+  "license": "MIT"
+}
