@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DICOM 医学影像批量处理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .connection-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-top: 12px;
+        }
+
+        .connection-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ccc;
+        }
+
+        .connection-dot.connected {
+            background: #4ade80;
+            animation: pulse-green 2s infinite;
+        }
+
+        @keyframes pulse-green {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .upload-area {
+            border: 2px dashed #cbd5e0;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f7fafc;
+        }
+
+        .upload-area:hover,
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: #ebf8ff;
+        }
+
+        .upload-area svg {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 16px;
+            color: #a0aec0;
+        }
+
+        .upload-area p {
+            color: #4a5568;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .upload-area .hint {
+            color: #718096;
+            font-size: 12px;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .queue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 24px 0 16px;
+        }
+
+        .queue-header h2 {
+            font-size: 18px;
+            color: #2d3748;
+        }
+
+        .queue-stats {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: #718096;
+        }
+
+        .queue-stats span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .queue-stats .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .queue-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .queue-item {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 16px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .queue-item:hover {
+            background: #edf2f7;
+        }
+
+        .queue-item.processing {
+            border-left: 4px solid #667eea;
+            background: linear-gradient(90deg, #ebf8ff 0%, #f7fafc 100%);
+        }
+
+        .queue-item.completed {
+            border-left: 4px solid #48bb78;
+            background: linear-gradient(90deg, #f0fff4 0%, #f7fafc 100%);
+        }
+
+        .queue-item.error {
+            border-left: 4px solid #f56565;
+            background: linear-gradient(90deg, #fed7d7 0%, #f7fafc 100%);
+        }
+
+        .queue-item.pending {
+            border-left: 4px solid #ecc94b;
+        }
+
+        .item-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            flex-shrink: 0;
+        }
+
+        .item-icon svg {
+            width: 24px;
+            height: 24px;
+            color: #667eea;
+        }
+
+        .item-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .item-name {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 14px;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .item-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .item-progress {
+            margin-top: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-fill.success {
+            background: linear-gradient(90deg, #48bb78 0%, #38a169 100%);
+        }
+
+        .progress-fill.error {
+            background: linear-gradient(90deg, #f56565 0%, #e53e3e 100%);
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .action-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .action-btn.remove {
+            color: #f56565;
+        }
+
+        .action-btn.remove:hover {
+            background: #fed7d7;
+        }
+
+        .action-btn.preview {
+            color: #667eea;
+        }
+
+        .action-btn.preview:hover {
+            background: #ebf8ff;
+        }
+
+        .action-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .item-status {
+            font-size: 12px;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-pending { color: #d69e2e; }
+        .status-processing { color: #3182ce; }
+        .status-completed { color: #38a169; }
+        .status-error { color: #e53e3e; }
+
+        .batch-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #f7fafc;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .btn-danger {
+            background: white;
+            color: #f56565;
+            border: 2px solid #f56565;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: #fff5f5;
+            box-shadow: 0 4px 12px rgba(245, 101, 101, 0.2);
+        }
+
+        .preview-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 40px;
+        }
+
+        .preview-modal.show {
+            display: flex;
+        }
+
+        .preview-content {
+            max-width: 90%;
+            max-height: 90%;
+            position: relative;
+        }
+
+        .preview-content img {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 8px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .preview-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            background: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-close svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #a0aec0;
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .stage-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stage-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .info-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .info-badge.masked {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>DICOM 医学影像批量处理系统</h1>
+            <p>WebAssembly 前端脱敏 + Redis 队列 + WebSocket 实时进度</p>
+            <div class="connection-status">
+                <span class="connection-dot" id="connectionDot"></span>
+                <span id="connectionText">未连接</span>
+            </div>
+        </div>
+        <div class="content">
+            <div class="upload-area" id="uploadArea">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                <p>点击或拖拽上传多个 DICOM 文件</p>
+                <p class="hint">支持批量上传 .dcm 格式文件，自动加入处理队列</p>
+            </div>
+            <input type="file" id="fileInput" accept=".dcm" multiple>
+
+            <div class="queue-header" id="queueHeader" style="display: none;">
+                <h2>处理队列</h2>
+                <div class="queue-stats">
+                    <span><span class="dot" style="background: #ecc94b;"></span><span id="pendingCount">0</span> 等待中</span>
+                    <span><span class="dot" style="background: #667eea;"></span><span id="processingCount">0</span> 处理中</span>
+                    <span><span class="dot" style="background: #48bb78;"></span><span id="completedCount">0</span> 已完成</span>
+                    <span><span class="dot" style="background: #f56565;"></span><span id="errorCount">0</span> 失败</span>
+                </div>
+            </div>
+
+            <div class="queue-list" id="queueList">
+                <div class="empty-state" id="emptyState">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <p>暂无文件，上传 DICOM 文件开始处理</p>
+                </div>
+            </div>
+
+            <div class="batch-actions" id="batchActions" style="display: none;">
+                <button class="btn btn-danger" id="clearBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    清空队列
+                </button>
+                <button class="btn" id="startBatchBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    开始批量处理
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="preview-modal" id="previewModal">
+        <div class="preview-content">
+            <button class="preview-close" id="previewClose">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <img id="previewImage" alt="DICOM 预览">
+        </div>
+    </div>
+
+    <script src="./dicom-worker.js"></script>
+    <script>
+        let fileQueue = [];
+        let ws = null;
+        let clientId = null;
+        let worker = null;
+        let workerInitialized = false;
+
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const queueList = document.getElementById('queueList');
+        const queueHeader = document.getElementById('queueHeader');
+        const batchActions = document.getElementById('batchActions');
+        const emptyState = document.getElementById('emptyState');
+        const startBatchBtn = document.getElementById('startBatchBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const previewModal = document.getElementById('previewModal');
+        const previewImage = document.getElementById('previewImage');
+        const previewClose = document.getElementById('previewClose');
+        const connectionDot = document.getElementById('connectionDot');
+        const connectionText = document.getElementById('connectionText');
+
+        function initWorker() {
+            if (typeof Worker === 'undefined') {
+                console.warn('Web Workers not supported');
+                return;
+            }
+            
+            if (worker) return;
+            
+            try {
+                worker = new Worker('./dicom-worker.js');
+                
+                worker.onmessage = function(e) {
+                    const { type, fileId, success, data, info, error, percent, stage } = e.data;
+                    
+                    switch (type) {
+                        case 'init':
+                            workerInitialized = true;
+                            console.log('WASM Worker initialized');
+                            break;
+                            
+                        case 'progress':
+                            updateFileProgress(fileId, percent, stage);
+                            break;
+                            
+                        case 'result':
+                            if (success) {
+                                completeFileMasking(fileId, data, info);
+                            } else {
+                                setFileError(fileId, error);
+                            }
+                            break;
+                    }
+                };
+                
+                worker.onerror = function(error) {
+                    console.error('Worker error:', error);
+                };
+            } catch (e) {
+                console.warn('Failed to create worker:', e);
+            }
+        }
+
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//localhost:8080/ws`;
+            
+            try {
+                ws = new WebSocket(wsUrl);
+                
+                ws.onopen = function() {
+                    connectionDot.classList.add('connected');
+                    connectionText.textContent = 'WebSocket 已连接';
+                    console.log('WebSocket connected');
+                };
+                
+                ws.onmessage = function(event) {
+                    const data = JSON.parse(event.data);
+                    handleWebSocketMessage(data);
+                };
+                
+                ws.onclose = function() {
+                    connectionDot.classList.remove('connected');
+                    connectionText.textContent = 'WebSocket 已断开';
+                    console.log('WebSocket disconnected, reconnecting...');
+                    setTimeout(connectWebSocket, 3000);
+                };
+                
+                ws.onerror = function(error) {
+                    console.error('WebSocket error:', error);
+                };
+            } catch (e) {
+                console.warn('Failed to connect WebSocket:', e);
+                connectionDot.classList.remove('connected');
+                connectionText.textContent = 'WebSocket 连接失败';
+            }
+        }
+
+        function handleWebSocketMessage(data) {
+            switch (data.type) {
+                case 'connected':
+                    clientId = data.clientId;
+                    break;
+                    
+                case 'progress':
+                    updateBackendProgress(data.fileId, data.percent, data.stage);
+                    break;
+                    
+                case 'completed':
+                    completeFileBackend(data.fileId, data.url);
+                    break;
+                    
+                case 'error':
+                    setFileError(data.fileId, data.message);
+                    break;
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+            if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+            return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+        }
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function addFileToQueue(file) {
+            const id = generateId();
+            const fileData = {
+                id,
+                file,
+                name: file.name,
+                size: file.size,
+                status: 'pending',
+                progress: 0,
+                stage: '等待中',
+                maskedData: null,
+                info: null,
+                previewUrl: null
+            };
+            
+            fileQueue.push(fileData);
+            renderQueue();
+            return id;
+        }
+
+        function renderQueue() {
+            if (fileQueue.length === 0) {
+                emptyState.style.display = 'block';
+                queueHeader.style.display = 'none';
+                batchActions.style.display = 'none';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            queueHeader.style.display = 'flex';
+            batchActions.style.display = 'flex';
+            
+            updateStats();
+            
+            queueList.innerHTML = '';
+            fileQueue.forEach(item => {
+                queueList.appendChild(createQueueItem(item));
+            });
+        }
+
+        function createQueueItem(item) {
+            const div = document.createElement('div');
+            div.className = `queue-item ${item.status}`;
+            div.id = `item-${item.id}`;
+            
+            const statusText = {
+                pending: '等待中',
+                masking: '脱敏处理中',
+                masked: '已脱敏，等待上传',
+                uploading: '上传中',
+                queued: '队列中',
+                processing: '转换中',
+                completed: '已完成',
+                error: '失败'
+            };
+            
+            const statusClass = {
+                pending: 'status-pending',
+                masking: 'status-processing',
+                masked: 'status-pending',
+                uploading: 'status-processing',
+                queued: 'status-pending',
+                processing: 'status-processing',
+                completed: 'status-completed',
+                error: 'status-error'
+            };
+            
+            let statusDisplay = '';
+            if (item.status === 'processing' || item.status === 'masking' || item.status === 'uploading') {
+                statusDisplay = `<span class="stage-indicator"><span class="stage-dot"></span>${item.stage} ${item.progress}%</span>`;
+            } else {
+                statusDisplay = `<span class="${statusClass[item.status]}">${statusText[item.status] || item.status}</span>`;
+            }
+            
+            let infoDisplay = '';
+            if (item.info) {
+                infoDisplay = `
+                    <div style="margin-top: 8px; font-size: 12px;">
+                        <span class="info-badge masked">
+                            ${item.info.masked_patient_name || '已脱敏'} / ${item.info.masked_patient_id || '已脱敏'}
+                        </span>
+                    </div>
+                `;
+            }
+            
+            let progressBar = '';
+            if (item.status === 'processing' || item.status === 'masking' || item.status === 'uploading') {
+                progressBar = `
+                    <div class="item-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${item.progress}%"></div>
+                        </div>
+                    </div>
+                `;
+            } else if (item.status === 'completed') {
+                progressBar = `
+                    <div class="item-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill success" style="width: 100%"></div>
+                        </div>
+                    </div>
+                `;
+            } else if (item.status === 'error') {
+                progressBar = `
+                    <div class="item-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill error" style="width: 100%"></div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            div.innerHTML = `
+                <div class="item-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                </div>
+                <div class="item-content">
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-meta">
+                        <span>${formatFileSize(item.size)}</span>
+                        <span class="item-status">${statusDisplay}</span>
+                    </div>
+                    ${infoDisplay}
+                    ${progressBar}
+                </div>
+                <div class="item-actions">
+                    <button class="action-btn preview" ${item.status !== 'completed' ? 'disabled' : ''} onclick="previewFile('${item.id}')" title="预览">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    </button>
+                    <button class="action-btn remove" onclick="removeFile('${item.id}')" title="移除">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                </div>
+            `;
+            
+            return div;
+        }
+
+        function updateStats() {
+            const pending = fileQueue.filter(f => f.status === 'pending' || f.status === 'masked').length;
+            const processing = fileQueue.filter(f => ['masking', 'uploading', 'queued', 'processing'].includes(f.status)).length;
+            const completed = fileQueue.filter(f => f.status === 'completed').length;
+            const errors = fileQueue.filter(f => f.status === 'error').length;
+            
+            document.getElementById('pendingCount').textContent = pending;
+            document.getElementById('processingCount').textContent = processing;
+            document.getElementById('completedCount').textContent = completed;
+            document.getElementById('errorCount').textContent = errors;
+        }
+
+        function updateFileProgress(fileId, percent, stage) {
+            const item = fileQueue.find(f => f.id === fileId);
+            if (!item) return;
+            
+            item.progress = percent;
+            item.stage = stage;
+            renderQueue();
+        }
+
+        function updateBackendProgress(fileId, percent, stage) {
+            const item = fileQueue.find(f => f.backendFileId === fileId);
+            if (!item) return;
+            
+            item.progress = percent;
+            item.stage = stage;
+            item.status = 'processing';
+            renderQueue();
+        }
+
+        function completeFileMasking(fileId, data, info) {
+            const item = fileQueue.find(f => f.id === fileId);
+            if (!item) return;
+            
+            item.maskedData = data;
+            item.info = info;
+            item.status = 'masked';
+            item.progress = 100;
+            
+            sendToBackend(item);
+        }
+
+        async function sendToBackend(item) {
+            if (!item.maskedData) return;
+            
+            try {
+                item.status = 'uploading';
+                item.progress = 0;
+                item.stage = '上传中';
+                renderQueue();
+                
+                const blob = new Blob([item.maskedData], { type: 'application/dicom' });
+                const formData = new FormData();
+                formData.append('file', blob, item.name);
+                formData.append('clientId', clientId || '');
+                formData.append('frontendFileId', item.id);
+                
+                const response = await fetch('http://localhost:8080/upload/batch', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error('上传失败');
+                }
+                
+                const result = await response.json();
+                item.backendFileId = result.fileId;
+                item.status = 'queued';
+                item.stage = '队列中';
+                renderQueue();
+                
+            } catch (error) {
+                setFileError(item.id, error.message);
+            }
+        }
+
+        function completeFileBackend(fileId, url) {
+            const item = fileQueue.find(f => f.backendFileId === fileId);
+            if (!item) return;
+            
+            item.status = 'completed';
+            item.progress = 100;
+            item.previewUrl = 'http://localhost:8080' + url;
+            renderQueue();
+        }
+
+        function setFileError(fileId, message) {
+            const item = fileQueue.find(f => f.id === fileId || f.backendFileId === fileId);
+            if (!item) return;
+            
+            item.status = 'error';
+            item.errorMessage = message;
+            item.stage = message;
+            renderQueue();
+        }
+
+        function removeFile(id) {
+            fileQueue = fileQueue.filter(f => f.id !== id);
+            renderQueue();
+        }
+
+        function previewFile(id) {
+            const item = fileQueue.find(f => f.id === id);
+            if (!item || !item.previewUrl) return;
+            
+            previewImage.src = item.previewUrl;
+            previewModal.classList.add('show');
+        }
+
+        previewClose.addEventListener('click', () => {
+            previewModal.classList.remove('show');
+        });
+
+        previewModal.addEventListener('click', (e) => {
+            if (e.target === previewModal) {
+                previewModal.classList.remove('show');
+            }
+        });
+
+        function startBatchProcessing() {
+            const pendingFiles = fileQueue.filter(f => f.status === 'pending');
+            
+            if (pendingFiles.length === 0) return;
+            
+            startBatchBtn.disabled = true;
+            
+            pendingFiles.forEach((item, index) => {
+                setTimeout(() => {
+                    startMasking(item);
+                }, index * 200);
+            });
+        }
+
+        function startMasking(item) {
+            if (!worker) {
+                initWorker();
+            }
+            
+            item.status = 'masking';
+            item.progress = 0;
+            item.stage = '初始化';
+            renderQueue();
+            
+            if (worker) {
+                worker.postMessage({
+                    type: 'process',
+                    fileId: item.id,
+                    file: item.file
+                }, [item.file]);
+            } else {
+                setFileError(item.id, 'Worker 不可用');
+            }
+        }
+
+        clearBtn.addEventListener('click', () => {
+            fileQueue = [];
+            renderQueue();
+            startBatchBtn.disabled = false;
+        });
+
+        startBatchBtn.addEventListener('click', startBatchProcessing);
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            const dcmFiles = Array.from(files).filter(f => f.name.toLowerCase().endsWith('.dcm'));
+            
+            if (dcmFiles.length === 0) {
+                alert('请上传 .dcm 格式的 DICOM 文件');
+                return;
+            }
+            
+            dcmFiles.forEach(file => addFileToQueue(file));
+            fileInput.value = '';
+        }
+
+        window.removeFile = removeFile;
+        window.previewFile = previewFile;
+
+        initWorker();
+        connectWebSocket();
+    </script>
+</body>
+</html>
