@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ODE 符号求解引擎</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] },
+      svg: { fontCache: 'global' },
+      options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] }
+    };
+  </script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+</head>
+<body>
+  <header class="top">
+    <h1>常微分方程（ODE）符号求解引擎</h1>
+    <p class="subtitle">
+      基于 Python + SymPy 的扩展求解器 · 支持 30+ 种方程类型识别 ·
+      Abel / Chini / Riccati / Clairaut / Euler / Bessel …
+    </p>
+  </header>
+
+  <main class="container">
+    <section class="panel input-panel">
+      <h2>1. 输入方程</h2>
+      <div class="form-row">
+        <label for="equation">LaTeX 表达式（或 SymPy 风格）</label>
+        <textarea id="equation" rows="3"
+          placeholder="例如: y'' + y = 0   或   \frac{d^2 y}{d x^2} + y = 0"></textarea>
+      </div>
+      <div class="form-row">
+        <label>输入格式</label>
+        <div class="radio-row">
+          <label><input type="radio" name="format" value="latex" checked /> LaTeX</label>
+          <label><input type="radio" name="format" value="sympy" /> SymPy</label>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="radio-row">
+          <label><input type="checkbox" id="computeNum" checked /> 生成数值对比</label>
+        </div>
+      </div>
+      <div class="form-row num-options">
+        <label>数值参数</label>
+        <div class="inline-inputs">
+          <div class="inline-field">
+            <span>x₀</span>
+            <input type="number" id="numX0" value="0" step="0.1" />
+          </div>
+          <div class="inline-field">
+            <span>x_max</span>
+            <input type="number" id="numXEnd" value="5" step="0.5" />
+          </div>
+          <div class="inline-field">
+            <span>y(x₀)</span>
+            <input type="number" id="numY0" value="1" step="0.1" />
+          </div>
+          <div class="inline-field">
+            <span>采样点</span>
+            <input type="number" id="numPoints" value="100" step="10" min="10" max="1000" />
+          </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <button id="solveBtn" class="primary">求解</button>
+        <button id="parseBtn" class="secondary">仅解析</button>
+        <button id="clearBtn" class="ghost">清空</button>
+      </div>
+      <div class="examples">
+        <span>示例：</span>
+        <button class="chip" data-eq="y' + y = 0">y' + y = 0</button>
+        <button class="chip" data-eq="y'' + y = 0">y'' + y = 0</button>
+        <button class="chip" data-eq="y' = y**2 + x">y' = y^2 + x (Riccati)</button>
+        <button class="chip" data-eq="y' + y = y**3">y' + y = y^3 (Bernoulli)</button>
+        <button class="chip" data-eq="x**2*y'' + x*y' + (x**2 - 1)*y = 0">Bessel</button>
+        <button class="chip" data-eq="(1-x**2)*y'' - 2*x*y' + 2*y = 0">Legendre</button>
+        <button class="chip" data-eq="y' = y**3 + y**2 + y">Abel 第一类</button>
+        <button class="chip" data-eq="y' = y**5 + y">Chini (n=5)</button>
+        <button class="chip" data-eq="y' = a*y**2 + b*y + c">Riccati (参数)</button>
+      </div>
+    </section>
+
+    <section class="panel info-panel">
+      <h2>2. 方程信息</h2>
+      <div id="info" class="info-grid"></div>
+    </section>
+
+    <section class="panel types-panel">
+      <h2>3. 类型识别</h2>
+      <div id="types" class="types-grid"></div>
+    </section>
+
+    <section class="panel steps-panel">
+      <h2>4. 求解步骤</h2>
+      <ol id="steps" class="steps"></ol>
+    </section>
+
+    <section class="panel solutions-panel">
+      <h2>5. 解</h2>
+      <div class="solutions">
+        <div>
+          <h3>通解</h3>
+          <ul id="general" class="sol"></ul>
+        </div>
+        <div>
+          <h3>特解</h3>
+          <ul id="particular" class="sol"></ul>
+        </div>
+      </div>
+      <div class="verify">
+        <h3>解的验证</h3>
+        <ul id="verification" class="ver"></ul>
+      </div>
+    </section>
+
+    <section id="numPanel" class="panel numerical-panel hidden">
+      <h2>6. 符号解 vs 数值解对比</h2>
+      <div id="numMetrics" class="num-metrics"></div>
+      <div id="numPlot" class="num-plot"></div>
+      <div id="numErrorReport" class="num-error-report"></div>
+    </section>
+
+    <section id="error" class="panel error-panel hidden">
+      <h2>错误</h2>
+      <pre id="errorMsg"></pre>
+    </section>
+  </main>
+
+  <footer>
+    <span id="status"></span>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
