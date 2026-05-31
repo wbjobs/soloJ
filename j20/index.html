@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实时视频风格迁移 - Neural Style Transfer</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.16.3/dist/ort.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/face_detection.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>🎨 实时视频风格迁移</h1>
+            <p class="subtitle">基于 ONNX.js + WebGL + MediaPipe</p>
+        </header>
+
+        <main class="main-content">
+            <div class="video-container">
+                <div class="video-wrapper">
+                    <video id="video" autoplay playsinline muted></video>
+                    <canvas id="output-canvas"></canvas>
+                    <canvas id="face-mask-canvas" class="hidden"></canvas>
+                    <canvas id="processing-canvas" class="hidden"></canvas>
+                    <div id="loading-overlay" class="loading-overlay">
+                        <div class="loading-spinner"></div>
+                        <p id="loading-text">正在初始化...</p>
+                    </div>
+                </div>
+                
+                <div id="performance-panel" class="performance-panel">
+                    <div class="perf-item">
+                        <span class="perf-label">FPS:</span>
+                        <span id="fps-value" class="perf-value">0</span>
+                    </div>
+                    <div class="perf-item">
+                        <span class="perf-label">推理时间:</span>
+                        <span id="inference-time" class="perf-value">0ms</span>
+                    </div>
+                    <div class="perf-item">
+                        <span class="perf-label">总耗时:</span>
+                        <span id="total-time" class="perf-value">0ms</span>
+                    </div>
+                    <div class="perf-item">
+                        <span class="perf-label">分辨率:</span>
+                        <span id="resolution" class="perf-value">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="control-panel">
+                <div class="control-section">
+                    <h3>🎭 艺术风格</h3>
+                    <div id="style-grid" class="style-grid">
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <h3>⚙️ 风格强度</h3>
+                    <div class="slider-container">
+                        <input type="range" id="intensity-slider" min="0" max="100" value="100">
+                        <span id="intensity-value">100%</span>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <h3>� 文字描述</h3>
+                    <div class="text-input-container">
+                        <textarea 
+                            id="text-description" 
+                            placeholder="例如：把天空变成梵高的星空，草地保持原样..."
+                            rows="3"
+                        ></textarea>
+                        <div class="button-row">
+                            <button id="apply-text-btn" class="btn btn-secondary" disabled>
+                                ✨ 应用描述
+                            </button>
+                            <button id="clear-text-btn" class="btn btn-outline">
+                                清除
+                            </button>
+                        </div>
+                    </div>
+                    <div class="connection-status">
+                        <span class="status-dot" id="ws-status-dot"></span>
+                        <span id="ws-status-text">后端服务未连接</span>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <h3>�👤 人脸保护</h3>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="face-protection-toggle" checked>
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-label">开启人脸区域保护</span>
+                    </label>
+                    <div class="slider-container mt-20" id="face-blur-container">
+                        <label class="sub-label">人脸边缘羽化:</label>
+                        <input type="range" id="face-blur-slider" min="0" max="50" value="20">
+                        <span id="face-blur-value">20px</span>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <h3>🔌 后端服务</h3>
+                    <div class="input-group">
+                        <label>服务地址:</label>
+                        <input 
+                            type="text" 
+                            id="backend-url" 
+                            value="ws://localhost:8000"
+                            placeholder="ws://localhost:8000"
+                        >
+                    </div>
+                    <button id="connect-backend-btn" class="btn btn-secondary mt-10">
+                        🔗 连接后端
+                    </button>
+                </div>
+
+                <div class="control-section">
+                    <h3>📷 摄像头设置</h3>
+                    <div class="select-container">
+                        <label>分辨率:</label>
+                        <select id="resolution-select">
+                            <option value="640x480">640 x 480 (480p)</option>
+                            <option value="1280x720" selected>1280 x 720 (720p)</option>
+                            <option value="1920x1080">1920 x 1080 (1080p)</option>
+                        </select>
+                    </div>
+                    <button id="camera-toggle" class="btn btn-primary mt-20">
+                        📹 开启摄像头
+                    </button>
+                </div>
+
+                <div class="control-section">
+                    <h3>⏱️ 性能监控</h3>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="show-perf-toggle" checked>
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-label">显示性能面板</span>
+                    </label>
+                </div>
+
+                <div class="control-section">
+                    <div id="model-status" class="model-status">
+                        <span class="status-dot"></span>
+                        <span id="status-text">等待加载模型...</span>
+                    </div>
+                </div>
+            </aside>
+        </main>
+
+        <footer class="app-footer">
+            <p>Fast Neural Style Transfer · ONNX Runtime Web · WebGL Acceleration</p>
+        </footer>
+    </div>
+
+    <script type="module" src="src/main.js"></script>
+</body>
+</html>
