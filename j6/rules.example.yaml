@@ -1,0 +1,88 @@
+rules:
+  - name: "Error Detection"
+    keywords:
+      - "ERROR"
+      - "Error"
+      - "error"
+    level: "error"
+    notification: true
+    case_sensitive: false
+    streams:
+      - "stderr"
+      - "stdout"
+
+  - name: "Timeout Detection"
+    keywords:
+      - "timeout"
+      - "Timeout"
+      - "TIMEOUT"
+    level: "warning"
+    notification: true
+    case_sensitive: false
+    streams:
+      - "stderr"
+      - "stdout"
+
+  - name: "Warning Detection"
+    keywords:
+      - "WARN"
+      - "Warning"
+      - "warning"
+    level: "warning"
+    notification: false
+    case_sensitive: false
+    streams:
+      - "stderr"
+      - "stdout"
+
+  - name: "Panic Detection"
+    keywords:
+      - "panic"
+      - "PANIC"
+    level: "error"
+    notification: true
+    case_sensitive: false
+    streams:
+      - "stderr"
+
+  - name: "Fatal Error"
+    keywords:
+      - "FATAL"
+      - "fatal"
+    level: "error"
+    notification: true
+    case_sensitive: false
+    streams:
+      - "stderr"
+      - "stdout"
+
+  - name: "404 Errors"
+    keywords:
+      - "404"
+    level: "warning"
+    notification: false
+    case_sensitive: false
+    streams:
+      - "stdout"
+      - "stderr"
+
+  - name: "500 Errors"
+    keywords:
+      - "500"
+    level: "error"
+    notification: true
+    case_sensitive: false
+    streams:
+      - "stdout"
+      - "stderr"
+
+  - name: "OOM Detection"
+    keywords:
+      - "OOM"
+      - "out of memory"
+      - "Out of memory"
+    level: "error"
+    notification: true
+    case_sensitive: false
+    streams:
+      - "stderr"
