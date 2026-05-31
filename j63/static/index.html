@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LAN File Transfer</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+.container{max-width:640px;width:100%;padding:40px 20px}
+h1{text-align:center;font-size:28px;margin-bottom:8px;background:linear-gradient(135deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{text-align:center;color:#94a3b8;margin-bottom:36px;font-size:14px}
+.card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:24px;margin-bottom:20px}
+.card h2{font-size:16px;margin-bottom:16px;color:#38bdf8}
+.room-display{text-align:center;font-size:32px;letter-spacing:4px;font-weight:700;color:#818cf8;padding:12px;background:#0f172a;border-radius:8px;margin:12px 0;user-select:all}
+input[type=text]{width:100%;padding:12px 16px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#e2e8f0;font-size:16px;outline:none;transition:border .2s}
+input[type=text]:focus{border-color:#38bdf8}
+input[type=file]{display:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 24px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;width:100%}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-primary{background:linear-gradient(135deg,#38bdf8,#818cf8);color:#0f172a}
+.btn-primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 4px 20px rgba(56,189,248,.3)}
+.btn-secondary{background:#334155;color:#e2e8f0}
+.btn-secondary:hover:not(:disabled){background:#475569}
+.btn-upload{background:linear-gradient(135deg,#34d399,#38bdf8);color:#0f172a;margin-top:12px}
+.status{text-align:center;padding:12px;border-radius:8px;margin:12px 0;font-size:13px}
+.status-waiting{background:#1e3a5f;color:#38bdf8}
+.status-connected{background:#1a3a2a;color:#34d399}
+.status-error{background:#3a1a1a;color:#f87171}
+.progress-bar{width:100%;height:8px;background:#0f172a;border-radius:4px;overflow:hidden;margin:12px 0}
+.progress-fill{height:100%;background:linear-gradient(90deg,#38bdf8,#818cf8);border-radius:4px;transition:width .3s;width:0}
+.progress-text{text-align:center;font-size:13px;color:#94a3b8}
+.file-info{display:flex;align-items:center;gap:12px;padding:12px;background:#0f172a;border-radius:8px;margin:12px 0}
+.file-icon{width:40px;height:40px;background:linear-gradient(135deg,#38bdf8,#818cf8);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.file-name{font-size:14px;font-weight:500;word-break:break-all}
+.file-size{font-size:12px;color:#94a3b8}
+.hidden{display:none}
+.row{display:flex;gap:12px}
+.row .btn{flex:1}
+#log{max-height:200px;overflow-y:auto;font-size:12px;color:#64748b;padding:8px;background:#0f172a;border-radius:8px;margin-top:12px;line-height:1.8}
+.transfer-actions{display:flex;gap:12px;margin-top:12px}
+.bandwidth-row{display:flex;align-items:center;gap:12px;margin-top:8px}
+.bandwidth-row label{font-size:13px;color:#94a3b8;white-space:nowrap}
+.bandwidth-row input[type=range]{flex:1;-webkit-appearance:none;height:6px;background:#334155;border-radius:3px;outline:none}
+.bandwidth-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:linear-gradient(135deg,#38bdf8,#818cf8);border-radius:50%;cursor:pointer}
+.bandwidth-val{font-size:13px;color:#818cf8;font-weight:600;min-width:60px;text-align:right}
+.hash-text{font-size:11px;color:#64748b;word-break:break-all;margin-top:4px;font-family:monospace}
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>LAN File Transfer</h1>
+    <p class="subtitle">WebRTC P2P LAN Fast File Transfer</p>
+
+    <div id="setupCard" class="card">
+        <h2>Create or Join Room</h2>
+        <button id="btnCreate" class="btn btn-primary" onclick="createRoom()">Create Room</button>
+        <div style="height:12px"></div>
+        <div class="row">
+            <input type="text" id="inputRoomId" placeholder="Enter Room ID">
+            <button id="btnJoin" class="btn btn-secondary" onclick="joinRoom()">Join</button>
+        </div>
+    </div>
+
+    <div id="roomCard" class="card hidden">
+        <h2>Room</h2>
+        <div id="roomIdDisplay" class="room-display"></div>
+        <div id="statusBar" class="status status-waiting">Waiting for peer connection...</div>
+    </div>
+
+    <div id="sendCard" class="card hidden">
+        <h2>Send File</h2>
+        <div id="fileInfo" class="file-info hidden">
+            <div class="file-icon">📄</div>
+            <div>
+                <div id="fileName" class="file-name"></div>
+                <div id="fileSize" class="file-size"></div>
+            </div>
+        </div>
+        <div id="fileHashRow" class="hidden"><div class="hash-text" id="fileHashText"></div></div>
+        <div class="transfer-actions">
+            <button id="btnSelect" class="btn btn-upload" onclick="selectFile()">Select File</button>
+            <button id="btnSend" class="btn btn-primary" onclick="sendFile()" disabled>Send</button>
+        </div>
+        <input type="file" id="fileInput" onchange="onFileSelected(event)">
+        <div class="bandwidth-row">
+            <label>Bandwidth Limit</label>
+            <input type="range" id="bwSlider" min="0" max="100" value="0" step="1" oninput="onBwChange()">
+            <span class="bandwidth-val" id="bwVal">Unlimited</span>
+        </div>
+        <div id="sendProgress" class="hidden">
+            <div class="progress-bar"><div id="sendProgressBar" class="progress-fill"></div></div>
+            <div id="sendProgressText" class="progress-text">0%</div>
+        </div>
+    </div>
+
+    <div id="receiveCard" class="card hidden">
+        <h2>Receiving File</h2>
+        <div id="recvFileInfo" class="file-info hidden">
+            <div class="file-icon">📥</div>
+            <div>
+                <div id="recvFileName" class="file-name"></div>
+                <div id="recvFileSize" class="file-size"></div>
+            </div>
+        </div>
+        <div id="recvHashRow" class="hidden"><div class="hash-text" id="recvHashText"></div></div>
+        <div id="recvProgress" class="hidden">
+            <div class="progress-bar"><div id="recvProgressBar" class="progress-fill"></div></div>
+            <div id="recvProgressText" class="progress-text">0%</div>
+        </div>
+        <button id="btnDownload" class="btn btn-primary hidden" onclick="downloadFile()">Download</button>
+    </div>
+
+    <div id="logCard" class="card">
+        <h2>Log</h2>
+        <div id="log"></div>
+    </div>
+</div>
+
+<script>
+const CHUNK_SIZE = 16384;
+const BUFFER_HIGH_WATERMARK = 8 * 1024 * 1024;
+const BUFFER_LOW_WATERMARK = 1024 * 1024;
+const READ_CHUNK_SIZE = 4 * 1024 * 1024;
+const SIGNALING_TIMEOUT_MS = 120000;
+const FETCH_TIMEOUT_MS = 15000;
+const MAX_SIGNALING_RETRIES = 3;
+const PROGRESS_REPORT_INTERVAL = 3000;
+const IDB_CHECKPOINT_INTERVAL = 16 * 1024 * 1024;
+const ICE_SERVERS = [{ urls: 'stun:stun.l.google.com:19302' }];
+
+const BW_PRESETS = [0,0.25,0.5,1,2,5,10,20,50];
+const SHA256_K = new Uint32Array([0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2]);
+
+let pc = null;
+let dataChannel = null;
+let roomId = null;
+let isSender = false;
+let selectedFile = null;
+let receivedBuffers = [];
+let receiveMeta = null;
+let receivedBytes = 0;
+let sendingInProgress = false;
+let signalingTimers = [];
+let bandwidthLimit = 0;
+let bytesAccounted = 0;
+let secondStartTime = 0;
+let currentTransferId = null;
+let senderHashState = null;
+let receiverHashState = null;
+let progressReportTimer = null;
+let lastCheckpointBytes = 0;
+
+function log(msg) {
+    const el = document.getElementById('log');
+    const time = new Date().toLocaleTimeString();
+    el.innerHTML += '[' + time + '] ' + msg + '<br>';
+    el.scrollTop = el.scrollHeight;
+}
+
+function setStatus(text, type) {
+    const bar = document.getElementById('statusBar');
+    bar.textContent = text;
+    bar.className = 'status status-' + type;
+}
+
+function show(el) { document.getElementById(el).classList.remove('hidden'); }
+function hide(el) { document.getElementById(el).classList.add('hidden'); }
+
+function formatSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+}
+
+function onBwChange() {
+    const slider = document.getElementById('bwSlider');
+    const val = parseInt(slider.value);
+    if (val === 0) {
+        bandwidthLimit = 0;
+        document.getElementById('bwVal').textContent = 'Unlimited';
+    } else {
+        const idx = Math.min(val, BW_PRESETS.length - 1);
+        bandwidthLimit = BW_PRESETS[idx] * 1024 * 1024;
+        if (BW_PRESETS[idx] >= 1) {
+            document.getElementById('bwVal').textContent = BW_PRESETS[idx] + ' MB/s';
+        } else {
+            document.getElementById('bwVal').textContent = (BW_PRESETS[idx] * 1024) + ' KB/s';
+        }
+    }
+}
+
+async function throttleCheck(bytesToSend) {
+    if (bandwidthLimit <= 0) return;
+    const now = performance.now();
+    if (now - secondStartTime >= 1000) {
+        bytesAccounted = 0;
+        secondStartTime = now;
+    }
+    if (bytesAccounted + bytesToSend > bandwidthLimit) {
+        const sleepMs = 1000 - (now - secondStartTime) + 1;
+        if (sleepMs > 0) await new Promise(r => setTimeout(r, sleepMs));
+        bytesAccounted = 0;
+        secondStartTime = performance.now();
+    }
+    bytesAccounted += bytesToSend;
+}
+
+function sha256Init() {
+    return {
+        h: new Uint32Array([0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19]),
+        buf: new Uint8Array(64),
+        bufLen: 0,
+        totalLen: 0
+    };
+}
+
+function sha256Block(state, block) {
+    const w = new Uint32Array(64);
+    const dv = new DataView(block.buffer || block, block.byteOffset, block.byteLength);
+    for (let i = 0; i < 16; i++) w[i] = dv.getUint32(i * 4);
+    for (let i = 16; i < 64; i++) {
+        const w15 = w[i-15], w2 = w[i-2];
+        const s0 = ((w15 >>> 7) | (w15 << 25)) ^ ((w15 >>> 18) | (w15 << 14)) ^ (w15 >>> 3);
+        const s1 = ((w2 >>> 17) | (w2 << 15)) ^ ((w2 >>> 19) | (w2 << 13)) ^ (w2 >>> 10);
+        w[i] = (w[i-16] + s0 + w[i-7] + s1) | 0;
+    }
+    let a=state.h[0],b=state.h[1],c=state.h[2],d=state.h[3],e=state.h[4],f=state.h[5],g=state.h[6],h=state.h[7];
+    for (let i = 0; i < 64; i++) {
+        const S1 = ((e >>> 6) | (e << 26)) ^ ((e >>> 11) | (e << 21)) ^ ((e >>> 25) | (e << 7));
+        const ch = (e & f) ^ (~e & g);
+        const t1 = (h + S1 + ch + SHA256_K[i] + w[i]) | 0;
+        const S0 = ((a >>> 2) | (a << 30)) ^ ((a >>> 13) | (a << 19)) ^ ((a >>> 22) | (a << 10));
+        const maj = (a & b) ^ (a & c) ^ (b & c);
+        const t2 = (S0 + maj) | 0;
+        h=g; g=f; f=e; e=(d+t1)|0; d=c; c=b; b=a; a=(t1+t2)|0;
+    }
+    state.h[0]=(state.h[0]+a)|0; state.h[1]=(state.h[1]+b)|0;
+    state.h[2]=(state.h[2]+c)|0; state.h[3]=(state.h[3]+d)|0;
+    state.h[4]=(state.h[4]+e)|0; state.h[5]=(state.h[5]+f)|0;
+    state.h[6]=(state.h[6]+g)|0; state.h[7]=(state.h[7]+h)|0;
+}
+
+function sha256Update(state, data) {
+    const bytes = data instanceof Uint8Array ? data : new Uint8Array(data);
+    let offset = 0;
+    if (state.bufLen > 0) {
+        const fill = Math.min(64 - state.bufLen, bytes.length);
+        state.buf.set(bytes.subarray(0, fill), state.bufLen);
+        state.bufLen += fill;
+        offset += fill;
+        if (state.bufLen === 64) { sha256Block(state, state.buf); state.bufLen = 0; }
+    }
+    while (offset + 64 <= bytes.length) {
+        sha256Block(state, bytes.subarray(offset, offset + 64));
+        offset += 64;
+    }
+    if (offset < bytes.length) {
+        state.buf.set(bytes.subarray(offset), state.bufLen);
+        state.bufLen += bytes.length - offset;
+    }
+    state.totalLen += bytes.length;
+}
+
+function sha256Final(state) {
+    const padLen = state.bufLen < 56 ? 64 : 128;
+    const pad = new Uint8Array(padLen);
+    pad.set(state.buf.subarray(0, state.bufLen));
+    pad[state.bufLen] = 0x80;
+    const bitLen = state.totalLen * 8;
+    const dv = new DataView(pad.buffer);
+    dv.setUint32(padLen - 8, (bitLen / 0x100000000) >>> 0);
+    dv.setUint32(padLen - 4, bitLen >>> 0);
+    sha256Block(state, pad.subarray(0, 64));
+    if (padLen === 128) sha256Block(state, pad.subarray(64, 128));
+    const result = new Uint8Array(32);
+    const rdv = new DataView(result.buffer);
+    for (let i = 0; i < 8; i++) rdv.setUint32(i * 4, state.h[i]);
+    return Array.from(result).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function generateTransferId(file) {
+    const raw = file.name + '::' + file.size + '::' + file.lastModified;
+    const st = sha256Init();
+    sha256Update(st, new TextEncoder().encode(raw));
+    return sha256Final(st).substring(0, 16);
+}
+
+const IDB_NAME = 'lan-file-transfer';
+const IDB_STORE = 'chunks';
+const IDB_VER = 1;
+
+function openIDB() {
+    return new Promise((resolve, reject) => {
+        const req = indexedDB.open(IDB_NAME, IDB_VER);
+        req.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(IDB_STORE)) {
+                db.createObjectStore(IDB_STORE, { keyPath: 'id', autoIncrement: true });
+            }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+    });
+}
+
+async function idbSaveChunks(transferId, chunks, receivedBytes, meta) {
+    try {
+        const db = await openIDB();
+        const tx = db.transaction(IDB_STORE, 'readwrite');
+        const store = tx.objectStore(IDB_STORE);
+        store.put({ id: transferId, chunks: chunks, receivedBytes: receivedBytes, meta: meta });
+        await new Promise((resolve, reject) => {
+            tx.oncomplete = resolve;
+            tx.onerror = () => reject(tx.error);
+        });
+    } catch (e) {
+        log('IDB save error: ' + e.message);
+    }
+}
+
+async function idbLoadTransfer(transferId) {
+    try {
+        const db = await openIDB();
+        const tx = db.transaction(IDB_STORE, 'readonly');
+        const store = tx.objectStore(IDB_STORE);
+        const req = store.get(transferId);
+        return new Promise((resolve, reject) => {
+            req.onsuccess = () => resolve(req.result || null);
+            req.onerror = () => reject(req.error);
+        });
+    } catch (e) {
+        log('IDB load error: ' + e.message);
+        return null;
+    }
+}
+
+async function idbDeleteTransfer(transferId) {
+    try {
+        const db = await openIDB();
+        const tx = db.transaction(IDB_STORE, 'readwrite');
+        tx.objectStore(IDB_STORE).delete(transferId);
+        await new Promise((resolve, reject) => {
+            tx.oncomplete = resolve;
+            tx.onerror = () => reject(tx.error);
+        });
+    } catch (e) {}
+}
+
+async function fetchWithTimeout(url, options, timeoutMs) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+        const resp = await fetch(url, { ...options, signal: controller.signal });
+        clearTimeout(timer);
+        return resp;
+    } catch (e) {
+        clearTimeout(timer);
+        if (e.name === 'AbortError') {
+            throw new Error('Request timed out (' + timeoutMs + 'ms): ' + url);
+        }
+        throw e;
+    }
+}
+
+async function retryFetch(url, options, maxRetries, timeoutMs) {
+    let lastError = null;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            const resp = await fetchWithTimeout(url, options, timeoutMs);
+            if (resp.ok || resp.status === 404) return resp;
+            lastError = new Error('HTTP ' + resp.status);
+        } catch (e) {
+            lastError = e;
+            if (attempt < maxRetries) {
+                const delay = Math.min(1000 * Math.pow(2, attempt - 1), 8000);
+                log('Retry ' + attempt + '/' + maxRetries + ' for ' + url + ' in ' + delay + 'ms');
+                await new Promise(r => setTimeout(r, delay));
+            }
+        }
+    }
+    throw lastError;
+}
+
+function clearSignalingTimers() {
+    signalingTimers.forEach(id => clearTimeout(id));
+    signalingTimers = [];
+}
+
+function addSignalingTimer(fn, delay) {
+    const id = setTimeout(fn, delay);
+    signalingTimers.push(id);
+    return id;
+}
+
+async function reportProgress() {
+    if (!currentTransferId || !receiveMeta) return;
+    try {
+        await retryFetch('/transfer/' + currentTransferId + '/progress', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ received_bytes: receivedBytes })
+        }, 2, FETCH_TIMEOUT_MS);
+    } catch (e) {
+        log('Progress report error: ' + e.message);
+    }
+}
+
+function startProgressReporter() {
+    stopProgressReporter();
+    progressReportTimer = setInterval(reportProgress, PROGRESS_REPORT_INTERVAL);
+}
+
+function stopProgressReporter() {
+    if (progressReportTimer) {
+        clearInterval(progressReportTimer);
+        progressReportTimer = null;
+    }
+}
+
+async function createRoom() {
+    try {
+        const resp = await retryFetch('/room/new', {}, MAX_SIGNALING_RETRIES, FETCH_TIMEOUT_MS);
+        const data = await resp.json();
+        roomId = data.room_id;
+        isSender = true;
+        document.getElementById('roomIdDisplay').textContent = roomId;
+        hide('setupCard');
+        show('roomCard');
+        show('sendCard');
+        log('Room created: ' + roomId);
+        initPeerConnection(true);
+    } catch (e) {
+        log('Failed to create room: ' + e.message);
+        setStatus('Failed to create room', 'error');
+    }
+}
+
+async function joinRoom() {
+    const input = document.getElementById('inputRoomId').value.trim();
+    if (!input) return;
+    roomId = input;
+    isSender = false;
+    document.getElementById('roomIdDisplay').textContent = roomId;
+    hide('setupCard');
+    show('roomCard');
+    show('receiveCard');
+    log('Joining room: ' + roomId);
+    initPeerConnection(false);
+}
+
+function initPeerConnection(asSender) {
+    pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+
+    pc.onicecandidate = async (e) => {
+        if (e.candidate) {
+            const role = asSender ? 'sender' : 'receiver';
+            try {
+                await retryFetch('/candidate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ room_id: roomId, candidate: e.candidate.toJSON(), role: role })
+                }, MAX_SIGNALING_RETRIES, FETCH_TIMEOUT_MS);
+            } catch (err) {
+                log('ICE candidate send failed: ' + err.message);
+            }
+        }
+    };
+
+    pc.onicecandidateerror = (e) => {
+        log('ICE candidate error: ' + e.errorCode + ' ' + e.errorText);
+    };
+
+    pc.onconnectionstatechange = () => {
+        log('Connection state: ' + pc.connectionState);
+        if (pc.connectionState === 'connected') {
+            setStatus('Peer connected!', 'connected');
+            clearSignalingTimers();
+        } else if (pc.connectionState === 'disconnected') {
+            setStatus('Connection interrupted, attempting recovery...', 'error');
+            handleConnectionRecovery();
+        } else if (pc.connectionState === 'failed') {
+            setStatus('Connection failed', 'error');
+            handleConnectionRecovery();
+        }
+    };
+
+    pc.oniceconnectionstatechange = () => {
+        log('ICE state: ' + pc.iceConnectionState);
+        if (pc.iceConnectionState === 'failed') {
+            log('ICE connection failed, attempting restart...');
+            pc.restartIce();
+        }
+    };
+
+    if (asSender) {
+        dataChannel = pc.createDataChannel('fileTransfer', { ordered: true });
+        setupDataChannel(dataChannel);
+        createAndSendOffer();
+    } else {
+        pc.ondatachannel = (e) => {
+            dataChannel = e.channel;
+            setupDataChannel(dataChannel);
+            log('Data channel received');
+        };
+        fetchOfferAndAnswer();
+    }
+}
+
+function handleConnectionRecovery() {
+    if (pc && pc.connectionState !== 'closed') {
+        try {
+            pc.restartIce();
+            log('ICE restart requested');
+        } catch (e) {
+            log('ICE restart failed: ' + e.message);
+        }
+    }
+}
+
+function setupDataChannel(channel) {
+    channel.binaryType = 'arraybuffer';
+    channel.bufferedAmountLowThreshold = BUFFER_LOW_WATERMARK;
+
+    channel.onopen = () => {
+        log('Data channel open');
+        setStatus('Data channel ready', 'connected');
+        if (isSender) {
+            document.getElementById('btnSend').disabled = !selectedFile;
+        }
+    };
+    channel.onclose = () => {
+        log('Data channel closed');
+        stopProgressReporter();
+        if (sendingInProgress) {
+            log('Transfer interrupted — channel closed');
+            setStatus('Transfer interrupted', 'error');
+            sendingInProgress = false;
+            document.getElementById('btnSelect').disabled = false;
+            document.getElementById('btnSend').disabled = false;
+            if (currentTransferId) reportProgress();
+        }
+    };
+    channel.onerror = (e) => {
+        log('Data channel error: ' + (e.error ? e.error.message : 'unknown'));
+        stopProgressReporter();
+        if (sendingInProgress) {
+            setStatus('Transfer error', 'error');
+            sendingInProgress = false;
+            document.getElementById('btnSelect').disabled = false;
+            document.getElementById('btnSend').disabled = false;
+            if (currentTransferId) reportProgress();
+        }
+    };
+    channel.onmessage = (e) => {
+        if (typeof e.data === 'string') {
+            const msg = JSON.parse(e.data);
+            if (msg.type === 'meta') {
+                receiveMeta = msg;
+                currentTransferId = msg.transferId;
+                receivedBuffers = [];
+                receivedBytes = 0;
+                lastCheckpointBytes = 0;
+                receiverHashState = sha256Init();
+                idbDeleteTransfer(currentTransferId);
+                document.getElementById('recvFileName').textContent = receiveMeta.name;
+                document.getElementById('recvFileSize').textContent = formatSize(receiveMeta.size);
+                show('recvFileInfo');
+                show('recvProgress');
+                hide('btnDownload');
+                hide('recvHashRow');
+                log('Receiving file: ' + receiveMeta.name + ' (' + formatSize(receiveMeta.size) + ')');
+                startProgressReporter();
+            } else if (msg.type === 'resume') {
+                currentTransferId = msg.transferId;
+                receiveMeta = { name: msg.name, size: msg.size, type: msg.fileType, transferId: msg.transferId };
+                receivedBytes = msg.offset;
+                lastCheckpointBytes = msg.offset;
+                receiverHashState = sha256Init();
+                log('Resuming from offset: ' + formatSize(msg.offset));
+                document.getElementById('recvFileName').textContent = receiveMeta.name;
+                document.getElementById('recvFileSize').textContent = formatSize(receiveMeta.size);
+                show('recvFileInfo');
+                show('recvProgress');
+                hide('btnDownload');
+                const pct = (receivedBytes / receiveMeta.size * 100).toFixed(1);
+                document.getElementById('recvProgressBar').style.width = pct + '%';
+                document.getElementById('recvProgressText').textContent = 'Resume ' + pct + '% — ' + formatSize(receivedBytes) + ' / ' + formatSize(receiveMeta.size);
+                startProgressReporter();
+            } else if (msg.type === 'hash') {
+                const senderHash = msg.hash;
+                if (receiverHashState) {
+                    const recvHash = sha256Final(receiverHashState);
+                    show('recvHashRow');
+                    document.getElementById('recvHashText').textContent = 'SHA-256: ' + recvHash;
+                    if (recvHash === senderHash) {
+                        log('Hash verified OK: ' + recvHash.substring(0, 16) + '...');
+                    } else {
+                        log('Hash MISMATCH! Sender: ' + senderHash.substring(0, 16) + '... Receiver: ' + recvHash.substring(0, 16) + '...');
+                        setStatus('Hash verification FAILED', 'error');
+                    }
+                }
+            }
+        } else {
+            receivedBuffers.push(e.data);
+            receivedBytes += e.data.byteLength;
+            if (receiverHashState) sha256Update(receiverHashState, e.data);
+            const pct = Math.min(100, (receivedBytes / receiveMeta.size * 100)).toFixed(1);
+            document.getElementById('recvProgressBar').style.width = pct + '%';
+            document.getElementById('recvProgressText').textContent = pct + '% — ' + formatSize(receivedBytes) + ' / ' + formatSize(receiveMeta.size);
+            if (receivedBytes - lastCheckpointBytes >= IDB_CHECKPOINT_INTERVAL) {
+                idbSaveChunks(currentTransferId, receivedBuffers, receivedBytes, receiveMeta);
+                lastCheckpointBytes = receivedBytes;
+            }
+            if (receivedBytes >= receiveMeta.size) {
+                log('File received completely');
+                stopProgressReporter();
+                reportProgress();
+                show('btnDownload');
+                setStatus('File received!', 'connected');
+                idbDeleteTransfer(currentTransferId);
+            }
+        }
+    };
+}
+
+function waitForBufferDrain(channel) {
+    if (channel.bufferedAmount <= BUFFER_HIGH_WATERMARK) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+        const onLow = () => {
+            channel.removeEventListener('bufferedamountlow', onLow);
+            channel.removeEventListener('close', onClose);
+            resolve();
+        };
+        const onClose = () => {
+            channel.removeEventListener('bufferedamountlow', onLow);
+            channel.removeEventListener('close', onClose);
+            reject(new Error('DataChannel closed while waiting for buffer drain'));
+        };
+        channel.addEventListener('bufferedamountlow', onLow);
+        channel.addEventListener('close', onClose);
+    });
+}
+
+async function createAndSendOffer() {
+    try {
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        await retryFetch('/offer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ room_id: roomId, sdp: pc.localDescription.toJSON() })
+        }, MAX_SIGNALING_RETRIES, FETCH_TIMEOUT_MS);
+        log('Offer sent, waiting for answer...');
+        pollAnswer();
+    } catch (e) {
+        log('Offer error: ' + e.message);
+        setStatus('Failed to send offer', 'error');
+    }
+}
+
+function pollAnswer() {
+    const startTime = Date.now();
+    let interval = 1000;
+    const poll = async () => {
+        if (pc.connectionState === 'connected') return;
+        if (Date.now() - startTime > SIGNALING_TIMEOUT_MS) {
+            log('Answer polling timed out');
+            setStatus('Signaling timeout', 'error');
+            return;
+        }
+        try {
+            const resp = await fetchWithTimeout('/answer/' + roomId, {}, FETCH_TIMEOUT_MS);
+            if (resp.ok) {
+                const data = await resp.json();
+                await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+                log('Answer received and set');
+                pollSenderCandidates();
+                return;
+            }
+        } catch (e) {
+            log('Answer poll error: ' + e.message);
+        }
+        interval = Math.min(interval * 1.5, 5000);
+        addSignalingTimer(poll, interval);
+    };
+    addSignalingTimer(poll, interval);
+}
+
+function fetchOfferAndAnswer() {
+    const startTime = Date.now();
+    let interval = 1000;
+    const pollOffer = async () => {
+        if (pc.connectionState === 'connected') return;
+        if (Date.now() - startTime > SIGNALING_TIMEOUT_MS) {
+            log('Offer polling timed out');
+            setStatus('Signaling timeout', 'error');
+            return;
+        }
+        try {
+            const resp = await fetchWithTimeout('/offer/' + roomId, {}, FETCH_TIMEOUT_MS);
+            if (resp.ok) {
+                const data = await resp.json();
+                await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+                log('Offer received');
+                const answer = await pc.createAnswer();
+                await pc.setLocalDescription(answer);
+                await retryFetch('/answer', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ room_id: roomId, sdp: pc.localDescription.toJSON() })
+                }, MAX_SIGNALING_RETRIES, FETCH_TIMEOUT_MS);
+                log('Answer sent');
+                pollReceiverCandidates();
+                return;
+            }
+        } catch (e) {
+            log('Offer poll error: ' + e.message);
+        }
+        interval = Math.min(interval * 1.5, 5000);
+        addSignalingTimer(pollOffer, interval);
+    };
+    addSignalingTimer(pollOffer, interval);
+}
+
+function pollSenderCandidates() {
+    let lastIndex = 0;
+    const startTime = Date.now();
+    const poll = async () => {
+        if (pc.connectionState === 'connected' || pc.connectionState === 'closed') return;
+        if (Date.now() - startTime > SIGNALING_TIMEOUT_MS) return;
+        try {
+            const resp = await fetchWithTimeout('/candidate/' + roomId + '/receiver', {}, FETCH_TIMEOUT_MS);
+            if (resp.ok) {
+                const data = await resp.json();
+                for (let i = lastIndex; i < data.candidates.length; i++) {
+                    try { await pc.addIceCandidate(new RTCIceCandidate(data.candidates[i])); }
+                    catch (iceErr) { log('Add ICE error: ' + iceErr.message); }
+                }
+                lastIndex = data.candidates.length;
+            }
+        } catch (e) {
+            log('Candidate poll error: ' + e.message);
+        }
+        addSignalingTimer(poll, 1000);
+    };
+    addSignalingTimer(poll, 500);
+}
+
+function pollReceiverCandidates() {
+    let lastIndex = 0;
+    const startTime = Date.now();
+    const poll = async () => {
+        if (pc.connectionState === 'connected' || pc.connectionState === 'closed') return;
+        if (Date.now() - startTime > SIGNALING_TIMEOUT_MS) return;
+        try {
+            const resp = await fetchWithTimeout('/candidate/' + roomId + '/sender', {}, FETCH_TIMEOUT_MS);
+            if (resp.ok) {
+                const data = await resp.json();
+                for (let i = lastIndex; i < data.candidates.length; i++) {
+                    try { await pc.addIceCandidate(new RTCIceCandidate(data.candidates[i])); }
+                    catch (iceErr) { log('Add ICE error: ' + iceErr.message); }
+                }
+                lastIndex = data.candidates.length;
+            }
+        } catch (e) {
+            log('Candidate poll error: ' + e.message);
+        }
+        addSignalingTimer(poll, 1000);
+    };
+    addSignalingTimer(poll, 500);
+}
+
+function selectFile() {
+    document.getElementById('fileInput').click();
+}
+
+async function onFileSelected(e) {
+    selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+    document.getElementById('fileName').textContent = selectedFile.name;
+    document.getElementById('fileSize').textContent = formatSize(selectedFile.size);
+    show('fileInfo');
+
+    const tid = generateTransferId(selectedFile);
+    try {
+        const resp = await fetchWithTimeout('/transfer/' + tid, {}, FETCH_TIMEOUT_MS);
+        if (resp.ok) {
+            const info = await resp.json();
+            if (info.received_bytes > 0 && info.received_bytes < selectedFile.size) {
+                const pct = (info.received_bytes / selectedFile.size * 100).toFixed(0);
+                log('Found previous transfer at ' + pct + '% — will resume from ' + formatSize(info.received_bytes));
+            }
+        }
+    } catch (e) {}
+
+    show('fileHashRow');
+    document.getElementById('fileHashText').textContent = 'Transfer ID: ' + tid;
+
+    if (dataChannel && dataChannel.readyState === 'open') {
+        document.getElementById('btnSend').disabled = false;
+    }
+    log('File selected: ' + selectedFile.name + ' (' + formatSize(selectedFile.size) + ')');
+}
+
+function readFileSlice(file, start, end) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsArrayBuffer(file.slice(start, end));
+    });
+}
+
+async function sendFile() {
+    if (!selectedFile || !dataChannel || dataChannel.readyState !== 'open') return;
+    sendingInProgress = true;
+    document.getElementById('btnSend').disabled = true;
+    document.getElementById('btnSelect').disabled = true;
+    show('sendProgress');
+
+    const total = selectedFile.size;
+    const tid = generateTransferId(selectedFile);
+    currentTransferId = tid;
+
+    let resumeOffset = 0;
+    try {
+        const resp = await fetchWithTimeout('/transfer/' + tid, {}, FETCH_TIMEOUT_MS);
+        if (resp.ok) {
+            const info = await resp.json();
+            if (info.received_bytes > 0 && info.received_bytes < total) {
+                resumeOffset = info.received_bytes;
+                log('Resuming from ' + formatSize(resumeOffset));
+            }
+        }
+    } catch (e) {}
+
+    if (resumeOffset === 0) {
+        await retryFetch('/transfer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                transfer_id: tid,
+                room_id: roomId,
+                file_name: selectedFile.name,
+                file_size: total,
+                file_hash: ''
+            })
+        }, MAX_SIGNALING_RETRIES, FETCH_TIMEOUT_MS);
+
+        dataChannel.send(JSON.stringify({
+            type: 'meta',
+            transferId: tid,
+            name: selectedFile.name,
+            size: total,
+            fileType: selectedFile.type || 'application/octet-stream'
+        }));
+        log('Sending file metadata...');
+    } else {
+        dataChannel.send(JSON.stringify({
+            type: 'resume',
+            transferId: tid,
+            name: selectedFile.name,
+            size: total,
+            fileType: selectedFile.type || 'application/octet-stream',
+            offset: resumeOffset
+        }));
+        log('Sending resume signal from offset ' + formatSize(resumeOffset));
+    }
+
+    senderHashState = sha256Init();
+    let fileOffset = resumeOffset;
+    bytesAccounted = 0;
+    secondStartTime = performance.now();
+
+    try {
+        while (fileOffset < total) {
+            await waitForBufferDrain(dataChannel);
+
+            const readEnd = Math.min(fileOffset + READ_CHUNK_SIZE, total);
+            const buffer = await readFileSlice(selectedFile, fileOffset, readEnd);
+
+            if (resumeOffset === 0 || fileOffset > resumeOffset) {
+                sha256Update(senderHashState, buffer);
+            } else if (fileOffset < resumeOffset && fileOffset + buffer.byteLength > resumeOffset) {
+                const partialStart = resumeOffset - fileOffset;
+                sha256Update(senderHashState, buffer.slice(partialStart));
+            }
+
+            let chunkOffset = 0;
+            while (chunkOffset < buffer.byteLength) {
+                if (dataChannel.bufferedAmount > BUFFER_HIGH_WATERMARK) {
+                    await waitForBufferDrain(dataChannel);
+                }
+                const end = Math.min(chunkOffset + CHUNK_SIZE, buffer.byteLength);
+                const chunkSize = end - chunkOffset;
+                await throttleCheck(chunkSize);
+                dataChannel.send(buffer.slice(chunkOffset, end));
+                chunkOffset = end;
+            }
+
+            fileOffset = readEnd;
+            const pct = (fileOffset / total * 100).toFixed(1);
+            document.getElementById('sendProgressBar').style.width = pct + '%';
+            document.getElementById('sendProgressText').textContent = pct + '% — ' + formatSize(fileOffset) + ' / ' + formatSize(total);
+        }
+
+        const fileHash = sha256Final(senderHashState);
+        dataChannel.send(JSON.stringify({ type: 'hash', hash: fileHash }));
+        show('fileHashRow');
+        document.getElementById('fileHashText').textContent = 'SHA-256: ' + fileHash;
+        log('File sent! SHA-256: ' + fileHash.substring(0, 16) + '...');
+        setStatus('File sent!', 'connected');
+
+        try {
+            await retryFetch('/transfer/' + tid, { method: 'DELETE' }, 2, FETCH_TIMEOUT_MS);
+        } catch (e) {}
+    } catch (e) {
+        log('Send error: ' + e.message);
+        setStatus('Transfer failed: ' + e.message, 'error');
+        if (currentTransferId) {
+            try {
+                await retryFetch('/transfer/' + currentTransferId + '/progress', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ received_bytes: fileOffset })
+                }, 2, FETCH_TIMEOUT_MS);
+            } catch (e2) {}
+        }
+    } finally {
+        sendingInProgress = false;
+        document.getElementById('btnSelect').disabled = false;
+        document.getElementById('btnSend').disabled = false;
+    }
+}
+
+function downloadFile() {
+    if (!receiveMeta || receivedBuffers.length === 0) return;
+    const blob = new Blob(receivedBuffers, { type: receiveMeta.type || 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = receiveMeta.name;
+    a.click();
+    URL.revokeObjectURL(url);
+    log('File downloaded: ' + receiveMeta.name);
+}
+
+window.addEventListener('beforeunload', () => {
+    if (currentTransferId && receivedBytes > 0 && receiveMeta && receivedBytes < receiveMeta.size) {
+        navigator.sendBeacon('/transfer/' + currentTransferId + '/progress', JSON.stringify({ received_bytes: receivedBytes }));
+    }
+});
+</script>
+</body>
+</html>
