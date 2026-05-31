@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>手势识别语音转换系统</title>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            background: rgba(255,255,255,0.3);
+            color: white;
+            transition: all 0.3s;
+        }
+        .tab-btn.active {
+            background: white;
+            color: #667eea;
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .video-container {
+            position: relative;
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        video, canvas {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .info-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        .status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ccc;
+        }
+        .status-dot.active {
+            background: #4CAF50;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .recognized-text {
+            font-size: 1.5rem;
+            color: #333;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f5f5f5;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        .gesture-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .gesture-item {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .gesture-item span {
+            display: block;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #d32f2f;
+        }
+        .btn-success {
+            background: #4CAF50;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #388E3C;
+        }
+        .btn-warning {
+            background: #ff9800;
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #e68900;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .recording-status {
+            text-align: center;
+            padding: 15px;
+            background: #fff3e0;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        .recording-status.active {
+            display: block;
+            background: #ffebee;
+        }
+        .recording-status.recording {
+            background: #e8f5e9;
+        }
+        .progress-bar {
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #4CAF50;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .trained-gestures {
+            margin-top: 20px;
+        }
+        .trained-gestures h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .trained-gesture-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .trained-gesture-item .gesture-info {
+            flex: 1;
+        }
+        .trained-gesture-item .gesture-name {
+            font-weight: bold;
+            color: #333;
+        }
+        .trained-gesture-item .gesture-id {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        .trained-gesture-item .gesture-samples {
+            font-size: 0.85rem;
+            color: #667eea;
+            margin-right: 15px;
+        }
+        .trained-gesture-item .delete-btn {
+            flex: none;
+            width: auto;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+        }
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        .message.success {
+            display: block;
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message.error {
+            display: block;
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .message.info {
+            display: block;
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤚 手势识别语音转换系统</h1>
+        
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="recognize">手势识别</button>
+            <button class="tab-btn" data-tab="train">训练手势</button>
+        </div>
+        
+        <div id="recognize" class="tab-content active">
+            <div class="video-container">
+                <video id="video" autoplay playsinline></video>
+                <canvas id="canvas"></canvas>
+            </div>
+            
+            <div class="info-panel">
+                <div class="status">
+                    <div class="status-item">
+                        <div class="status-dot" id="modelStatus"></div>
+                        <span>模型状态</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-dot" id="wsStatus"></div>
+                        <span>连接状态</span>
+                    </div>
+                </div>
+                
+                <div class="recognized-text" id="recognizedText">
+                    等待手势识别...
+                </div>
+                
+                <div class="gesture-list">
+                    <div class="gesture-item"><span>✊</span>拳头 - 停止</div>
+                    <div class="gesture-item"><span>🖐️</span>张开 - 你好</div>
+                    <div class="gesture-item"><span>☝️</span>1指 - 一</div>
+                    <div class="gesture-item"><span>✌️</span>2指 - 二</div>
+                    <div class="gesture-item"><span>👌</span>OK - 好的</div>
+                    <div class="gesture-item"><span>🤘</span>摇滚 - 加油</div>
+                    <div class="gesture-item"><span>🤟</span>爱你 - 我爱你</div>
+                    <div class="gesture-item"><span>🤙</span>电话 - 打电话</div>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn-primary" id="startBtn">开始识别</button>
+                    <button class="btn-secondary" id="stopBtn">停止识别</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="train" class="tab-content">
+            <div class="video-container">
+                <video id="trainVideo" autoplay playsinline></video>
+                <canvas id="trainCanvas"></canvas>
+            </div>
+            
+            <div class="info-panel">
+                <div id="trainMessage" class="message"></div>
+                
+                <div class="form-group">
+                    <label for="gestureId">手势 ID</label>
+                    <input type="text" id="gestureId" placeholder="例如: thank_you" />
+                </div>
+                
+                <div class="form-group">
+                    <label for="gestureName">手势名称 (语音朗读文本)</label>
+                    <input type="text" id="gestureName" placeholder="例如: 谢谢" />
+                </div>
+                
+                <div id="recordingStatus" class="recording-status">
+                    <span id="recordingText">准备录制...</span>
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill"></div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn-primary" id="startTrainBtn">开始录制</button>
+                    <button class="btn-warning" id="recordSampleBtn" disabled>录制样本</button>
+                    <button class="btn-success" id="trainModelBtn" disabled>训练模型</button>
+                    <button class="btn-secondary" id="clearSamplesBtn">清除样本</button>
+                </div>
+                
+                <div class="trained-gestures">
+                    <h3>已训练手势</h3>
+                    <div id="trainedGesturesList">
+                        <div style="color: #666; text-align: center; padding: 20px;">
+                            暂无已训练手势
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn-secondary" id="refreshGesturesBtn">刷新列表</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <audio id="audioPlayer"></audio>
+    <script src="app.js"></script>
+</body>
+</html>
