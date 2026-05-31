@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>分布式渲染 - 管理面板</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a192f;
+      --bg-secondary: #112240;
+      --bg-tertiary: #1d3557;
+      --accent-primary: #64ffda;
+      --accent-secondary: #4cc9f0;
+      --text-primary: #e6f1ff;
+      --text-secondary: #8892b0;
+      --warning: #f59e0b;
+      --error: #f43f5e;
+      --success: #10b981;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      position: relative;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(ellipse at 10% 10%, rgba(100, 255, 218, 0.05) 0%, transparent 50%),
+        radial-gradient(ellipse at 90% 90%, rgba(76, 201, 240, 0.05) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: -1;
+    }
+    
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(100, 255, 218, 0.1);
+    }
+    
+    .logo {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+      letter-spacing: -0.02em;
+    }
+    
+    .logo span {
+      color: var(--accent-secondary);
+    }
+    
+    .header-stats {
+      display: flex;
+      gap: 2rem;
+    }
+    
+    .header-stat {
+      text-align: right;
+    }
+    
+    .header-stat-value {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+    }
+    
+    .header-stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .main-grid {
+      display: grid;
+      grid-template-columns: 320px 1fr 320px;
+      gap: 1.5rem;
+    }
+    
+    .panel {
+      background: rgba(17, 34, 64, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(100, 255, 218, 0.1);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+    
+    .panel-title {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+    }
+    
+    .form-input {
+      width: 100%;
+      background: var(--bg-primary);
+      border: 1px solid rgba(100, 255, 218, 0.2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      color: var(--text-primary);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px rgba(100, 255, 218, 0.1);
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+    
+    .slider-container {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .slider {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--bg-primary);
+      outline: none;
+    }
+    
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent-primary);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    
+    .slider::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+    
+    .slider-value {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--accent-primary);
+      min-width: 3rem;
+      text-align: right;
+    }
+    
+    .btn {
+      padding: 0.875rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      color: var(--bg-primary);
+    }
+    
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(100, 255, 218, 0.3);
+    }
+    
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .btn-secondary {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid rgba(100, 255, 218, 0.2);
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(100, 255, 218, 0.1);
+    }
+    
+    .progress-section {
+      margin-bottom: 1.5rem;
+    }
+    
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    
+    .progress-label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+    
+    .progress-percent {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+    }
+    
+    .progress-bar {
+      height: 12px;
+      background: var(--bg-primary);
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid rgba(100, 255, 218, 0.1);
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+      border-radius: 6px;
+      transition: width 0.5s ease;
+      width: 0%;
+      position: relative;
+    }
+    
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      animation: shimmer 2s infinite;
+    }
+    
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    
+    .tiles-grid-container {
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+    
+    #tilesGrid {
+      display: grid;
+      gap: 2px;
+      background: var(--bg-primary);
+      padding: 4px;
+      border-radius: 6px;
+      aspect-ratio: 4 / 3;
+    }
+    
+    .tile-cell {
+      background: var(--bg-tertiary);
+      border-radius: 2px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .tile-cell.pending {
+      background: rgba(136, 146, 176, 0.2);
+    }
+    
+    .tile-cell.assigned {
+      background: rgba(245, 158, 11, 0.3);
+      animation: tilePulse 1.5s ease-in-out infinite;
+    }
+    
+    .tile-cell.completed {
+      background: rgba(16, 185, 129, 0.5);
+    }
+    
+    @keyframes tilePulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+    
+    .preview-container {
+      position: relative;
+      aspect-ratio: 4 / 3;
+      background: var(--bg-primary);
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(100, 255, 218, 0.1);
+    }
+    
+    #previewCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    
+    .preview-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 0.75rem;
+      background: linear-gradient(180deg, rgba(10, 25, 47, 0.9) 0%, transparent 100%);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    
+    .resolution-badge {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      background: rgba(100, 255, 218, 0.2);
+      color: var(--accent-primary);
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+    }
+    
+    .download-section {
+      margin-top: 1rem;
+      display: flex;
+      gap: 0.75rem;
+    }
+    
+    .download-section .btn {
+      flex: 1;
+    }
+    
+    .workers-list {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .worker-card {
+      background: var(--bg-primary);
+      border: 1px solid rgba(100, 255, 218, 0.1);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      transition: all 0.3s ease;
+    }
+    
+    .worker-card:hover {
+      border-color: rgba(100, 255, 218, 0.3);
+    }
+    
+    .worker-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    
+    .worker-id {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--accent-primary);
+    }
+    
+    .worker-status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .worker-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+    }
+    
+    .worker-stat-label {
+      color: var(--text-secondary);
+    }
+    
+    .worker-stat-value {
+      font-family: 'Space Mono', monospace;
+      color: var(--text-primary);
+      text-align: right;
+    }
+    
+    .info-box {
+      background: rgba(100, 255, 218, 0.05);
+      border: 1px solid rgba(100, 255, 218, 0.1);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .info-box-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--accent-primary);
+      margin-bottom: 0.5rem;
+    }
+    
+    .info-box-content {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    
+    .info-box-content code {
+      font-family: 'Space Mono', monospace;
+      background: var(--bg-primary);
+      padding: 0.125rem 0.375rem;
+      border-radius: 3px;
+      color: var(--accent-primary);
+      font-size: 0.7rem;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-secondary);
+    }
+    
+    .empty-state-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+    
+    .radio-group {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .radio-option {
+      flex: 1;
+      position: relative;
+    }
+    
+    .radio-option input {
+      position: absolute;
+      opacity: 0;
+    }
+    
+    .radio-label {
+      display: block;
+      text-align: center;
+      padding: 0.75rem;
+      background: var(--bg-primary);
+      border: 1px solid rgba(100, 255, 218, 0.2);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .radio-option input:checked + .radio-label {
+      background: rgba(100, 255, 218, 0.1);
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
+    }
+    
+    @media (max-width: 1200px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    @media (max-width: 600px) {
+      header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+      
+      .header-stats {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">◈ DISTRIBUTED_<span>RAYTRACER</span></div>
+      <div class="header-stats">
+        <div class="header-stat">
+          <div class="header-stat-value" id="totalWorkers">0</div>
+          <div class="header-stat-label">在线节点</div>
+        </div>
+        <div class="header-stat">
+          <div class="header-stat-value" id="completedTiles">0</div>
+          <div class="header-stat-label">已完成 Tile</div>
+        </div>
+        <div class="header-stat">
+          <div class="header-stat-value" id="totalTiles">0</div>
+          <div class="header-stat-label">总 Tile 数</div>
+        </div>
+      </div>
+    </header>
+    
+    <div class="main-grid">
+      <div class="panel">
+        <div class="panel-title">⚙️ 任务配置</div>
+        
+        <div class="form-group">
+          <label class="form-label">渲染场景</label>
+          <div class="radio-group">
+            <div class="radio-option">
+              <input type="radio" id="sceneCornell" name="scene" value="cornell" checked>
+              <label class="radio-label" for="sceneCornell">Cornell 盒子</label>
+            </div>
+            <div class="radio-option">
+              <input type="radio" id="sceneSpheres" name="scene" value="spheres">
+              <label class="radio-label" for="sceneSpheres">随机球体</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">宽度 (px)</label>
+            <input type="number" class="form-input" id="renderWidth" value="800" min="100" max="4096">
+          </div>
+          <div class="form-group">
+            <label class="form-label">高度 (px)</label>
+            <input type="number" class="form-input" id="renderHeight" value="600" min="100" max="4096">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Tile 大小 (px)</label>
+            <input type="number" class="form-input" id="tileSize" value="128" min="32" max="512" step="32">
+          </div>
+          <div class="form-group">
+            <label class="form-label">每像素采样</label>
+            <input type="number" class="form-input" id="samplesPerPixel" value="4" min="1" max="100">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <div class="form-label">
+            最大反弹次数: <span class="slider-value" id="maxBouncesValue">3</span>
+          </div>
+          <div class="slider-container">
+            <input type="range" class="slider" id="maxBounces" min="1" max="10" value="3">
+          </div>
+        </div>
+        
+        <button class="btn btn-primary" id="startJobBtn">
+          <span>🚀</span>
+          <span>开始渲染任务</span>
+        </button>
+        
+        <div class="info-box">
+          <div class="info-box-title">💡 快速开始</div>
+          <div class="info-box-content">
+            1. 配置渲染参数后点击「开始渲染任务」<br>
+            2. 打开新的浏览器标签页访问 <code>/worker</code><br>
+            3. 在工作节点页面点击「连接服务端」<br>
+            4. 多个工作节点可同时参与计算
+          </div>
+        </div>
+      </div>
+      
+      <div class="panel">
+        <div class="panel-title">🖼️ 渲染进度</div>
+        
+        <div class="progress-section">
+          <div class="progress-header">
+            <span class="progress-label">总进度</span>
+            <span class="progress-percent" id="totalProgress">0%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="totalProgressFill"></div>
+          </div>
+        </div>
+        
+        <div class="tiles-grid-container" id="tilesContainer">
+          <div class="empty-state" id="emptyState">
+            <div class="empty-state-icon">🎯</div>
+            <div>提交渲染任务后显示 Tile 网格</div>
+          </div>
+          <div id="tilesGrid" style="display: none;"></div>
+        </div>
+        
+        <div class="preview-container" id="previewContainer">
+          <div class="empty-state" id="previewEmptyState">
+            <div class="empty-state-icon">🖼️</div>
+            <div>渲染开始后显示渐进式预览</div>
+          </div>
+          <canvas id="previewCanvas" style="display: none;"></canvas>
+          <div class="preview-overlay" id="previewOverlay" style="display: none;">
+            <span class="resolution-badge" id="resolutionBadge">—</span>
+          </div>
+        </div>
+        
+        <div class="download-section" id="downloadSection" style="display: none;">
+          <button class="btn btn-secondary" id="downloadBtn">
+            <span>⬇️</span>
+            <span>下载 PNG</span>
+          </button>
+        </div>
+      </div>
+      
+      <div class="panel">
+        <div class="panel-title">👥 工作节点</div>
+        
+        <div class="workers-list" id="workersList">
+          <div class="empty-state">
+            <div class="empty-state-icon">🔌</div>
+            <div>暂无连接的工作节点</div>
+          </div>
+        </div>
+        
+        <div class="info-box" style="margin-top: 1.5rem;">
+          <div class="info-box-title">📊 Tile 状态图例</div>
+          <div class="info-box-content" style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <div style="width: 12px; height: 12px; background: rgba(136, 146, 176, 0.2); border-radius: 2px;"></div>
+              <span>等待分配</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <div style="width: 12px; height: 12px; background: rgba(245, 158, 11, 0.3); border-radius: 2px;"></div>
+              <span>正在计算</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <div style="width: 12px; height: 12px; background: rgba(16, 185, 129, 0.5); border-radius: 2px;"></div>
+              <span>已完成</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

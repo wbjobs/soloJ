@@ -1,0 +1,16 @@
+{
+  "name": "distributed-raytracing",
+  "version": "1.0.0",
+  "description": "分布式 3D 渲染系统 - 基于 Web Worker 的光线追踪计算网络",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2",
+    "pngjs": "^7.0.0",
+    "cors": "^2.8.5"
+  }
+}
