@@ -1,0 +1,22 @@
+[package]
+name = "dicom-parser"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+wasm-bindgen = "0.2.92"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+dicom = { version = "0.6.4", features = ["pixeldata"] }
+dicom-pixeldata = "0.6.4"
+dicom-encoding = "0.6.4"
+image = { version = "0.24", default-features = false, features = ["jpeg", "png"] }
+js-sys = "0.3.66"
+web-sys = { version = "0.3.66", features = ["ImageData", "CanvasRenderingContext2d"] }
+
+[profile.release]
+opt-level = "s"
+lto = true
