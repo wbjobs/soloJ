@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LAN P2P 文件传输</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f172a;--surface:#1e293b;--surface2:#334155;--accent:#3b82f6;--accent-hover:#2563eb;--green:#22c55e;--yellow:#eab308;--red:#ef4444;--text:#f1f5f9;--text2:#94a3b8;--border:#475569;--purple:#a855f7}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+header{background:var(--surface);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0;gap:12px;flex-wrap:wrap}
+header h1{font-size:1.1rem;font-weight:600;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.status-dot{width:10px;height:10px;border-radius:50%;background:var(--text2);flex-shrink:0}
+.status-dot.connected{background:var(--green);box-shadow:0 0 8px var(--green)}
+.status-dot.waiting{background:var(--yellow);animation:pulse 1.5s infinite}
+.status-dot.checking{background:var(--yellow)}
+.status-dot.failed{background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.header-badges{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.badge{font-size:.7rem;padding:3px 10px;border-radius:10px;white-space:nowrap}
+.badge-peers{background:var(--surface2);color:var(--text2)}
+.badge-encrypt{background:rgba(168,85,247,.2);color:var(--purple)}
+.badge-encrypt.off{background:var(--surface2);color:var(--text2)}
+.badge-conn{background:var(--surface2);color:var(--text2)}
+.badge-conn.direct{background:rgba(34,197,94,.2);color:var(--green)}
+.badge-conn.relay{background:rgba(234,179,8,.2);color:var(--yellow)}
+
+.main{display:flex;flex:1;overflow:hidden}
+.chat-panel{flex:1;display:flex;flex-direction:column;border-right:1px solid var(--border);min-width:0}
+.side-panel{width:380px;display:flex;flex-direction:column;background:var(--surface);flex-shrink:0}
+.side-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.side-tab{flex:1;padding:10px;text-align:center;font-size:.8rem;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;transition:all .2s}
+.side-tab.active{color:var(--text);border-bottom-color:var(--accent)}
+.side-tab:hover{background:var(--surface2)}
+.side-content{flex:1;overflow-y:auto;display:none}
+.side-content.active{display:flex;flex-direction:column}
+
+.peers-list{padding:8px}
+.peer-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;margin-bottom:4px;background:var(--surface2)}
+.peer-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.peer-dot.on{background:var(--green)}
+.peer-dot.off{background:var(--red)}
+.peer-dot.connecting{background:var(--yellow);animation:pulse 1.5s infinite}
+.peer-name{flex:1;font-size:.85rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.peer-you{font-size:.65rem;color:var(--text2)}
+
+.drop-zone{margin:12px;border:2px dashed var(--border);border-radius:12px;padding:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;transition:all .2s;min-height:140px}
+.drop-zone:hover,.drop-zone.dragover{border-color:var(--accent);background:rgba(59,130,246,.08)}
+.drop-zone svg{width:40px;height:40px;color:var(--text2)}
+.drop-zone p{color:var(--text2);font-size:.85rem}
+.drop-zone .hint{font-size:.7rem;color:var(--border)}
+
+.transfers{padding:8px;overflow-y:auto}
+.transfer-item{padding:8px 10px;background:var(--surface2);border-radius:8px;margin-bottom:6px;font-size:.8rem}
+.transfer-item .t-header{display:flex;align-items:center;gap:8px}
+.transfer-item .t-icon{width:24px;height:24px;border-radius:4px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.transfer-item .t-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.transfer-item .t-from{font-size:.7rem;color:var(--purple);flex-shrink:0}
+.transfer-item .t-meta{font-size:.7rem;color:var(--text2);margin-top:4px;display:flex;justify-content:space-between}
+.transfer-item .t-speed{color:var(--green)}
+.progress-bar{height:3px;background:var(--border);border-radius:2px;margin-top:4px;overflow:hidden}
+.progress-bar .fill{height:100%;background:var(--accent);border-radius:2px;transition:width .2s}
+
+.encrypt-section{padding:12px}
+.encrypt-row{display:flex;gap:8px;margin-bottom:8px;align-items:center}
+.encrypt-row label{font-size:.8rem;color:var(--text2);white-space:nowrap}
+.encrypt-row input{flex:1;padding:6px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:.8rem;outline:none}
+.encrypt-row input:focus{border-color:var(--accent)}
+.encrypt-toggle{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.encrypt-toggle input{width:auto;margin:0}
+.encrypt-toggle label{font-size:.8rem;color:var(--text2);margin:0;cursor:pointer}
+.encrypt-info{font-size:.75rem;color:var(--text2);line-height:1.6;padding:8px;background:var(--bg);border-radius:6px}
+
+.messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:6px}
+.msg{max-width:70%;padding:8px 12px;border-radius:12px;font-size:.85rem;line-height:1.5;word-break:break-word}
+.msg.self{align-self:flex-end;background:var(--accent);border-bottom-right-radius:4px}
+.msg.peer{align-self:flex-start;background:var(--surface2);border-bottom-left-radius:4px}
+.msg.system{align-self:center;background:transparent;color:var(--text2);font-size:.75rem;max-width:100%;text-align:center;padding:4px}
+.msg.system.error{color:var(--red)}
+.msg .name{font-size:.65rem;color:var(--text2);margin-bottom:2px}
+
+.chat-input{display:flex;padding:10px;border-top:1px solid var(--border);gap:8px;flex-shrink:0}
+.chat-input input{flex:1;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:.85rem;outline:none}
+.chat-input input:focus{border-color:var(--accent)}
+.chat-input button{padding:8px 16px;border-radius:8px;border:none;background:var(--accent);color:white;font-weight:500;cursor:pointer;transition:background .2s;font-size:.85rem}
+.chat-input button:hover{background:var(--accent-hover)}
+.chat-input button:disabled{opacity:.4;cursor:not-allowed}
+
+.join-screen{position:fixed;inset:0;background:rgba(15,23,42,.95);display:flex;align-items:center;justify-content:center;z-index:100}
+.join-card{background:var(--surface);padding:36px;border-radius:16px;width:420px;box-shadow:0 25px 50px rgba(0,0,0,.5)}
+.join-card h2{text-align:center;margin-bottom:20px;font-size:1.2rem}
+.join-card label{display:block;font-size:.8rem;color:var(--text2);margin-bottom:4px}
+.join-card input{width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:.85rem;margin-bottom:14px;outline:none}
+.join-card input:focus{border-color:var(--accent)}
+.join-card .section-title{font-size:.8rem;color:var(--text2);margin-bottom:8px;margin-top:4px;display:flex;align-items:center;gap:6px}
+.join-card .toggle-wrap{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.join-card .toggle-wrap input{width:auto;margin:0}
+.join-card .toggle-wrap label{margin:0;cursor:pointer}
+.join-card .turn-config{padding:10px;background:var(--bg);border-radius:8px;margin-bottom:14px;display:none}
+.join-card .turn-config.visible{display:block}
+.join-card .turn-config input{margin-bottom:6px}
+.join-card .encrypt-config{padding:10px;background:var(--bg);border-radius:8px;margin-bottom:14px;display:none}
+.join-card .encrypt-config.visible{display:block}
+.join-card .encrypt-config input{margin-bottom:6px}
+.join-card button{width:100%;padding:11px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:.95rem;font-weight:600;cursor:pointer;transition:background .2s}
+.join-card button:hover{background:var(--accent-hover)}
+.join-card button:disabled{opacity:.4;cursor:not-allowed}
+.hidden{display:none!important}
+
+.decrypt-modal{position:fixed;inset:0;background:rgba(15,23,42,.9);display:flex;align-items:center;justify-content:center;z-index:200}
+.decrypt-card{background:var(--surface);padding:28px;border-radius:12px;width:360px;box-shadow:0 20px 40px rgba(0,0,0,.5)}
+.decrypt-card h3{margin-bottom:12px;font-size:1rem;text-align:center}
+.decrypt-card p{font-size:.8rem;color:var(--text2);margin-bottom:12px}
+.decrypt-card input{width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:.85rem;margin-bottom:12px;outline:none}
+.decrypt-card input:focus{border-color:var(--accent)}
+.decrypt-card .decrypt-btns{display:flex;gap:8px}
+.decrypt-card button{flex:1;padding:9px;border-radius:8px;border:none;font-size:.85rem;cursor:pointer;font-weight:500}
+.decrypt-card .btn-primary{background:var(--accent);color:white}
+.decrypt-card .btn-secondary{background:var(--surface2);color:var(--text2)}
+
+@media(max-width:800px){
+    .main{flex-direction:column}
+    .chat-panel{border-right:none;border-bottom:1px solid var(--border)}
+    .side-panel{width:100%;max-height:45vh}
+}
+</style>
+</head>
+<body>
+
+<div class="join-screen" id="joinScreen">
+    <div class="join-card">
+        <h2>🔗 加入 Mesh 网络</h2>
+        <label>你的昵称</label>
+        <input id="nameInput" placeholder="输入昵称" maxlength="20">
+        <label>房间号</label>
+        <input id="roomInput" placeholder="输入房间号（所有人需一致）" maxlength="30">
+
+        <div class="section-title">🔒 端到端加密</div>
+        <div class="toggle-wrap">
+            <input type="checkbox" id="enableEncrypt" checked onchange="toggleEncryptConfig()">
+            <label for="enableEncrypt">启用 AES-256 加密</label>
+        </div>
+        <div class="encrypt-config visible" id="encryptConfig">
+            <input id="encryptPass" placeholder="设置加密密码（房间内所有人需一致）" type="password">
+        </div>
+
+        <div class="section-title">🌐 TURN 中继（可选）</div>
+        <div class="toggle-wrap">
+            <input type="checkbox" id="enableTurn" onchange="toggleTurnConfig()">
+            <label for="enableTurn">启用 TURN 中继</label>
+        </div>
+        <div class="turn-config" id="turnConfig">
+            <input id="turnUrl" placeholder="TURN 服务器地址，如 turn:example.com:3478">
+            <input id="turnUser" placeholder="用户名">
+            <input id="turnPass" placeholder="密码" type="password">
+        </div>
+
+        <button id="joinBtn" onclick="joinRoom()">加入房间</button>
+    </div>
+</div>
+
+<header>
+    <h1><span class="status-dot" id="statusDot"></span> Mesh P2P 文件传输</h1>
+    <div class="header-badges">
+        <span class="badge badge-peers" id="peersBadge">在线: 0</span>
+        <span class="badge badge-encrypt off" id="encryptBadge">🔓 未加密</span>
+        <span class="badge badge-conn" id="connBadge">等待连接</span>
+    </div>
+</header>
+
+<div class="main">
+    <div class="chat-panel">
+        <div class="messages" id="messages"></div>
+        <div class="chat-input">
+            <input id="chatInput" placeholder="输入消息..." disabled onkeydown="if(event.key==='Enter')sendChat()">
+            <button id="sendBtn" onclick="sendChat()" disabled>发送</button>
+        </div>
+    </div>
+    <div class="side-panel">
+        <div class="side-tabs">
+            <div class="side-tab active" onclick="switchTab('peers')">👥 成员</div>
+            <div class="side-tab" onclick="switchTab('files')">📁 文件</div>
+            <div class="side-tab" onclick="switchTab('encrypt')">🔒 加密</div>
+        </div>
+        <div class="side-content active" id="tab-peers">
+            <div class="peers-list" id="peersList"></div>
+        </div>
+        <div class="side-content" id="tab-files">
+            <div class="drop-zone" id="dropZone">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 16V4m0 0l-4 4m4-4l4 4"/><path d="M2 17l.621 2.485A2 2 0 004.561 21h14.878a2 2 0 001.94-1.515L22 17"/></svg>
+                <p>拖拽文件到此处发送</p>
+                <span class="hint">广播给房间内所有成员</span>
+            </div>
+            <div class="transfers" id="transfers"></div>
+        </div>
+        <div class="side-content" id="tab-encrypt">
+            <div class="encrypt-section">
+                <div class="encrypt-toggle">
+                    <input type="checkbox" id="e2eeToggle" onchange="toggleE2EE()">
+                    <label for="e2eeToggle">端到端加密 (AES-256-GCM)</label>
+                </div>
+                <div class="encrypt-row" id="e2eePassRow">
+                    <label>密码</label>
+                    <input id="e2eePassInput" placeholder="输入加密密码" type="password">
+                    <button style="padding:6px 12px;border-radius:6px;border:none;background:var(--accent);color:white;font-size:.75rem;cursor:pointer" onclick="applyE2EEPassword()">应用</button>
+                </div>
+                <div class="encrypt-info">
+                    <strong>加密说明：</strong><br>
+                    • 使用 AES-256-GCM 对文件流加密<br>
+                    • 密码通过 PBKDF2 派生为 256 位密钥<br>
+                    • 每个分片独立加密，含随机 IV + 认证标签<br>
+                    • 发送端加密，接收端需输入相同密码解密<br>
+                    • 服务器无法读取加密内容
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let ws = null;
+let myPeerId = '';
+let myName = '';
+let roomId = '';
+let fileInput = null;
+
+const CHUNK_SIZE = 16384;
+const BUFFER_THRESHOLD = 1024 * 1024;
+const LARGE_FILE_THRESHOLD = 100 * 1024 * 1024;
+const CRYPTO_TAG = 'E2EE-V1:';
+
+const DEFAULT_STUN_SERVERS = [
+    'stun:stun.l.google.com:19302',
+    'stun:stun1.l.google.com:19302',
+    'stun:stun2.l.google.com:19302',
+    'stun:stun3.l.google.com:19302',
+    'stun:stun4.l.google.com:19302',
+    'stun:stun.ekiga.net',
+    'stun:stun.iptel.org',
+    'stun:stun.rixtelecom.se'
+];
+
+const peers = new Map();
+
+let e2eeEnabled = false;
+let e2eeKey = null;
+let e2eePassRaw = '';
+
+let receiveTasks = new Map();
+let sendTasks = new Map();
+
+function generateId() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
+function toggleTurnConfig() {
+    document.getElementById('turnConfig').classList.toggle('visible', document.getElementById('enableTurn').checked);
+}
+
+function toggleEncryptConfig() {
+    document.getElementById('encryptConfig').classList.toggle('visible', document.getElementById('enableEncrypt').checked);
+}
+
+function switchTab(name) {
+    document.querySelectorAll('.side-tab').forEach((t, i) => {
+        t.classList.toggle('active', ['peers', 'files', 'encrypt'][i] === name);
+    });
+    document.querySelectorAll('.side-content').forEach(c => c.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+}
+
+function getIceServers() {
+    const servers = [{ urls: DEFAULT_STUN_SERVERS }];
+    if (document.getElementById('enableTurn').checked) {
+        const url = document.getElementById('turnUrl').value.trim();
+        const user = document.getElementById('turnUser').value.trim();
+        const pass = document.getElementById('turnPass').value;
+        if (url) {
+            const s = { urls: url };
+            if (user) s.username = user;
+            if (pass) s.credential = pass;
+            servers.push(s);
+        }
+    }
+    return servers;
+}
+
+async function deriveKey(password) {
+    const enc = new TextEncoder();
+    const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+    const salt = enc.encode('lan-p2p-mesh-e2ee-salt-v1');
+    return crypto.subtle.deriveKey(
+        { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+        keyMaterial,
+        { name: 'AES-GCM', length: 256 },
+        false,
+        ['encrypt', 'decrypt']
+    );
+}
+
+async function encryptChunk(key, data) {
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const encrypted = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, data);
+    const result = new Uint8Array(12 + encrypted.byteLength);
+    result.set(iv, 0);
+    result.set(new Uint8Array(encrypted), 12);
+    return result.buffer;
+}
+
+async function decryptChunk(key, data) {
+    const iv = new Uint8Array(data, 0, 12);
+    const ciphertext = new Uint8Array(data, 12);
+    return crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ciphertext);
+}
+
+async function joinRoom() {
+    myName = document.getElementById('nameInput').value.trim() || '匿名用户';
+    roomId = document.getElementById('roomInput').value.trim();
+    if (!roomId) { alert('请输入房间号'); return; }
+
+    const useEncrypt = document.getElementById('enableEncrypt').checked;
+    const pass = document.getElementById('encryptPass').value;
+    if (useEncrypt && !pass) { alert('请设置加密密码'); return; }
+
+    if (useEncrypt) {
+        try {
+            e2eeKey = await deriveKey(pass);
+            e2eePassRaw = pass;
+            e2eeEnabled = true;
+        } catch (err) {
+            alert('密钥派生失败: ' + err.message);
+            return;
+        }
+    }
+
+    const joinBtn = document.getElementById('joinBtn');
+    joinBtn.disabled = true;
+    joinBtn.textContent = '连接中...';
+
+    myPeerId = generateId();
+
+    const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    ws = new WebSocket(`${proto}//${location.host}`);
+
+    ws.onopen = () => {
+        ws.send(JSON.stringify({ type: 'join', roomId, peerId: myPeerId, peerName: myName }));
+    };
+
+    ws.onmessage = async (e) => {
+        const msg = JSON.parse(e.data);
+        switch (msg.type) {
+            case 'joined': {
+                myPeerId = msg.peerId;
+                document.getElementById('joinScreen').classList.add('hidden');
+                updateEncryptBadge();
+                addSystemMsg(`已加入房间: ${roomId}`);
+
+                if (msg.peers.length === 0) {
+                    setStatus('waiting', '等待其他人加入...');
+                } else {
+                    addSystemMsg(`房间内已有 ${msg.peers.length} 人，正在建立连接...`);
+                }
+
+                for (const peer of msg.peers) {
+                    addPeer(peer.peerId, peer.peerName);
+                    initiateConnection(peer.peerId);
+                }
+                updatePeersUI();
+                break;
+            }
+            case 'peer-joined': {
+                addSystemMsg(`${msg.peerName} 加入了房间`);
+                addPeer(msg.peerId, msg.peerName);
+                updatePeersUI();
+                break;
+            }
+            case 'peer-left': {
+                addSystemMsg(`${msg.peerName} 离开了房间`);
+                removePeer(msg.peerId);
+                updatePeersUI();
+                break;
+            }
+            case 'offer': {
+                await handleSignal(msg, 'offer');
+                break;
+            }
+            case 'answer': {
+                await handleSignal(msg, 'answer');
+                break;
+            }
+            case 'candidate': {
+                await handleSignal(msg, 'candidate');
+                break;
+            }
+        }
+    };
+
+    ws.onclose = () => { setStatus('', '连接断开'); };
+    ws.onerror = () => {
+        alert('无法连接到信令服务器');
+        joinBtn.disabled = false;
+        joinBtn.textContent = '加入房间';
+    };
+}
+
+function addPeer(peerId, name) {
+    if (peerId === myPeerId) return;
+    if (peers.has(peerId)) return;
+    peers.set(peerId, {
+        id: peerId,
+        name: name,
+        pc: null,
+        dc: null,
+        dcReady: false
+    });
+}
+
+function removePeer(peerId) {
+    const peer = peers.get(peerId);
+    if (!peer) return;
+    if (peer.dc) peer.dc.close();
+    if (peer.pc) peer.pc.close();
+    peers.delete(peerId);
+    updateConnectedCount();
+}
+
+function updatePeersUI() {
+    const list = document.getElementById('peersList');
+    list.innerHTML = '';
+
+    const selfItem = document.createElement('div');
+    selfItem.className = 'peer-item';
+    selfItem.innerHTML = `<span class="peer-dot on"></span><span class="peer-name">${escHtml(myName)}</span><span class="peer-you">你</span>`;
+    list.appendChild(selfItem);
+
+    for (const [pid, peer] of peers) {
+        const item = document.createElement('div');
+        item.className = 'peer-item';
+        const dotClass = peer.dcReady ? 'on' : 'connecting';
+        item.innerHTML = `<span class="peer-dot ${dotClass}"></span><span class="peer-name">${escHtml(peer.name)}</span>`;
+        list.appendChild(item);
+    }
+
+    updateConnectedCount();
+}
+
+function updateConnectedCount() {
+    let connected = 0;
+    for (const [, peer] of peers) {
+        if (peer.dcReady) connected++;
+    }
+    const total = peers.size;
+    document.getElementById('peersBadge').textContent = `在线: ${total + 1} | 连接: ${connected}/${total}`;
+    const hasAny = connected > 0;
+    document.getElementById('chatInput').disabled = !hasAny;
+    document.getElementById('sendBtn').disabled = !hasAny;
+
+    if (total === 0) {
+        setStatus('waiting', '等待其他人加入...');
+    } else if (connected === total) {
+        setStatus('connected', `已连接 ${total} 位成员`);
+    } else {
+        setStatus('checking', `连接中 ${connected}/${total}...`);
+    }
+}
+
+function updateEncryptBadge() {
+    const badge = document.getElementById('encryptBadge');
+    if (e2eeEnabled) {
+        badge.textContent = '🔒 AES-256 已启用';
+        badge.className = 'badge badge-encrypt';
+    } else {
+        badge.textContent = '🔓 未加密';
+        badge.className = 'badge badge-encrypt off';
+    }
+}
+
+function setStatus(state, text) {
+    const dot = document.getElementById('statusDot');
+    dot.className = 'status-dot' + (state ? ` ${state}` : '');
+}
+
+async function initiateConnection(peerId) {
+    const peer = peers.get(peerId);
+    if (!peer || peer.pc) return;
+
+    const config = { iceServers: getIceServers(), iceTransportPolicy: 'all', bundlePolicy: 'balanced' };
+    const pc = new RTCPeerConnection(config);
+    peer.pc = pc;
+
+    pc.onicecandidate = (e) => {
+        if (e.candidate) {
+            ws.send(JSON.stringify({ type: 'candidate', candidate: e.candidate, targetId: peerId }));
+        }
+    };
+
+    pc.onconnectionstatechange = () => {
+        if (pc.connectionState === 'connected') {
+            detectConnectionType(peerId);
+        } else if (pc.connectionState === 'failed') {
+            addSystemMsg(`与 ${peer.name} 的连接失败，请检查网络或启用 TURN`, true);
+        }
+        updatePeersUI();
+    };
+
+    const dc = pc.createDataChannel('mesh', { ordered: true, maxRetransmits: 60 });
+    peer.dc = dc;
+    setupDataChannel(dc, peerId);
+
+    try {
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        ws.send(JSON.stringify({ type: 'offer', sdp: offer, targetId: peerId }));
+    } catch (err) {
+        addSystemMsg(`创建连接失败: ${err.message}`, true);
+    }
+}
+
+async function handleSignal(msg, signalType) {
+    const peerId = msg.fromId;
+    if (!peerId || peerId === myPeerId) return;
+
+    let peer = peers.get(peerId);
+    if (!peer) return;
+
+    if (signalType === 'offer') {
+        if (peer.pc) {
+            peer.dc.close();
+            peer.pc.close();
+            peer.dcReady = false;
+        }
+
+        const config = { iceServers: getIceServers(), iceTransportPolicy: 'all', bundlePolicy: 'balanced' };
+        const pc = new RTCPeerConnection(config);
+        peer.pc = pc;
+
+        pc.onicecandidate = (e) => {
+            if (e.candidate) {
+                ws.send(JSON.stringify({ type: 'candidate', candidate: e.candidate, targetId: peerId }));
+            }
+        };
+
+        pc.ondatachannel = (e) => {
+            peer.dc = e.channel;
+            setupDataChannel(e.channel, peerId);
+        };
+
+        pc.onconnectionstatechange = () => {
+            if (pc.connectionState === 'connected') {
+                detectConnectionType(peerId);
+            } else if (pc.connectionState === 'failed') {
+                addSystemMsg(`与 ${peer.name} 的连接失败`, true);
+            }
+            updatePeersUI();
+        };
+
+        try {
+            await pc.setRemoteDescription(new RTCSessionDescription(msg.sdp));
+            const answer = await pc.createAnswer();
+            await pc.setLocalDescription(answer);
+            ws.send(JSON.stringify({ type: 'answer', sdp: answer, targetId: peerId }));
+        } catch (err) {
+            addSystemMsg(`信令处理失败: ${err.message}`, true);
+        }
+    } else if (signalType === 'answer') {
+        if (peer.pc) {
+            try {
+                await peer.pc.setRemoteDescription(new RTCSessionDescription(msg.sdp));
+            } catch (err) {
+                addSystemMsg(`连接失败: ${err.message}`, true);
+            }
+        }
+    } else if (signalType === 'candidate') {
+        if (peer.pc && msg.candidate) {
+            try { await peer.pc.addIceCandidate(new RTCIceCandidate(msg.candidate)); } catch {}
+        }
+    }
+}
+
+async function detectConnectionType(peerId) {
+    const peer = peers.get(peerId);
+    if (!peer || !peer.pc) return;
+    try {
+        const stats = await peer.pc.getStats();
+        for (const report of stats.values()) {
+            if (report.type === 'candidate-pair' && report.nominated) {
+                const remote = stats.get(report.remoteCandidateId);
+                if (remote) {
+                    const t = remote.candidateType;
+                    let label = '未知';
+                    let cls = '';
+                    if (t === 'host' || t === 'srflx') { label = 'P2P 直连'; cls = 'direct'; }
+                    else if (t === 'relay') { label = 'TURN 中继'; cls = 'relay'; }
+                    const badge = document.getElementById('connBadge');
+                    badge.textContent = label;
+                    badge.className = 'badge badge-conn ' + cls;
+                }
+                break;
+            }
+        }
+    } catch {}
+}
+
+function setupDataChannel(channel, peerId) {
+    channel.binaryType = 'arraybuffer';
+    channel.bufferedAmountLowThreshold = CHUNK_SIZE;
+
+    channel.onopen = () => {
+        const peer = peers.get(peerId);
+        if (peer) peer.dcReady = true;
+        updatePeersUI();
+        addSystemMsg(`与 ${peer ? peer.name : peerId} 的数据通道已建立`);
+    };
+
+    channel.onclose = () => {
+        const peer = peers.get(peerId);
+        if (peer) peer.dcReady = false;
+        updatePeersUI();
+    };
+
+    channel.onmessage = async (e) => {
+        if (typeof e.data === 'string') {
+            const msg = JSON.parse(e.data);
+            const peer = peers.get(peerId);
+
+            if (msg.type === 'chat') {
+                addChatMsg(peer ? peer.name : peerId, msg.text, false);
+            } else if (msg.type === 'file-start') {
+                await handleFileStart(msg, peerId);
+            } else if (msg.type === 'file-end') {
+                await handleFileEnd(msg.id, peerId);
+            } else if (msg.type === 'file-cancel') {
+                handleFileCancel(msg.id, peerId);
+            }
+        } else {
+            await handleFileChunk(e.data, peerId);
+        }
+    };
+}
+
+async function handleFileStart(msg, fromPeerId) {
+    const peer = peers.get(fromPeerId);
+    const fromName = peer ? peer.name : fromPeerId;
+
+    const needDecrypt = msg.encrypted && e2eeEnabled && e2eeKey;
+    const useFS = typeof window.showSaveFilePicker !== 'undefined' && msg.size > LARGE_FILE_THRESHOLD;
+
+    let task = {
+        id: msg.id,
+        name: msg.name,
+        size: msg.size,
+        mimeType: msg.mimeType,
+        encrypted: msg.encrypted,
+        received: 0,
+        startTime: Date.now(),
+        useFileSystem: false,
+        writable: null,
+        chunks: null,
+        decryptedChunks: null,
+        needDecrypt: needDecrypt,
+        fromPeerId: fromPeerId,
+        fromName: fromName,
+        lastUpdate: Date.now()
+    };
+
+    if (useFS && !needDecrypt) {
+        try {
+            const handle = await window.showSaveFilePicker({ suggestedName: msg.name });
+            task.writable = await handle.createWritable();
+            task.useFileSystem = true;
+        } catch {
+            task.chunks = [];
+        }
+    } else {
+        task.chunks = [];
+        if (needDecrypt) {
+            task.decryptedChunks = [];
+        }
+    }
+
+    receiveTasks.set(msg.id, task);
+    addTransferItem(msg.id, msg.name, msg.size, 0, 'receiving', fromName, msg.encrypted);
+}
+
+async function handleFileChunk(data, fromPeerId) {
+    if (receiveTasks.size === 0) return;
+
+    let activeTask = null;
+    for (const task of receiveTasks.values()) {
+        if (task.fromPeerId === fromPeerId && task.received < task.size) {
+            activeTask = task;
+            break;
+        }
+    }
+    if (!activeTask) {
+        for (const task of receiveTasks.values()) {
+            if (task.received < task.size) {
+                activeTask = task;
+                break;
+            }
+        }
+    }
+    if (!activeTask) return;
+
+    let processedData = data;
+
+    if (activeTask.needDecrypt && e2eeKey) {
+        try {
+            processedData = await decryptChunk(e2eeKey, data);
+        } catch {
+            if (!activeTask.decryptFailed) {
+                activeTask.decryptFailed = true;
+                addSystemMsg(`解密失败: ${activeTask.name} — 密码可能不正确`, true);
+                updateTransferItem(activeTask.id, 0, 'decrypt-failed');
+            }
+            return;
+        }
+    }
+
+    if (activeTask.useFileSystem && activeTask.writable) {
+        await activeTask.writable.write({ type: 'write', data: processedData });
+    } else if (activeTask.needDecrypt && activeTask.decryptedChunks) {
+        activeTask.decryptedChunks.push(processedData);
+    } else if (activeTask.chunks) {
+        activeTask.chunks.push(data);
+    }
+
+    activeTask.received += data.byteLength;
+    const now = Date.now();
+    if (now - activeTask.lastUpdate > 300) {
+        activeTask.lastUpdate = now;
+        const pct = Math.min(99, Math.round((activeTask.received / activeTask.size) * 100));
+        const elapsed = (now - activeTask.startTime) / 1000;
+        const speed = elapsed > 0 ? activeTask.received / elapsed : 0;
+        updateTransferItem(activeTask.id, pct, 'receiving', speed);
+    }
+}
+
+async function handleFileEnd(id, fromPeerId) {
+    const task = receiveTasks.get(id);
+    if (!task) return;
+
+    try {
+        if (task.decryptFailed) {
+            const blob = new Blob(task.chunks || [], { type: 'application/octet-stream' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = task.name + '.encrypted';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 30000);
+            updateTransferItem(id, 100, 'decrypt-failed');
+            addSystemMsg(`文件已保存（加密状态）: ${task.name}`, true);
+        } else if (task.useFileSystem && task.writable) {
+            await task.writable.close();
+            task.writable = null;
+            updateTransferItem(id, 100, 'done');
+            addSystemMsg(`已接收文件: ${task.name} (${formatSize(task.size)})`);
+        } else {
+            const chunks = task.needDecrypt && task.decryptedChunks ? task.decryptedChunks : task.chunks;
+            const mimeType = task.needDecrypt ? task.mimeType : (task.mimeType || 'application/octet-stream');
+            const blob = new Blob(chunks, { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = task.name;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 30000);
+            updateTransferItem(id, 100, 'done');
+            addSystemMsg(`已接收文件: ${task.name} (${formatSize(task.size)})${task.needDecrypt ? ' [已解密]' : ''}`);
+        }
+    } catch (err) {
+        addSystemMsg(`保存文件失败: ${err.message}`, true);
+    } finally {
+        task.chunks = [];
+        task.decryptedChunks = [];
+        receiveTasks.delete(id);
+    }
+}
+
+function handleFileCancel(id, fromPeerId) {
+    const task = receiveTasks.get(id);
+    if (!task) return;
+    if (task.writable) task.writable.abort().catch(() => {});
+    task.chunks = [];
+    task.decryptedChunks = [];
+    receiveTasks.delete(id);
+    updateTransferItem(id, 0, 'cancelled');
+    addSystemMsg(`传输已取消: ${task.name}`, true);
+}
+
+function sendChat() {
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if (!text) return;
+    broadcastToAll({ type: 'chat', text });
+    addChatMsg(myName, text, true);
+    input.value = '';
+}
+
+function broadcastToAll(msg) {
+    const str = JSON.stringify(msg);
+    for (const [, peer] of peers) {
+        if (peer.dc && peer.dc.readyState === 'open') {
+            peer.dc.send(str);
+        }
+    }
+}
+
+async function sendFile(file) {
+    let readyCount = 0;
+    for (const [, peer] of peers) {
+        if (peer.dc && peer.dc.readyState === 'open') readyCount++;
+    }
+    if (readyCount === 0) {
+        alert('没有已连接的成员');
+        return;
+    }
+
+    const id = generateId();
+    const reader = file.stream().getReader();
+
+    const task = { id, name: file.name, size: file.size, cancelled: false, startTime: Date.now() };
+    sendTasks.set(id, task);
+
+    broadcastToAll({
+        type: 'file-start',
+        name: file.name,
+        size: file.size,
+        mimeType: file.type || 'application/octet-stream',
+        id,
+        encrypted: e2eeEnabled && e2eeKey ? true : false
+    });
+
+    addTransferItem(id, file.name, file.size, 0, 'sending', '广播', e2eeEnabled && !!e2eeKey);
+
+    let totalSent = 0;
+    let lastUpdate = Date.now();
+
+    try {
+        while (true) {
+            if (task.cancelled) { sendTasks.delete(id); return; }
+
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            let offset = 0;
+            while (offset < value.length) {
+                if (task.cancelled) { sendTasks.delete(id); return; }
+
+                const allBuffered = [...peers.values()].some(p =>
+                    p.dc && p.dc.readyState === 'open' && p.dc.bufferedAmount > BUFFER_THRESHOLD
+                );
+
+                if (allBuffered) {
+                    await new Promise(resolve => setTimeout(resolve, 50));
+                    continue;
+                }
+
+                const end = Math.min(offset + CHUNK_SIZE, value.length);
+                let chunkData = value.slice(offset, end);
+
+                if (e2eeEnabled && e2eeKey) {
+                    try {
+                        const encrypted = await encryptChunk(e2eeKey, chunkData);
+                        chunkData = new Uint8Array(encrypted);
+                    } catch (err) {
+                        addSystemMsg(`加密失败: ${err.message}`, true);
+                        sendTasks.delete(id);
+                        return;
+                    }
+                }
+
+                for (const [, peer] of peers) {
+                    if (peer.dc && peer.dc.readyState === 'open') {
+                        peer.dc.send(chunkData);
+                    }
+                }
+
+                offset = end;
+            }
+
+            totalSent += value.length;
+            const now = Date.now();
+            if (now - lastUpdate > 300) {
+                lastUpdate = now;
+                const pct = Math.min(99, Math.round((totalSent / file.size) * 100));
+                const elapsed = (now - task.startTime) / 1000;
+                const speed = elapsed > 0 ? totalSent / elapsed : 0;
+                updateTransferItem(id, pct, 'sending', speed);
+            }
+        }
+
+        broadcastToAll({ type: 'file-end', id });
+        updateTransferItem(id, 100, 'done');
+        addSystemMsg(`已发送文件: ${file.name} (${formatSize(file.size)}) → ${readyCount} 人${e2eeEnabled ? ' [已加密]' : ''}`);
+    } catch (err) {
+        addSystemMsg(`发送失败: ${err.message}`, true);
+    } finally {
+        sendTasks.delete(id);
+        reader.cancel().catch(() => {});
+    }
+}
+
+function cancelSend(id) {
+    const task = sendTasks.get(id);
+    if (task) {
+        task.cancelled = true;
+        broadcastToAll({ type: 'file-cancel', id });
+        addSystemMsg(`已取消发送: ${task.name}`);
+    }
+}
+
+async function toggleE2EE() {
+    const enabled = document.getElementById('e2eeToggle').checked;
+    const row = document.getElementById('e2eePassRow');
+    if (enabled) {
+        row.style.display = 'flex';
+    } else {
+        e2eeEnabled = false;
+        e2eeKey = null;
+        row.style.display = 'none';
+        updateEncryptBadge();
+    }
+}
+
+async function applyE2EEPassword() {
+    const pass = document.getElementById('e2eePassInput').value;
+    if (!pass) { alert('请输入密码'); return; }
+    try {
+        e2eeKey = await deriveKey(pass);
+        e2eePassRaw = pass;
+        e2eeEnabled = true;
+        updateEncryptBadge();
+        addSystemMsg('端到端加密已启用 🔒');
+    } catch (err) {
+        alert('密钥派生失败: ' + err.message);
+    }
+}
+
+function addChatMsg(name, text, isSelf) {
+    const div = document.createElement('div');
+    div.className = 'msg ' + (isSelf ? 'self' : 'peer');
+    div.innerHTML = `<div class="name">${escHtml(name)}</div>${escHtml(text)}`;
+    document.getElementById('messages').appendChild(div);
+    scrollBottom();
+}
+
+function addSystemMsg(text, isError = false) {
+    const div = document.createElement('div');
+    div.className = 'msg system' + (isError ? ' error' : '');
+    div.textContent = text;
+    document.getElementById('messages').appendChild(div);
+    scrollBottom();
+}
+
+function scrollBottom() {
+    const el = document.getElementById('messages');
+    el.scrollTop = el.scrollHeight;
+}
+
+function escHtml(s) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+}
+
+function formatSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+}
+
+function formatSpeed(bps) {
+    if (bps < 1024) return bps.toFixed(0) + ' B/s';
+    if (bps < 1024 * 1024) return (bps / 1024).toFixed(1) + ' KB/s';
+    if (bps < 1024 * 1024 * 1024) return (bps / (1024 * 1024)).toFixed(1) + ' MB/s';
+    return (bps / (1024 * 1024 * 1024)).toFixed(2) + ' GB/s';
+}
+
+function addTransferItem(id, name, size, pct, status, fromName, encrypted) {
+    const el = document.createElement('div');
+    el.className = 'transfer-item';
+    el.id = 'transfer-' + id;
+    const lockIcon = encrypted ? '🔒' : '';
+    const fromLabel = status === 'receiving' ? `<span class="t-from">来自 ${escHtml(fromName)}</span>` : '';
+    const statusLabel = status === 'done' ? '完成' : (status === 'sending' ? '发送中' : (status === 'decrypt-failed' ? '解密失败' : (status === 'cancelled' ? '已取消' : '接收中')));
+    el.innerHTML = `
+        <div class="t-header">
+            <div class="t-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 5v14m-7-7l7 7 7-7"/></svg></div>
+            <span class="t-name">${lockIcon} ${escHtml(name)}</span>
+            ${fromLabel}
+        </div>
+        <div class="t-meta" id="meta-${id}"><span>${formatSize(size)} · ${statusLabel} ${pct}%</span><span class="t-speed" id="speed-${id}"></span></div>
+        <div class="progress-bar"><div class="fill" style="width:${pct}%"></div></div>`;
+    document.getElementById('transfers').prepend(el);
+}
+
+function updateTransferItem(id, pct, status, speed = 0) {
+    const el = document.getElementById('transfer-' + id);
+    if (!el) return;
+    const meta = document.getElementById('meta-' + id);
+    const fill = el.querySelector('.fill');
+    const speedEl = document.getElementById('speed-' + id);
+    if (meta) {
+        const sizeText = meta.querySelector('span').textContent.split('·')[0].trim();
+        const label = status === 'done' ? '完成' : (status === 'sending' ? '发送中' : (status === 'decrypt-failed' ? '解密失败' : (status === 'cancelled' ? '已取消' : '接收中')));
+        meta.querySelector('span').textContent = `${sizeText} · ${label} ${pct}%`;
+    }
+    if (speedEl && speed > 0) speedEl.textContent = formatSpeed(speed);
+    if (fill) fill.style.width = pct + '%';
+}
+
+const dropZone = document.getElementById('dropZone');
+dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
+dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    for (let i = 0; i < e.dataTransfer.files.length; i++) sendFile(e.dataTransfer.files[i]);
+});
+dropZone.addEventListener('click', () => {
+    if (!fileInput) {
+        fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.multiple = true;
+        fileInput.onchange = () => {
+            for (let i = 0; i < fileInput.files.length; i++) sendFile(fileInput.files[i]);
+            fileInput.value = '';
+        };
+    }
+    fileInput.click();
+});
+
+document.getElementById('nameInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') document.getElementById('roomInput').focus(); });
+document.getElementById('roomInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') joinRoom(); });
+document.getElementById('encryptPass').addEventListener('keydown', (e) => { if (e.key === 'Enter') joinRoom(); });
+</script>
+</body>
+</html>
