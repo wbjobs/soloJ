@@ -1,0 +1,4 @@
+node_modules/
+data/cache.db
+config.json
+*.log
