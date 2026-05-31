@@ -1,0 +1,29 @@
+{
+  "name": "codeshare-server",
+  "version": "1.0.0",
+  "description": "Code share backend server with Yjs real-time collaboration",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mongoose": "^8.4.1",
+    "nanoid": "^3.3.7",
+    "ws": "^8.17.1",
+    "y-websocket": "^2.0.4",
+    "yjs": "^13.6.18"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^20.14.2",
+    "@types/ws": "^8.18.1",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.4.5"
+  }
+}
