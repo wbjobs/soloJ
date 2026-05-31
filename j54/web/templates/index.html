@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helm Chart Dependency Audit</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <h1>Helm Chart Dependency Audit</h1>
+            <div class="controls">
+                <button id="btn-refresh" class="btn btn-primary">Refresh Topology</button>
+                <button id="btn-reset" class="btn btn-secondary">Reset View</button>
+            </div>
+        </header>
+
+        <div class="legend">
+            <span class="legend-item"><span class="dot chart-dot"></span> Chart</span>
+            <span class="legend-item"><span class="dot image-dot"></span> Image</span>
+            <span class="legend-item"><span class="dot dep-dot"></span> Dependency</span>
+            <span class="legend-item"><span class="dot vuln-critical-dot"></span> Critical CVE</span>
+            <span class="legend-item"><span class="dot vuln-high-dot"></span> High CVE</span>
+            <span class="legend-item legend-line"><span class="line uses-line"></span> Uses Image</span>
+            <span class="legend-item legend-line"><span class="line depends-line"></span> Depends On</span>
+        </div>
+
+        <div id="topology-container"></div>
+
+        <div id="tooltip" class="tooltip hidden"></div>
+
+        <div id="sidebar" class="sidebar hidden">
+            <h2 id="sidebar-title">Node Details</h2>
+            <div id="sidebar-content"></div>
+            <button id="btn-close-sidebar" class="btn btn-secondary">Close</button>
+        </div>
+    </div>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="{{ url_for('static', filename='js/topology.js') }}"></script>
+</body>
+</html>
