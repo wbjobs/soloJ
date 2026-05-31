@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>订单簿回放可视化系统</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <span class="logo-icon">◈</span>
+                    <span class="logo-text">Orderbook Replay</span>
+                </div>
+            </div>
+            <div class="header-center">
+                <div class="connection-status">
+                    <span class="status-dot" id="statusDot"></span>
+                    <span class="status-text" id="statusText">连接中...</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="export-btn" id="exportBtn">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                    </svg>
+                    导出快照
+                </button>
+                <div class="time-display" id="timeDisplay">--:--:--</div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <aside class="metrics-panel">
+                <h2 class="panel-title">市场指标</h2>
+                
+                <div class="metric-card">
+                    <div class="metric-label">买一价 (Best Bid)</div>
+                    <div class="metric-value bid-price" id="bestBid">--</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-label">卖一价 (Best Ask)</div>
+                    <div class="metric-value ask-price" id="bestAsk">--</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-label">买卖价差 (Spread)</div>
+                    <div class="metric-value spread" id="spread">--</div>
+                    <div class="metric-subvalue" id="spreadPct">--</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-label">订单不平衡 (Imbalance)</div>
+                    <div class="metric-value imbalance" id="imbalance">--</div>
+                    <div class="imbalance-bar">
+                        <div class="imbalance-fill" id="imbalanceFill"></div>
+                    </div>
+                    <div class="imbalance-labels">
+                        <span>卖方</span>
+                        <span>买方</span>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">波动率预测</div>
+                    <div class="prediction-summary">
+                        <div class="prediction-row">
+                            <span class="prediction-label">实际</span>
+                            <span class="prediction-value" id="actualVolatility">--</span>
+                        </div>
+                        <div class="prediction-row">
+                            <span class="prediction-label">预测(10s)</span>
+                            <span class="prediction-value predicted" id="predictedVolatility">--</span>
+                        </div>
+                        <div class="prediction-row">
+                            <span class="prediction-label">置信度</span>
+                            <span class="prediction-value confidence" id="predictionConfidence">--</span>
+                        </div>
+                    </div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" id="confidenceFill"></div>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">事件进度</div>
+                    <div class="metric-value" id="eventProgress">0 / 0</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">播放速度</div>
+                    <div class="speed-controls">
+                        <button class="speed-btn" data-speed="0.25">0.25x</button>
+                        <button class="speed-btn" data-speed="0.5">0.5x</button>
+                        <button class="speed-btn active" data-speed="1">1x</button>
+                        <button class="speed-btn" data-speed="2">2x</button>
+                        <button class="speed-btn" data-speed="5">5x</button>
+                    </div>
+                </div>
+            </aside>
+
+            <section class="charts-container">
+                <div class="chart-container depth-container">
+                    <canvas id="depthChart"></canvas>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <span class="legend-color bid"></span>
+                            <span>买盘深度</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color ask"></span>
+                            <span>卖盘深度</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="volatility-container">
+                    <div id="volatilityChart"></div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="controls-panel">
+            <div class="controls-left">
+                <button class="control-btn play-btn" id="playBtn">
+                    <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                    <svg class="pause-icon hidden" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                    </svg>
+                </button>
+                <button class="control-btn" id="resetBtn">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="controls-center">
+                <div class="time-range">
+                    <span id="startTime">--:--:--</span>
+                </div>
+                <div class="slider-container">
+                    <input type="range" id="timeSlider" min="0" max="1000" value="0" step="1">
+                    <div class="slider-tooltip" id="sliderTooltip">--:--:--</div>
+                </div>
+                <div class="time-range">
+                    <span id="endTime">--:--:--</span>
+                </div>
+            </div>
+
+            <div class="controls-right">
+                <span class="current-time" id="currentTime">--:--:--</span>
+            </div>
+        </footer>
+    </div>
+
+    <div class="export-modal hidden" id="exportModal">
+        <div class="export-modal-content">
+            <div class="export-modal-header">
+                <h3>导出订单簿快照</h3>
+                <button class="close-btn" id="closeExportModal">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="export-modal-body">
+                <div class="export-options">
+                    <label class="export-option">
+                        <input type="checkbox" id="exportDepth" checked>
+                        <span>深度图</span>
+                    </label>
+                    <label class="export-option">
+                        <input type="checkbox" id="exportVolatility" checked>
+                        <span>波动率预测图</span>
+                    </label>
+                </div>
+                <div class="export-preview">
+                    <div class="preview-item" id="depthPreview">
+                        <h4>深度图预览</h4>
+                        <div class="preview-content">
+                            <canvas id="depthPreviewCanvas"></canvas>
+                        </div>
+                    </div>
+                    <div class="preview-item" id="volatilityPreview">
+                        <h4>波动率图预览</h4>
+                        <div class="preview-content volatility-preview-content">
+                            <img id="volatilityPreviewImg" alt="波动率图预览">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="export-modal-footer">
+                <button class="control-btn" id="downloadDepthBtn">下载深度图</button>
+                <button class="control-btn" id="downloadVolatilityBtn">下载波动率图</button>
+                <button class="control-btn primary" id="downloadAllBtn">下载全部</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/orderbook.js"></script>
+    <script src="js/renderer.js"></script>
+    <script src="js/metrics.js"></script>
+    <script src="js/predictor.js"></script>
+    <script src="js/volatilityChart.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

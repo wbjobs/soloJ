@@ -1,0 +1,16 @@
+{
+  "name": "orderbook-replay",
+  "version": "1.0.0",
+  "description": "Orderbook replay visualization system",
+  "main": "server/server.js",
+  "type": "module",
+  "scripts": {
+    "generate-data": "node server/generate-data.js",
+    "start": "node server/server.js",
+    "dev": "node server/server.js"
+  },
+  "dependencies": {
+    "ws": "^8.16.0",
+    "csv-parser": "^3.0.0"
+  }
+}
