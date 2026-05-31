@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WebGPU SPH 流体模拟</title>
+  <link rel="stylesheet" href="/src/ui/styles.css" />
+</head>
+<body>
+  <canvas id="gpu-canvas"></canvas>
+  <div id="control-panel">
+    <h2>流体控制面板</h2>
+    <div class="section">
+      <label>渲染模式</label>
+      <div class="radio-group">
+        <label><input type="radio" name="renderMode" value="particles" checked /> 粒子</label>
+        <label><input type="radio" name="renderMode" value="surface" /> 表面重建</label>
+        <label><input type="radio" name="renderMode" value="raytrace" /> 光线追踪</label>
+      </div>
+    </div>
+    <div class="section">
+      <label>粒子数量: <span id="particle-count">0</span></label>
+      <button id="add-particles">添加默认粒子</button>
+      <button id="add-water">添加水</button>
+      <button id="add-oil">添加油</button>
+      <button id="add-bubbles">添加气泡</button>
+      <button id="clear-particles">清除粒子</button>
+    </div>
+    <div class="section">
+      <label>添加流体类型</label>
+      <select id="fluid-type">
+        <option value="0">水 (蓝色)</option>
+        <option value="1">油 (橙色)</option>
+        <option value="2">气泡 (白色)</option>
+      </select>
+    </div>
+    <div class="section">
+      <label>重力方向</label>
+      <div class="gravity-controls">
+        <button data-gx="0" data-gy="-1">↑ 上</button>
+        <button data-gx="0" data-gy="1">↓ 下</button>
+        <button data-gx="-1" data-gy="0">← 左</button>
+        <button data-gx="1" data-gy="0">→ 右</button>
+        <button data-gx="0" data-gy="0">○ 无</button>
+      </div>
+    </div>
+    <div class="section">
+      <label>重力强度: <span id="gravity-value">9.8</span></label>
+      <input type="range" id="gravity-strength" min="0" max="30" step="0.1" value="9.8" />
+    </div>
+    <div class="section">
+      <label>粒子半径: <span id="radius-value">0.025</span></label>
+      <input type="range" id="particle-radius" min="0.005" max="0.06" step="0.001" value="0.025" />
+    </div>
+    <div class="section">
+      <label>表面张力: <span id="tension-value">1.0</span></label>
+      <input type="range" id="surface-tension" min="0" max="5" step="0.1" value="1.0" />
+    </div>
+    <div class="section">
+      <label>附着力: <span id="adhesion-value">0.5</span></label>
+      <input type="range" id="adhesion" min="0" max="2" step="0.1" value="0.5" />
+    </div>
+    <div class="section">
+      <label>排斥力: <span id="repulsion-value">2.0</span></label>
+      <input type="range" id="repulsion" min="0" max="10" step="0.1" value="2.0" />
+    </div>
+    <div class="section">
+      <label>时间步长: <span id="dt-value">0.001</span></label>
+      <input type="range" id="time-step" min="0.0001" max="0.005" step="0.0001" value="0.001" />
+    </div>
+    <div class="section">
+      <label>子步数: <span id="substep-value">3</span></label>
+      <input type="range" id="substeps" min="1" max="8" step="1" value="3" />
+    </div>
+    <div class="section">
+      <label>抗锯齿</label>
+      <label class="switch">
+        <input type="checkbox" id="taa-toggle" checked />
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="section">
+      <label>自动旋转</label>
+      <label class="switch">
+        <input type="checkbox" id="auto-rotate" />
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="info">
+      <div>鼠标拖拽添加粒子</div>
+      <div>右键拖拽旋转视角</div>
+      <div id="fps-display">FPS: --</div>
+    </div>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
