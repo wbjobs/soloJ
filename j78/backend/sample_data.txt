@@ -1,0 +1,45 @@
+# 威胁情报示例数据
+# 每行是一个独立的威胁情报报告片段
+
+# 示例 1: APT 组织攻击报告
+APT28（也称为Fancy Bear）是一个疑似与俄罗斯军事情报总局（GRU）有关的黑客组织。该组织在最近的攻击活动中使用了IP地址192.168.1.100、10.0.0.50和域名command-control-server.com。
+
+与此同时，Cozy Bear组织（又称APT29）被发现使用IP地址8.8.8.8和域名cozybear-apt29.org对政府机构目标发起了多次网络间谍活动。
+
+Lazarus Group，一个来自朝鲜的黑客组织，涉嫌对金融机构进行了多次攻击。他们使用IP 203.0.113.45、198.51.100.23和域名lazarus-attack.net、crypto-heist.org。
+
+Sandworm Team，另一个俄罗斯黑客组织，在攻击活动中涉及IP 192.0.2.100、198.51.100.10和恶意软件Industroyer。
+
+最近发现，APT28还使用了新的C2服务器：203.0.113.67和域名new-apt28-c2.com来控制被攻陷的系统。
+
+---
+
+# 示例 2: 勒索软件攻击报告
+Conti勒索软件团伙在过去一年中对全球多个企业发起了勒索攻击。该组织使用的服务器位于IP地址185.220.101.33、45.33.32.156和域名conti-ransomware.com、conti-leak.site进行数据泄露网站。
+
+REvil（Sodinokibi）勒索软件团伙使用IP 91.121.85.103、185.141.62.78和域名revil-group.org进行双重勒索攻击。
+
+LockBit勒索软件团伙最近非常活跃，他们的基础设施包括IP 193.142.54.127、45.154.16.78和lockbit-ransom.com域名。
+
+BlackCat勒索软件（也称为ALPHV）使用域名blackcat-blog.com和IP 103.230.84.10、185.243.115.84进行勒索攻击活动。
+
+支付赎金的网站包括：pay-ransom-conti.com和conti-support.to
+
+---
+
+# 示例 3: 复合攻击场景报告
+在最近的一起复杂的网络攻击事件中，发现了多个攻击组织的活动痕迹。
+
+首先，OceanLotus组织（也称为APT32）被发现使用IP 104.21.8.90和域名oceanlotus-apt.org针对东南亚地区的政府机构。该组织使用水坑攻击域名malicious-docs.com分发恶意软件。
+
+Golden Jackal组织使用IP 45.60.156.78和jackal-c2.net以及多个C2域名：golden-jackal.to、jackal-apt34.com。
+
+在攻击链路中发现，IP 104.21.8.90解析到了域名phishing-target.com，该域名用于分发恶意钓鱼攻击。
+
+另外，Lapsus$团伙涉嫌使用域名lapsus-hack.com和IP 192.168.100.50攻击了多家科技公司，数据泄露到dark-web-leaks.com。
+
+与此同时，发现域名phishing-docs.net解析到IP 185.220.101.46，该IP与多个恶意活动相关联。
+
+Turla组织，一个历史悠久的俄罗斯黑客组织，使用IP 195.123.210.100和域名turla-apt.net进行长期的网络间谍活动。
+
+Equation Group被怀疑使用极其复杂的恶意软件框架，其基础设施涉及IP 209.126.110.50和域名eq-group-tools.xyz。
