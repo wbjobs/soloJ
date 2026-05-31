@@ -1,0 +1,36 @@
+{
+  "rules": [
+    {
+      "oldApi": "oldLib.request",
+      "newApi": "newLib.fetch",
+      "description": "Migrate oldLib.request to newLib.fetch",
+      "paramMapping": [0, 2, 1],
+      "removeParams": [],
+      "addParams": []
+    },
+    {
+      "oldApi": "jQuery.ajax",
+      "newApi": "axios",
+      "description": "Migrate jQuery.ajax to axios",
+      "paramMapping": [0],
+      "removeParams": [],
+      "addParams": []
+    },
+    {
+      "oldApi": "fs.readFile",
+      "newApi": "fs.promises.readFile",
+      "description": "Migrate callback-style fs.readFile to promise-based",
+      "paramMapping": [0, 1],
+      "removeParams": [2],
+      "addParams": []
+    },
+    {
+      "oldApi": "console.log",
+      "newApi": "logger.info",
+      "description": "Migrate console.log to logger.info",
+      "paramMapping": [0],
+      "removeParams": [],
+      "addParams": []
+    }
+  ]
+}

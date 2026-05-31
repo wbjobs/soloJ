@@ -1,0 +1,21 @@
+{
+  "name": "js-upgrade-cli",
+  "version": "1.0.0",
+  "description": "CLI tool to upgrade old JavaScript code by converting var to let/const",
+  "main": "src/index.js",
+  "bin": {
+    "js-upgrade": "./src/index.js"
+  },
+  "scripts": {
+    "test": "node src/index.js test"
+  },
+  "keywords": ["javascript", "ast", "babel", "upgrade"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@babel/parser": "^7.24.0",
+    "@babel/traverse": "^7.24.0",
+    "@babel/generator": "^7.24.0",
+    "commander": "^12.0.0"
+  }
+}

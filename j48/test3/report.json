@@ -1,0 +1,152 @@
+{
+  "timestamp": "2026-05-27T22:30:48.721Z",
+  "directory": "E:\\soloJ\\j48\\test3",
+  "totalFiles": 1,
+  "modifiedFiles": [
+    {
+      "file": "E:\\soloJ\\j48\\test3\\api-migration.js",
+      "modified": true,
+      "linesModified": [
+        4,
+        7,
+        9,
+        14,
+        19,
+        25,
+        26,
+        29,
+        33
+      ],
+      "lineCount": 9,
+      "warnings": [],
+      "apiMigrations": [
+        {
+          "oldApi": "console.log",
+          "newApi": "logger.info",
+          "line": 4,
+          "paramsChanged": false
+        },
+        {
+          "oldApi": "oldLib.request",
+          "newApi": "newLib.fetch",
+          "line": 7,
+          "paramsChanged": true
+        },
+        {
+          "oldApi": "jQuery.ajax",
+          "newApi": "axios",
+          "line": 9,
+          "paramsChanged": false
+        },
+        {
+          "oldApi": "console.log",
+          "newApi": "logger.info",
+          "line": 14,
+          "paramsChanged": false
+        },
+        {
+          "oldApi": "fs.readFile",
+          "newApi": "fs.promises.readFile",
+          "line": 19,
+          "paramsChanged": true
+        },
+        {
+          "oldApi": "console.log",
+          "newApi": "logger.info",
+          "line": 25,
+          "paramsChanged": false
+        },
+        {
+          "oldApi": "console.log",
+          "newApi": "logger.info",
+          "line": 26,
+          "paramsChanged": false
+        },
+        {
+          "oldApi": "oldLib.request",
+          "newApi": "newLib.fetch",
+          "line": 29,
+          "paramsChanged": true
+        },
+        {
+          "oldApi": "oldLib.request",
+          "newApi": "newLib.fetch",
+          "line": 33,
+          "paramsChanged": true
+        }
+      ]
+    }
+  ],
+  "totalLinesModified": 9,
+  "warnings": [],
+  "apiMigrations": [
+    {
+      "oldApi": "console.log",
+      "newApi": "logger.info",
+      "line": 4,
+      "paramsChanged": false,
+      "file": "E:\\soloJ\\j48\\test3\\api-migration.js"
+    },
+    {
+      "oldApi": "oldLib.request",
+      "newApi": "newLib.fetch",
+      "line": 7,
+      "paramsChanged": true,
+      "file": "E:\\soloJ\\j48\\test3\\api-migration.js"
+    },
+    {
+      "oldApi": "jQuery.ajax",
+      "newApi": "axios",
+      "line": 9,
+      "paramsChanged": false,
+      "file": "E:\\soloJ\\j48\\test3\\api-migration.js"
+    },
+    {
+      "oldApi": "console.log",
+      "newApi": "logger.info",
+      "line": 14,
+      "paramsChanged": false,
+      "file": "E:\\soloJ\\j48\\test3\\api-migration.js"
+    },
+    {
+      "oldApi": "fs.readFile",
+      "newApi": "fs.promises.readFile",
+      "line": 19,
+      "paramsChanged": true,
+      "file": "E:\\soloJ\\j48\\test3\\api-migration.js"
+    },
+    {
+      "oldApi": "console.log",
+      "newApi": "logger.info",
+      "line": 25,
+      "paramsChanged": false,
+      "file": "E:\\soloJ\\j48\\test3\\api-migration.js"
+    },
+    {
+      "oldApi": "console.log",
+      "newApi": "logger.info",
+      "line": 26,
+      "paramsChanged": false,
+      "file": "E:\\soloJ\\j48\\test3\\api-migration.js"
+    },
+    {
+      "oldApi": "oldLib.request",
+      "newApi": "newLib.fetch",
+      "line": 29,
+      "paramsChanged": true,
+      "file": "E:\\soloJ\\j48\\test3\\api-migration.js"
+    },
+    {
+      "oldApi": "oldLib.request",
+      "newApi": "newLib.fetch",
+      "line": 33,
+      "paramsChanged": true,
+      "file": "E:\\soloJ\\j48\\test3\\api-migration.js"
+    }
+  ],
+  "totalApiMigrations": 9,
+  "options": {
+    "skipVarUpgrade": true,
+    "apiRulesFile": "test3/rules.json"
+  }
+}

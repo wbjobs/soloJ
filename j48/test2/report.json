@@ -1,0 +1,47 @@
+{
+  "timestamp": "2026-05-27T22:25:27.358Z",
+  "directory": "E:\\soloJ\\j48\\test2",
+  "totalFiles": 2,
+  "modifiedFiles": [
+    {
+      "file": "E:\\soloJ\\j48\\test2\\hoisting.js",
+      "modified": true,
+      "linesModified": [
+        6,
+        7,
+        11,
+        12,
+        17
+      ],
+      "lineCount": 5,
+      "warnings": [
+        {
+          "variable": "message",
+          "line": 2,
+          "reason": "Variable 'message' is referenced outside its declaration block (var hoisting); keeping as 'var'"
+        }
+      ]
+    }
+  ],
+  "totalLinesModified": 5,
+  "warnings": [
+    {
+      "variable": "i",
+      "line": 2,
+      "reason": "Variable 'i' is referenced outside the for-loop (var hoisting); keeping as 'var'",
+      "file": "E:\\soloJ\\j48\\test2\\edge_cases.js"
+    },
+    {
+      "variable": "z",
+      "line": 30,
+      "reason": "Variable 'z' is referenced before declaration (var hoisting / TDZ); keeping as 'var'",
+      "file": "E:\\soloJ\\j48\\test2\\edge_cases.js"
+    },
+    {
+      "variable": "message",
+      "line": 2,
+      "reason": "Variable 'message' is referenced outside its declaration block (var hoisting); keeping as 'var'",
+      "file": "E:\\soloJ\\j48\\test2\\hoisting.js"
+    }
+  ]
+}
