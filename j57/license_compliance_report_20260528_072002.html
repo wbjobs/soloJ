@@ -1,0 +1,1744 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python 依赖许可证合规性报告</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f3f4f6;
+            color: #1f2937;
+            line-height: 1.6;
+        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+        }
+        .header h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        .header .subtitle { font-size: 1.1rem; opacity: 0.9; }
+        .header .metadata { margin-top: 20px; font-size: 0.9rem; opacity: 0.8; }
+
+        .risk-overview {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        .risk-badge {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+            font-weight: bold;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        .risk-details { flex: 1; }
+        .risk-details h2 { margin-bottom: 15px; color: #374151; }
+        .risk-bars { display: flex; gap: 20px; }
+        .risk-bar-item { flex: 1; }
+        .risk-bar-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        .risk-bar {
+            height: 12px;
+            background: #e5e7eb;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .risk-bar-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.5s ease;
+        }
+        .risk-low { background: #10b981; }
+        .risk-medium { background: #f59e0b; }
+        .risk-high { background: #ef4444; }
+        .risk-critical { background: #991b1b; }
+
+        .contamination-banner {
+            background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 50%, #450a0a 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(153, 27, 27, 0.4);
+            border: 2px solid #fca5a5;
+            animation: pulse-border 2s ease-in-out infinite;
+        }
+        @keyframes pulse-border {
+            0%, 100% { border-color: #fca5a5; }
+            50% { border-color: #fecaca; }
+        }
+        .contamination-banner h2 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .contamination-banner .warning-icon {
+            display: inline-block;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        .contamination-banner .desc {
+            opacity: 0.95;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+        .conflict-pairs {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        .conflict-pair {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .conflict-pair:last-child { border-bottom: none; }
+        .conflict-arrow {
+            color: #fca5a5;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .pkg-chip {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .pkg-chip.gpl {
+            background: rgba(220, 38, 38, 0.3);
+            border: 1px solid #fca5a5;
+        }
+        .pkg-chip.proprietary {
+            background: rgba(124, 58, 237, 0.3);
+            border: 1px solid #c4b5fd;
+        }
+        .recommendation {
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            white-space: pre-line;
+            line-height: 1.8;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-card .number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        .stat-card .label { color: #6b7280; font-size: 0.95rem; }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        .section-header {
+            padding: 20px 30px;
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .section-header h2 {
+            color: #374151;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-header .count {
+            background: #667eea;
+            color: white;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+        .section-body { padding: 20px 30px; }
+
+        .issues-list { list-style: none; }
+        .issue-item {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid;
+        }
+        .issue-item.risk-high {
+            background: #fef2f2;
+            border-color: #ef4444;
+        }
+        .issue-item.risk-critical {
+            background: #450a0a;
+            border-color: #991b1b;
+            color: #fecaca;
+        }
+        .issue-item.risk-critical .issue-title {
+            color: #fca5a5;
+        }
+        .issue-item.risk-critical .issue-reason {
+            color: #fca5a5;
+        }
+        .issue-item.risk-medium {
+            background: #fffbeb;
+            border-color: #f59e0b;
+        }
+        .issue-item.risk-low {
+            background: #f0fdf4;
+            border-color: #10b981;
+        }
+        .issue-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .issue-reason { color: #6b7280; font-size: 0.9rem; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background: #f9fafb;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        tr:hover { background: #f9fafb; }
+
+        .license-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: white;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .status-badge.declared {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+        .status-badge.used {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .status-badge.optional {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+        .status-badge.undeclared {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .status-badge.unused {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .file-list {
+            font-size: 0.85rem;
+            color: #6b7280;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+        .file-list span {
+            display: inline-block;
+            background: #f3f4f6;
+            padding: 2px 6px;
+            margin: 2px;
+            border-radius: 4px;
+        }
+
+        .details-panel {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        .details-panel h4 { color: #374151; margin-bottom: 10px; }
+        .permission-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+        .perm-tag {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+        }
+        .perm-tag.allow {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .perm-tag.require {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+        .perm-tag.forbid {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .collapsible { cursor: pointer; }
+        .collapsible-content { display: none; }
+        .collapsible.open + .collapsible-content { display: block; }
+        .arrow { display: inline-block; transition: transform 0.2s; }
+        .collapsible.open .arrow { transform: rotate(90deg); }
+
+        .license-dist {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .license-dist-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f9fafb;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+        .license-dist-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 Python 依赖许可证合规性报告</h1>
+            <p class="subtitle">分析项目依赖的许可证合规性，识别潜在法律风险</p>
+            <div class="metadata">
+                <p>项目路径: E:\soloJ\j57\test_project</p>
+                <p>生成时间: 2026-05-28 07:20:02</p>
+                <p>扫描引擎: PyLicenseScanner v1.0</p>
+            </div>
+        </div>
+
+        <div class="risk-overview">
+            <div class="risk-badge" style="background: #991b1b;">
+                严重风险
+            </div>
+            <div class="risk-details">
+                <h2>整体风险评估</h2>
+                <div class="risk-bars">
+                    
+            <div class="risk-bar-item">
+                <div class="risk-bar-label">
+                    <span>低风险</span>
+                    <span>21 (78%)</span>
+                </div>
+                <div class="risk-bar">
+                    <div class="risk-bar-fill risk-low" style="width: 77.77777777777779%;"></div>
+                </div>
+            </div>
+            <div class="risk-bar-item">
+                <div class="risk-bar-label">
+                    <span>中风险</span>
+                    <span>1 (4%)</span>
+                </div>
+                <div class="risk-bar">
+                    <div class="risk-bar-fill risk-medium" style="width: 3.7037037037037033%;"></div>
+                </div>
+            </div>
+            <div class="risk-bar-item">
+                <div class="risk-bar-label">
+                    <span>高风险</span>
+                    <span>5 (19%)</span>
+                </div>
+                <div class="risk-bar">
+                    <div class="risk-bar-fill risk-high" style="width: 18.51851851851852%;"></div>
+                </div>
+            </div>
+                </div>
+                <div class="license-dist">
+                    
+            <div class="license-dist-item">
+                <div class="license-dist-color" style="background: #667eea;"></div>
+                <span>BSD-3-Clause</span>
+                <span style="color: #6b7280;">(6)</span>
+            </div>
+            <div class="license-dist-item">
+                <div class="license-dist-color" style="background: #764ba2;"></div>
+                <span>Apache-2.0</span>
+                <span style="color: #6b7280;">(3)</span>
+            </div>
+            <div class="license-dist-item">
+                <div class="license-dist-color" style="background: #f093fb;"></div>
+                <span>MIT</span>
+                <span style="color: #6b7280;">(11)</span>
+            </div>
+            <div class="license-dist-item">
+                <div class="license-dist-color" style="background: #f5576c;"></div>
+                <span>LGPL-3.0</span>
+                <span style="color: #6b7280;">(1)</span>
+            </div>
+            <div class="license-dist-item">
+                <div class="license-dist-color" style="background: #4facfe;"></div>
+                <span>GPL-3.0</span>
+                <span style="color: #6b7280;">(1)</span>
+            </div>
+            <div class="license-dist-item">
+                <div class="license-dist-color" style="background: #00f2fe;"></div>
+                <span>Proprietary</span>
+                <span style="color: #6b7280;">(2)</span>
+            </div>
+            <div class="license-dist-item">
+                <div class="license-dist-color" style="background: #43e97b;"></div>
+                <span>Unknown</span>
+                <span style="color: #6b7280;">(2)</span>
+            </div>
+            <div class="license-dist-item">
+                <div class="license-dist-color" style="background: #38f9d7;"></div>
+                <span>PSF-2.0</span>
+                <span style="color: #6b7280;">(1)</span>
+            </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="number">27</div>
+                <div class="label">第三方依赖总数</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">17</div>
+                <div class="label">已声明依赖</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">20</div>
+                <div class="label">实际使用依赖</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">4</div>
+                <div class="label">未声明依赖 ⚠️</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">6</div>
+                <div class="label">可选依赖</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">7</div>
+                <div class="label">未使用依赖</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">12</div>
+                <div class="label">标准库引用</div>
+            </div>
+        </div>
+
+        
+        <div class="contamination-banner">
+            <h2>
+                <span class="warning-icon">🚨</span>
+                许可证污染风险
+            </h2>
+            <p class="desc">项目中同时使用了强 Copyleft 许可证（GPL/AGPL）和闭源/商业许可证的库。强 Copyleft 许可证要求衍生作品以相同许可证开源，这与闭源/商业软件的使用条款存在根本冲突，可能导致闭源代码被迫开源或违反商业许可协议。</p>
+            <div class="conflict-pairs">
+                <h3 style="margin-bottom: 10px;">⚠️ 冲突对：</h3>
+                
+                <div class="conflict-pair">
+                    <span class="pkg-chip gpl">gpl_toolkit (GPL-3.0)</span>
+                    <span class="conflict-arrow">⟷</span>
+                    <span class="pkg-chip proprietary">commercial_sdk (Proprietary)</span>
+                </div>
+            </div>
+            <div class="recommendation">
+                <h3 style="margin-bottom: 8px;">📋 修复建议：</h3>
+                1. 审查 GPL/AGPL 库是否可以通过动态链接或独立进程隔离来避免污染；
+2. 考虑将 GPL 库替换为功能等效的宽松许可（MIT/Apache/BSD）替代品；
+3. 咨询法律顾问评估合规风险；
+4. 如无法替换，需确保闭源代码不与 GPL 代码静态链接或形成衍生作品。
+            </div>
+        </div>
+
+        
+        <div class="section">
+            <div class="section-header">
+                <h2>⚠️ 合规性问题 <span class="count">23</span></h2>
+            </div>
+            <div class="section-body">
+                <ul class="issues-list">
+                    <li class="issue-item risk-critical">
+                        <div class="issue-title">
+                            <strong>许可证污染</strong>
+                            <span class="license-badge" style="background: #991b1b;">
+                                GPL + Proprietary
+                            </span>
+                            <span style="color: #6b7280; font-weight: normal;">v-</span>
+                        </div>
+                        <div class="issue-reason">项目中同时使用了强 Copyleft 许可证（GPL/AGPL）和闭源/商业许可证的库。强 Copyleft 许可证要求衍生作品以相同许可证开源，这与闭源/商业软件的使用条款存在根本冲突，可能导致闭源代码被迫开源或违反商业许可协议。</div>
+                        <div style="margin-top: 5px;">
+                            <span class="status-badge undeclared">未声明</span> <span class="status-badge unused">未使用</span>
+                        </div>
+                    </li>
+                    <li class="issue-item risk-low">
+                        <div class="issue-title">
+                            <strong>psycopg2-binary</strong>
+                            <span class="license-badge" style="background: #10b981;">
+                                LGPL-3.0
+                            </span>
+                            <span style="color: #6b7280; font-weight: normal;">v2.9.0</span>
+                        </div>
+                        <div class="issue-reason">包已声明但未在代码中使用</div>
+                        <div style="margin-top: 5px;">
+                            <span class="status-badge declared">已声明</span> <span class="status-badge unused">未使用</span>
+                        </div>
+                    </li>
+                    <li class="issue-item risk-high">
+                        <div class="issue-title">
+                            <strong>gpl_toolkit</strong>
+                            <span class="license-badge" style="background: #ef4444;">
+                                GPL-3.0
+                            </span>
+                            <span style="color: #6b7280; font-weight: normal;">v2.0.0</span>
+                        </div>
+                        <div class="issue-reason">GPLv3 是强Copyleft许可证，要求衍生作品开源</div>
+                        <div style="margin-top: 5px;">
+                            <span class="status-badge declared">已声明</span> <span class="status-badge used">已使用</span>
+                        </div>
+                    </li>
+                    <li class="issue-item risk-high">
+                        <div class="issue-title">
+                            <strong>commercial_sdk</strong>
+                            <span class="license-badge" style="background: #ef4444;">
+                                Proprietary
+                            </span>
+                            <span style="color: #6b7280; font-weight: normal;">v3.2.0</span>
+                        </div>
+                        <div class="issue-reason">专有软件使用受限，需要仔细审查许可协议</div>
+                        <div style="margin-top: 5px;">
+                            <span class="status-badge declared">已声明</span> <span class="status-badge used">已使用</span>
+                        </div>
+                    </li>
+                    <li class="issue-item risk-high">
+                        <div class="issue-title">
+                            <strong>oracledb</strong>
+                            <span class="license-badge" style="background: #ef4444;">
+                                Proprietary
+                            </span>
+                            <span style="color: #6b7280; font-weight: normal;">v1.4.0</span>
+                        </div>
+                        <div class="issue-reason">专有软件使用受限，需要仔细审查许可协议</div>
+                        <div style="margin-top: 5px;">
+                            <span class="status-badge declared">已声明</span> <span class="status-badge unused">未使用</span>
+                        </div>
+                    </li>
+                    <li class="issue-item risk-low">
+                        <div class="issue-title">
+                            <strong>oracledb</strong>
+                            <span class="license-badge" style="background: #10b981;">
+                                Proprietary
+                            </span>
+                            <span style="color: #6b7280; font-weight: normal;">v1.4.0</span>
+                        </div>
+                        <div class="issue-reason">包已声明但未在代码中使用</div>
+                        <div style="margin-top: 5px;">
+                            <span class="status-badge declared">已声明</span> <span class="status-badge unused">未使用</span>
+                        </div>
+                    </li>
+                    <li class="issue-item risk-low">
+                        <div class="issue-title">
+                            <strong>pytest</strong>
+                            <span class="license-badge" style="background: #10b981;">
+                                MIT
+                            </span>
+                            <span style="color: #6b7280; font-weight: normal;">v7.4.0</span>
+                        </div>
+                        <div class="issue-reason">包已声明但未在代码中使用</div>
+                        <div style="margin-top: 5px;">
+                            <span class="status-badge declared">已声明</span> <span class="status-badge unused">未使用</span>
+                        </div>
+                    </li>
+                    <li class="issue-item risk-low">
+                        <div class="issue-title">
+                            <strong>coverage</strong>
+                            <span class="license-badge" style="background: #10b981;">
+                                Apache-2.0
+                            </span>
+                            <span style="color: #6b7280; font-weight: normal;">v7.3.0</span>
+                        </div>
+                        <div class="issue-reason">包已声明但未在代码中使用</div>
+                        <div style="margin-top: 5px;">
+                            <span class="status-badge declared">已声明</span> <span class="status-badge unused">未使用</span>
+                        </div>
+                    </li>
+                    <li class="issue-item risk-low">
+                        <div class="issue-title">
+                            <strong>black</strong>
+                            <span class="license-badge" style="background: #10b981;">
+                                MIT
+                            </span>
+                            <span style="color: #6b7280; font-weight: normal;">v23.0.0</span>
+                        </div>
+                        <div class="issue-reason">包已声明但未在代码中使用</div>
+                        <div style="margin-top: 5px;">
+                            <span class="status-badge declared">已声明</span> <span class="status-badge unused">未使用</span>
+                        </div>
+                    </li>
+                    <li class="issue-item risk-low">
+                        <div class="issue-title">
+                            <strong>flake8</strong>
+                            <span class="license-badge" style="background: #10b981;">
+                                MIT
+                            </span>
+                            <span style="color: #6b7280; font-weight: normal;">v6.0.0</span>
+                        </div>
+                        <div class="issue-reason">包已声明但未在代码中使用</div>
+                        <div style="margin-top: 5px;">
+                            <span class="status-badge declared">已声明</span> <span class="status-badge unused">未使用</span>
+                        </div>
+                    </li>
+                    <li class="issue-item risk-low">
+                        <div class="issue-title">
+                            <strong>mypy</strong>
+                            <span class="license-badge" style="background: #10b981;">
+                                MIT
+                            </span>
+                            <span style="color: #6b7280; font-weight: normal;">v1.0.0</span>
+                        </div>
+                        <div class="issue-reason">包已声明但未在代码中使用</div>
+                        <div style="margin-top: 5px;">
+                            <span class="status-badge declared">已声明</span> <span class="status-badge unused">未使用</span>
+                        </div>
+                    </li>
+                    <li class="issue-item risk-medium">
+                        <div class="issue-title">
+                            <strong>yaml</strong>
+                            <span class="license-badge" style="background: #f59e0b;">
+                                MIT
+                            </span>
+                            <span style="color: #6b7280; font-weight: normal;">vundetected</span>
+                        </div>
+                        <div class="issue-reason">包已在代码中使用但未在依赖文件中声明</div>
+                        <div style="margin-top: 5px;">
+                            <span class="status-badge used">已使用</span> <span class="status-badge undeclared">未声明</span>
+                        </div>
+                    </li>
+                    <li class="issue-item risk-medium">
+                        <div class="issue-title">
+                            <strong>bs4</strong>
+                            <span class="license-badge" style="background: #f59e0b;">
+                                MIT
+                            </span>
+                            <span style="color: #6b7280; font-weight: normal;">vundetected</span>
+                        </div>
+                        <div class="issue-reason">包已在代码中使用但未在依赖文件中声明</div>
+                        <div style="margin-top: 5px;">
+                            <span class="status-badge used">已使用</span> <span class="status-badge undeclared">未声明</span>
+                        </div>
+                    </li>
+                    <li class="issue-item risk-low">
+                        <div class="issue-title">
+                            <strong>lxml</strong>
+                            <span class="license-badge" style="background: #10b981;">
+                                BSD-3-Clause
+                            </span>
+                            <span style="color: #6b7280; font-weight: normal;">voptional</span>
+                        </div>
+                        <div class="issue-reason">可选依赖（try/except块中导入，未在依赖文件中声明）</div>
+                        <div style="margin-top: 5px;">
+                            <span class="status-badge optional">可选</span> <span class="status-badge used">已使用</span>
+                        </div>
+                    </li>
+                    <li class="issue-item risk-high">
+                        <div class="issue-title">
+                            <strong>cv2</strong>
+                            <span class="license-badge" style="background: #ef4444;">
+                                Unknown
+                            </span>
+                            <span style="color: #6b7280; font-weight: normal;">voptional</span>
+                        </div>
+                        <div class="issue-reason">许可证未知，存在法律风险</div>
+                        <div style="margin-top: 5px;">
+                            <span class="status-badge used">已使用</span> <span class="status-badge undeclared">未声明</span>
+                        </div>
+                    </li>
+                    <li class="issue-item risk-low">
+                        <div class="issue-title">
+                            <strong>cv2</strong>
+                            <span class="license-badge" style="background: #10b981;">
+                                Unknown
+                            </span>
+                            <span style="color: #6b7280; font-weight: normal;">voptional</span>
+                        </div>
+                        <div class="issue-reason">可选依赖（try/except块中导入，未在依赖文件中声明）</div>
+                        <div style="margin-top: 5px;">
+                            <span class="status-badge optional">可选</span> <span class="status-badge used">已使用</span>
+                        </div>
+                    </li>
+                    <li class="issue-item risk-low">
+                        <div class="issue-title">
+                            <strong>matplotlib</strong>
+                            <span class="license-badge" style="background: #10b981;">
+                                PSF-2.0
+                            </span>
+                            <span style="color: #6b7280; font-weight: normal;">voptional</span>
+                        </div>
+                        <div class="issue-reason">可选依赖（try/except块中导入，未在依赖文件中声明）</div>
+                        <div style="margin-top: 5px;">
+                            <span class="status-badge optional">可选</span> <span class="status-badge used">已使用</span>
+                        </div>
+                    </li>
+                    <li class="issue-item risk-low">
+                        <div class="issue-title">
+                            <strong>seaborn</strong>
+                            <span class="license-badge" style="background: #10b981;">
+                                BSD-3-Clause
+                            </span>
+                            <span style="color: #6b7280; font-weight: normal;">voptional</span>
+                        </div>
+                        <div class="issue-reason">可选依赖（try/except块中导入，未在依赖文件中声明）</div>
+                        <div style="margin-top: 5px;">
+                            <span class="status-badge optional">可选</span> <span class="status-badge used">已使用</span>
+                        </div>
+                    </li>
+                    <li class="issue-item risk-high">
+                        <div class="issue-title">
+                            <strong>torch</strong>
+                            <span class="license-badge" style="background: #ef4444;">
+                                Unknown
+                            </span>
+                            <span style="color: #6b7280; font-weight: normal;">voptional</span>
+                        </div>
+                        <div class="issue-reason">许可证未知，存在法律风险</div>
+                        <div style="margin-top: 5px;">
+                            <span class="status-badge used">已使用</span> <span class="status-badge undeclared">未声明</span>
+                        </div>
+                    </li>
+                    <li class="issue-item risk-low">
+                        <div class="issue-title">
+                            <strong>torch</strong>
+                            <span class="license-badge" style="background: #10b981;">
+                                Unknown
+                            </span>
+                            <span style="color: #6b7280; font-weight: normal;">voptional</span>
+                        </div>
+                        <div class="issue-reason">可选依赖（try/except块中导入，未在依赖文件中声明）</div>
+                        <div style="margin-top: 5px;">
+                            <span class="status-badge optional">可选</span> <span class="status-badge used">已使用</span>
+                        </div>
+                    </li>
+                    <li class="issue-item risk-medium">
+                        <div class="issue-title">
+                            <strong>non_optional_lib</strong>
+                            <span class="license-badge" style="background: #f59e0b;">
+                                MIT
+                            </span>
+                            <span style="color: #6b7280; font-weight: normal;">vundetected</span>
+                        </div>
+                        <div class="issue-reason">包已在代码中使用但未在依赖文件中声明</div>
+                        <div style="margin-top: 5px;">
+                            <span class="status-badge used">已使用</span> <span class="status-badge undeclared">未声明</span>
+                        </div>
+                    </li>
+                    <li class="issue-item risk-low">
+                        <div class="issue-title">
+                            <strong>deep_learning_lib</strong>
+                            <span class="license-badge" style="background: #10b981;">
+                                MIT
+                            </span>
+                            <span style="color: #6b7280; font-weight: normal;">voptional</span>
+                        </div>
+                        <div class="issue-reason">可选依赖（try/except块中导入，未在依赖文件中声明）</div>
+                        <div style="margin-top: 5px;">
+                            <span class="status-badge optional">可选</span> <span class="status-badge used">已使用</span>
+                        </div>
+                    </li>
+                    <li class="issue-item risk-medium">
+                        <div class="issue-title">
+                            <strong>redis</strong>
+                            <span class="license-badge" style="background: #f59e0b;">
+                                MIT
+                            </span>
+                            <span style="color: #6b7280; font-weight: normal;">vundetected</span>
+                        </div>
+                        <div class="issue-reason">包已在代码中使用但未在依赖文件中声明</div>
+                        <div style="margin-top: 5px;">
+                            <span class="status-badge used">已使用</span> <span class="status-badge undeclared">未声明</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-header">
+                <h2>📦 第三方依赖包清单 <span class="count">27</span></h2>
+            </div>
+            <div class="section-body">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>包名</th>
+                            <th>版本</th>
+                            <th>许可证</th>
+                            <th>风险等级</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>black</strong></td>
+                            <td>23.0.0</td>
+                            <td><span class="license-badge" style="background: #10b981;">MIT</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><span class="status-badge declared">已声明</span> <span class="status-badge unused">未使用</span></td>
+                            <td><span class="collapsible" style="color: #667eea; cursor: pointer;">详情 <span class="arrow">▶</span></span>
+                                <div class="collapsible-content">
+                                    
+        <div class="details-panel">
+            <h4>许可证详情: MIT License</h4>
+            <p style="margin-bottom: 10px; color: #6b7280;">A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.</p>
+            <div class="permission-tags"><span class="perm-tag allow">✓ commercial-use</span><span class="perm-tag allow">✓ modification</span><span class="perm-tag allow">✓ distribution</span><span class="perm-tag allow">✓ private-use</span><span class="perm-tag require">⚡ license-and-copyright-notice</span><span class="perm-tag forbid">✗ liability</span><span class="perm-tag forbid">✗ warranty</span></div>
+
+            <h4 style="margin-top: 15px;">来源信息</h4>
+            <p>声明来源: pyproject.toml, optional-dependencies/dev</p>
+
+            
+
+            <h4 style="margin-top: 15px;">项目主页</h4><p><a href="https://black.readthedocs.io" target="_blank" style="color: #667eea;">https://black.readthedocs.io</a></p>
+        </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>bs4</strong></td>
+                            <td>undetected</td>
+                            <td><span class="license-badge" style="background: #10b981;">MIT</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><span class="status-badge used">已使用</span> <span class="status-badge undeclared">未声明</span></td>
+                            <td><span class="collapsible" style="color: #667eea; cursor: pointer;">详情 <span class="arrow">▶</span></span>
+                                <div class="collapsible-content">
+                                    
+        <div class="details-panel">
+            <h4>许可证详情: MIT License</h4>
+            <p style="margin-bottom: 10px; color: #6b7280;">A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.</p>
+            <div class="permission-tags"><span class="perm-tag allow">✓ commercial-use</span><span class="perm-tag allow">✓ modification</span><span class="perm-tag allow">✓ distribution</span><span class="perm-tag allow">✓ private-use</span><span class="perm-tag require">⚡ license-and-copyright-notice</span><span class="perm-tag forbid">✗ liability</span><span class="perm-tag forbid">✗ warranty</span></div>
+
+            <h4 style="margin-top: 15px;">来源信息</h4>
+            <p>声明来源: N/A</p>
+
+            <h4 style="margin-top: 15px;">使用位置</h4><div class="file-list"><span>app.py:18</span><span>app.py:19</span></div>
+
+            <h4 style="margin-top: 15px;">项目主页</h4><p><a href="https://www.crummy.com/software/BeautifulSoup/" target="_blank" style="color: #667eea;">https://www.crummy.com/software/BeautifulSoup/</a></p>
+        </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>commercial_sdk</strong></td>
+                            <td>3.2.0</td>
+                            <td><span class="license-badge" style="background: #ef4444;">Proprietary</span></td>
+                            <td><span class="license-badge" style="background: #ef4444;">高风险</span></td>
+                            <td><span class="status-badge declared">已声明</span> <span class="status-badge used">已使用</span></td>
+                            <td><span class="collapsible" style="color: #667eea; cursor: pointer;">详情 <span class="arrow">▶</span></span>
+                                <div class="collapsible-content">
+                                    
+        <div class="details-panel">
+            <h4>许可证详情: Proprietary/Commercial License</h4>
+            <p style="margin-bottom: 10px; color: #6b7280;">Proprietary software is non-free software that is not distributed with a license that allows modification or redistribution.</p>
+            <div class="permission-tags"><span class="perm-tag allow">✓ private-use</span><span class="perm-tag forbid">✗ commercial-use</span><span class="perm-tag forbid">✗ modification</span><span class="perm-tag forbid">✗ distribution</span><span class="perm-tag forbid">✗ liability</span><span class="perm-tag forbid">✗ warranty</span></div>
+
+            <h4 style="margin-top: 15px;">来源信息</h4>
+            <p>声明来源: requirements.txt</p>
+
+            <h4 style="margin-top: 15px;">使用位置</h4><div class="file-list"><span>enterprise.py:12</span><span>enterprise.py:13</span><span>enterprise.py:13</span></div>
+
+            <h4 style="margin-top: 15px;">项目主页</h4><p><a href="https://example.com/commercial-sdk" target="_blank" style="color: #667eea;">https://example.com/commercial-sdk</a></p>
+        </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>coverage</strong></td>
+                            <td>7.3.0</td>
+                            <td><span class="license-badge" style="background: #10b981;">Apache-2.0</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><span class="status-badge declared">已声明</span> <span class="status-badge unused">未使用</span></td>
+                            <td><span class="collapsible" style="color: #667eea; cursor: pointer;">详情 <span class="arrow">▶</span></span>
+                                <div class="collapsible-content">
+                                    
+        <div class="details-panel">
+            <h4>许可证详情: Apache License 2.0</h4>
+            <p style="margin-bottom: 10px; color: #6b7280;">A permissive license whose main conditions require preservation of copyright and license notices. Contributors provide an express grant of patent rights.</p>
+            <div class="permission-tags"><span class="perm-tag allow">✓ commercial-use</span><span class="perm-tag allow">✓ modification</span><span class="perm-tag allow">✓ distribution</span><span class="perm-tag allow">✓ patent-use</span><span class="perm-tag allow">✓ private-use</span><span class="perm-tag require">⚡ license-and-copyright-notice</span><span class="perm-tag require">⚡ state-changes</span><span class="perm-tag forbid">✗ liability</span><span class="perm-tag forbid">✗ trademark-use</span><span class="perm-tag forbid">✗ warranty</span></div>
+
+            <h4 style="margin-top: 15px;">来源信息</h4>
+            <p>声明来源: requirements.txt</p>
+
+            
+
+            <h4 style="margin-top: 15px;">项目主页</h4><p><a href="https://coverage.readthedocs.io" target="_blank" style="color: #667eea;">https://coverage.readthedocs.io</a></p>
+        </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>cryptography</strong></td>
+                            <td>41.0.0</td>
+                            <td><span class="license-badge" style="background: #10b981;">Apache-2.0</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><span class="status-badge declared">已声明</span> <span class="status-badge used">已使用</span></td>
+                            <td><span class="collapsible" style="color: #667eea; cursor: pointer;">详情 <span class="arrow">▶</span></span>
+                                <div class="collapsible-content">
+                                    
+        <div class="details-panel">
+            <h4>许可证详情: Apache License 2.0</h4>
+            <p style="margin-bottom: 10px; color: #6b7280;">A permissive license whose main conditions require preservation of copyright and license notices. Contributors provide an express grant of patent rights.</p>
+            <div class="permission-tags"><span class="perm-tag allow">✓ commercial-use</span><span class="perm-tag allow">✓ modification</span><span class="perm-tag allow">✓ distribution</span><span class="perm-tag allow">✓ patent-use</span><span class="perm-tag allow">✓ private-use</span><span class="perm-tag require">⚡ license-and-copyright-notice</span><span class="perm-tag require">⚡ state-changes</span><span class="perm-tag forbid">✗ liability</span><span class="perm-tag forbid">✗ trademark-use</span><span class="perm-tag forbid">✗ warranty</span></div>
+
+            <h4 style="margin-top: 15px;">来源信息</h4>
+            <p>声明来源: requirements.txt</p>
+
+            <h4 style="margin-top: 15px;">使用位置</h4><div class="file-list"><span>config.py:10</span></div>
+
+            <h4 style="margin-top: 15px;">项目主页</h4><p><a href="https://cryptography.io" target="_blank" style="color: #667eea;">https://cryptography.io</a></p>
+        </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>cv2</strong></td>
+                            <td>optional</td>
+                            <td><span class="license-badge" style="background: #ef4444;">Unknown</span></td>
+                            <td><span class="license-badge" style="background: #ef4444;">高风险</span></td>
+                            <td><span class="status-badge optional">可选</span> <span class="status-badge used">已使用</span></td>
+                            <td><span class="collapsible" style="color: #667eea; cursor: pointer;">详情 <span class="arrow">▶</span></span>
+                                <div class="collapsible-content">
+                                    
+        <div class="details-panel">
+            <h4>许可证详情: Unknown License</h4>
+            <p style="margin-bottom: 10px; color: #6b7280;">The license for this package could not be determined.</p>
+            <div class="permission-tags"><span class="perm-tag forbid">✗ commercial-use</span><span class="perm-tag forbid">✗ modification</span><span class="perm-tag forbid">✗ distribution</span><span class="perm-tag forbid">✗ private-use</span></div>
+
+            <h4 style="margin-top: 15px;">来源信息</h4>
+            <p>声明来源: N/A</p>
+
+            <h4 style="margin-top: 15px;">使用位置</h4><div class="file-list"><span>optional_deps.py:26</span></div>
+
+            
+        </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>deep_learning_lib</strong></td>
+                            <td>optional</td>
+                            <td><span class="license-badge" style="background: #10b981;">MIT</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><span class="status-badge optional">可选</span> <span class="status-badge used">已使用</span></td>
+                            <td><span class="collapsible" style="color: #667eea; cursor: pointer;">详情 <span class="arrow">▶</span></span>
+                                <div class="collapsible-content">
+                                    
+        <div class="details-panel">
+            <h4>许可证详情: MIT License</h4>
+            <p style="margin-bottom: 10px; color: #6b7280;">A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.</p>
+            <div class="permission-tags"><span class="perm-tag allow">✓ commercial-use</span><span class="perm-tag allow">✓ modification</span><span class="perm-tag allow">✓ distribution</span><span class="perm-tag allow">✓ private-use</span><span class="perm-tag require">⚡ license-and-copyright-notice</span><span class="perm-tag forbid">✗ liability</span><span class="perm-tag forbid">✗ warranty</span></div>
+
+            <h4 style="margin-top: 15px;">来源信息</h4>
+            <p>声明来源: N/A</p>
+
+            <h4 style="margin-top: 15px;">使用位置</h4><div class="file-list"><span>optional_deps.py:70</span></div>
+
+            <h4 style="margin-top: 15px;">项目主页</h4><p><a href="https://example.com" target="_blank" style="color: #667eea;">https://example.com</a></p>
+        </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>flake8</strong></td>
+                            <td>6.0.0</td>
+                            <td><span class="license-badge" style="background: #10b981;">MIT</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><span class="status-badge declared">已声明</span> <span class="status-badge unused">未使用</span></td>
+                            <td><span class="collapsible" style="color: #667eea; cursor: pointer;">详情 <span class="arrow">▶</span></span>
+                                <div class="collapsible-content">
+                                    
+        <div class="details-panel">
+            <h4>许可证详情: MIT License</h4>
+            <p style="margin-bottom: 10px; color: #6b7280;">A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.</p>
+            <div class="permission-tags"><span class="perm-tag allow">✓ commercial-use</span><span class="perm-tag allow">✓ modification</span><span class="perm-tag allow">✓ distribution</span><span class="perm-tag allow">✓ private-use</span><span class="perm-tag require">⚡ license-and-copyright-notice</span><span class="perm-tag forbid">✗ liability</span><span class="perm-tag forbid">✗ warranty</span></div>
+
+            <h4 style="margin-top: 15px;">来源信息</h4>
+            <p>声明来源: pyproject.toml, optional-dependencies/dev</p>
+
+            
+
+            <h4 style="margin-top: 15px;">项目主页</h4><p><a href="https://flake8.pycqa.org" target="_blank" style="color: #667eea;">https://flake8.pycqa.org</a></p>
+        </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>flask</strong></td>
+                            <td>3.0.0</td>
+                            <td><span class="license-badge" style="background: #10b981;">BSD-3-Clause</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><span class="status-badge declared">已声明</span> <span class="status-badge used">已使用</span></td>
+                            <td><span class="collapsible" style="color: #667eea; cursor: pointer;">详情 <span class="arrow">▶</span></span>
+                                <div class="collapsible-content">
+                                    
+        <div class="details-panel">
+            <h4>许可证详情: BSD 3-Clause "New" or "Revised" License</h4>
+            <p style="margin-bottom: 10px; color: #6b7280;">A permissive license similar to the BSD 2-Clause License, but with a 3rd clause that prohibits others from using the name of the copyright holder or its contributors to endorse derived products.</p>
+            <div class="permission-tags"><span class="perm-tag allow">✓ commercial-use</span><span class="perm-tag allow">✓ modification</span><span class="perm-tag allow">✓ distribution</span><span class="perm-tag allow">✓ private-use</span><span class="perm-tag require">⚡ license-and-copyright-notice</span><span class="perm-tag forbid">✗ liability</span><span class="perm-tag forbid">✗ warranty</span></div>
+
+            <h4 style="margin-top: 15px;">来源信息</h4>
+            <p>声明来源: requirements.txt</p>
+
+            <h4 style="margin-top: 15px;">使用位置</h4><div class="file-list"><span>app.py:11</span><span>app.py:12</span><span>app.py:12</span><span>app.py:12</span><span>enterprise.py:17</span><span>optional_deps.py:8</span></div>
+
+            <h4 style="margin-top: 15px;">项目主页</h4><p><a href="https://flask.palletsprojects.com" target="_blank" style="color: #667eea;">https://flask.palletsprojects.com</a></p>
+        </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>gpl_toolkit</strong></td>
+                            <td>2.0.0</td>
+                            <td><span class="license-badge" style="background: #ef4444;">GPL-3.0</span></td>
+                            <td><span class="license-badge" style="background: #ef4444;">高风险</span></td>
+                            <td><span class="status-badge declared">已声明</span> <span class="status-badge used">已使用</span></td>
+                            <td><span class="collapsible" style="color: #667eea; cursor: pointer;">详情 <span class="arrow">▶</span></span>
+                                <div class="collapsible-content">
+                                    
+        <div class="details-panel">
+            <h4>许可证详情: GNU General Public License v3.0</h4>
+            <p style="margin-bottom: 10px; color: #6b7280;">Permissions of this strong copyleft license are conditioned on making available complete source code of licensed works and modifications, which include larger works using a licensed work, under the same license.</p>
+            <div class="permission-tags"><span class="perm-tag allow">✓ commercial-use</span><span class="perm-tag allow">✓ modification</span><span class="perm-tag allow">✓ distribution</span><span class="perm-tag allow">✓ patent-use</span><span class="perm-tag allow">✓ private-use</span><span class="perm-tag require">⚡ disclose-source</span><span class="perm-tag require">⚡ license-and-copyright-notice</span><span class="perm-tag require">⚡ same-license</span><span class="perm-tag require">⚡ state-changes</span><span class="perm-tag forbid">✗ liability</span><span class="perm-tag forbid">✗ warranty</span></div>
+
+            <h4 style="margin-top: 15px;">来源信息</h4>
+            <p>声明来源: requirements.txt</p>
+
+            <h4 style="margin-top: 15px;">使用位置</h4><div class="file-list"><span>enterprise.py:8</span><span>enterprise.py:9</span><span>enterprise.py:9</span></div>
+
+            <h4 style="margin-top: 15px;">项目主页</h4><p><a href="https://example.com/gpl-toolkit" target="_blank" style="color: #667eea;">https://example.com/gpl-toolkit</a></p>
+        </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>lxml</strong></td>
+                            <td>optional</td>
+                            <td><span class="license-badge" style="background: #10b981;">BSD-3-Clause</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><span class="status-badge optional">可选</span> <span class="status-badge used">已使用</span></td>
+                            <td><span class="collapsible" style="color: #667eea; cursor: pointer;">详情 <span class="arrow">▶</span></span>
+                                <div class="collapsible-content">
+                                    
+        <div class="details-panel">
+            <h4>许可证详情: BSD 3-Clause "New" or "Revised" License</h4>
+            <p style="margin-bottom: 10px; color: #6b7280;">A permissive license similar to the BSD 2-Clause License, but with a 3rd clause that prohibits others from using the name of the copyright holder or its contributors to endorse derived products.</p>
+            <div class="permission-tags"><span class="perm-tag allow">✓ commercial-use</span><span class="perm-tag allow">✓ modification</span><span class="perm-tag allow">✓ distribution</span><span class="perm-tag allow">✓ private-use</span><span class="perm-tag require">⚡ license-and-copyright-notice</span><span class="perm-tag forbid">✗ liability</span><span class="perm-tag forbid">✗ warranty</span></div>
+
+            <h4 style="margin-top: 15px;">来源信息</h4>
+            <p>声明来源: N/A</p>
+
+            <h4 style="margin-top: 15px;">使用位置</h4><div class="file-list"><span>optional_deps.py:20</span></div>
+
+            <h4 style="margin-top: 15px;">项目主页</h4><p><a href="https://lxml.de" target="_blank" style="color: #667eea;">https://lxml.de</a></p>
+        </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>matplotlib</strong></td>
+                            <td>optional</td>
+                            <td><span class="license-badge" style="background: #10b981;">PSF-2.0</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><span class="status-badge optional">可选</span> <span class="status-badge used">已使用</span></td>
+                            <td><span class="collapsible" style="color: #667eea; cursor: pointer;">详情 <span class="arrow">▶</span></span>
+                                <div class="collapsible-content">
+                                    
+        <div class="details-panel">
+            <h4>许可证详情: Python Software Foundation License 2.0</h4>
+            <p style="margin-bottom: 10px; color: #6b7280;">This is a free software license, GPL compatible.</p>
+            <div class="permission-tags"><span class="perm-tag allow">✓ commercial-use</span><span class="perm-tag allow">✓ modification</span><span class="perm-tag allow">✓ distribution</span><span class="perm-tag allow">✓ private-use</span><span class="perm-tag require">⚡ license-and-copyright-notice</span><span class="perm-tag forbid">✗ liability</span><span class="perm-tag forbid">✗ warranty</span></div>
+
+            <h4 style="margin-top: 15px;">来源信息</h4>
+            <p>声明来源: N/A</p>
+
+            <h4 style="margin-top: 15px;">使用位置</h4><div class="file-list"><span>optional_deps.py:32</span></div>
+
+            <h4 style="margin-top: 15px;">项目主页</h4><p><a href="https://matplotlib.org" target="_blank" style="color: #667eea;">https://matplotlib.org</a></p>
+        </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>mypy</strong></td>
+                            <td>1.0.0</td>
+                            <td><span class="license-badge" style="background: #10b981;">MIT</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><span class="status-badge declared">已声明</span> <span class="status-badge unused">未使用</span></td>
+                            <td><span class="collapsible" style="color: #667eea; cursor: pointer;">详情 <span class="arrow">▶</span></span>
+                                <div class="collapsible-content">
+                                    
+        <div class="details-panel">
+            <h4>许可证详情: MIT License</h4>
+            <p style="margin-bottom: 10px; color: #6b7280;">A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.</p>
+            <div class="permission-tags"><span class="perm-tag allow">✓ commercial-use</span><span class="perm-tag allow">✓ modification</span><span class="perm-tag allow">✓ distribution</span><span class="perm-tag allow">✓ private-use</span><span class="perm-tag require">⚡ license-and-copyright-notice</span><span class="perm-tag forbid">✗ liability</span><span class="perm-tag forbid">✗ warranty</span></div>
+
+            <h4 style="margin-top: 15px;">来源信息</h4>
+            <p>声明来源: pyproject.toml, optional-dependencies/dev</p>
+
+            
+
+            <h4 style="margin-top: 15px;">项目主页</h4><p><a href="https://mypy.readthedocs.io" target="_blank" style="color: #667eea;">https://mypy.readthedocs.io</a></p>
+        </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>non_optional_lib</strong></td>
+                            <td>undetected</td>
+                            <td><span class="license-badge" style="background: #10b981;">MIT</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><span class="status-badge used">已使用</span> <span class="status-badge undeclared">未声明</span></td>
+                            <td><span class="collapsible" style="color: #667eea; cursor: pointer;">详情 <span class="arrow">▶</span></span>
+                                <div class="collapsible-content">
+                                    
+        <div class="details-panel">
+            <h4>许可证详情: MIT License</h4>
+            <p style="margin-bottom: 10px; color: #6b7280;">A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.</p>
+            <div class="permission-tags"><span class="perm-tag allow">✓ commercial-use</span><span class="perm-tag allow">✓ modification</span><span class="perm-tag allow">✓ distribution</span><span class="perm-tag allow">✓ private-use</span><span class="perm-tag require">⚡ license-and-copyright-notice</span><span class="perm-tag forbid">✗ liability</span><span class="perm-tag forbid">✗ warranty</span></div>
+
+            <h4 style="margin-top: 15px;">来源信息</h4>
+            <p>声明来源: N/A</p>
+
+            <h4 style="margin-top: 15px;">使用位置</h4><div class="file-list"><span>optional_deps.py:63</span></div>
+
+            <h4 style="margin-top: 15px;">项目主页</h4><p><a href="https://example.com" target="_blank" style="color: #667eea;">https://example.com</a></p>
+        </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>numpy</strong></td>
+                            <td>1.24.0</td>
+                            <td><span class="license-badge" style="background: #10b981;">BSD-3-Clause</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><span class="status-badge declared">已声明</span> <span class="status-badge used">已使用</span></td>
+                            <td><span class="collapsible" style="color: #667eea; cursor: pointer;">详情 <span class="arrow">▶</span></span>
+                                <div class="collapsible-content">
+                                    
+        <div class="details-panel">
+            <h4>许可证详情: BSD 3-Clause "New" or "Revised" License</h4>
+            <p style="margin-bottom: 10px; color: #6b7280;">A permissive license similar to the BSD 2-Clause License, but with a 3rd clause that prohibits others from using the name of the copyright holder or its contributors to endorse derived products.</p>
+            <div class="permission-tags"><span class="perm-tag allow">✓ commercial-use</span><span class="perm-tag allow">✓ modification</span><span class="perm-tag allow">✓ distribution</span><span class="perm-tag allow">✓ private-use</span><span class="perm-tag require">⚡ license-and-copyright-notice</span><span class="perm-tag forbid">✗ liability</span><span class="perm-tag forbid">✗ warranty</span></div>
+
+            <h4 style="margin-top: 15px;">来源信息</h4>
+            <p>声明来源: requirements.txt</p>
+
+            <h4 style="margin-top: 15px;">使用位置</h4><div class="file-list"><span>optional_deps.py:12</span><span>utils.py:9</span></div>
+
+            <h4 style="margin-top: 15px;">项目主页</h4><p><a href="https://numpy.org" target="_blank" style="color: #667eea;">https://numpy.org</a></p>
+        </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>oracledb</strong></td>
+                            <td>1.4.0</td>
+                            <td><span class="license-badge" style="background: #ef4444;">Proprietary</span></td>
+                            <td><span class="license-badge" style="background: #ef4444;">高风险</span></td>
+                            <td><span class="status-badge declared">已声明</span> <span class="status-badge unused">未使用</span></td>
+                            <td><span class="collapsible" style="color: #667eea; cursor: pointer;">详情 <span class="arrow">▶</span></span>
+                                <div class="collapsible-content">
+                                    
+        <div class="details-panel">
+            <h4>许可证详情: Proprietary/Commercial License</h4>
+            <p style="margin-bottom: 10px; color: #6b7280;">Proprietary software is non-free software that is not distributed with a license that allows modification or redistribution.</p>
+            <div class="permission-tags"><span class="perm-tag allow">✓ private-use</span><span class="perm-tag forbid">✗ commercial-use</span><span class="perm-tag forbid">✗ modification</span><span class="perm-tag forbid">✗ distribution</span><span class="perm-tag forbid">✗ liability</span><span class="perm-tag forbid">✗ warranty</span></div>
+
+            <h4 style="margin-top: 15px;">来源信息</h4>
+            <p>声明来源: requirements.txt</p>
+
+            
+
+            <h4 style="margin-top: 15px;">项目主页</h4><p><a href="https://oracle.com/database" target="_blank" style="color: #667eea;">https://oracle.com/database</a></p>
+        </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>pandas</strong></td>
+                            <td>2.1.0</td>
+                            <td><span class="license-badge" style="background: #10b981;">BSD-3-Clause</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><span class="status-badge declared">已声明</span> <span class="status-badge used">已使用</span></td>
+                            <td><span class="collapsible" style="color: #667eea; cursor: pointer;">详情 <span class="arrow">▶</span></span>
+                                <div class="collapsible-content">
+                                    
+        <div class="details-panel">
+            <h4>许可证详情: BSD 3-Clause "New" or "Revised" License</h4>
+            <p style="margin-bottom: 10px; color: #6b7280;">A permissive license similar to the BSD 2-Clause License, but with a 3rd clause that prohibits others from using the name of the copyright holder or its contributors to endorse derived products.</p>
+            <div class="permission-tags"><span class="perm-tag allow">✓ commercial-use</span><span class="perm-tag allow">✓ modification</span><span class="perm-tag allow">✓ distribution</span><span class="perm-tag allow">✓ private-use</span><span class="perm-tag require">⚡ license-and-copyright-notice</span><span class="perm-tag forbid">✗ liability</span><span class="perm-tag forbid">✗ warranty</span></div>
+
+            <h4 style="margin-top: 15px;">来源信息</h4>
+            <p>声明来源: requirements.txt</p>
+
+            <h4 style="margin-top: 15px;">使用位置</h4><div class="file-list"><span>optional_deps.py:13</span><span>utils.py:10</span></div>
+
+            <h4 style="margin-top: 15px;">项目主页</h4><p><a href="https://pandas.pydata.org" target="_blank" style="color: #667eea;">https://pandas.pydata.org</a></p>
+        </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>psycopg2-binary</strong></td>
+                            <td>2.9.0</td>
+                            <td><span class="license-badge" style="background: #f59e0b;">LGPL-3.0</span></td>
+                            <td><span class="license-badge" style="background: #f59e0b;">中风险</span></td>
+                            <td><span class="status-badge declared">已声明</span> <span class="status-badge unused">未使用</span></td>
+                            <td><span class="collapsible" style="color: #667eea; cursor: pointer;">详情 <span class="arrow">▶</span></span>
+                                <div class="collapsible-content">
+                                    
+        <div class="details-panel">
+            <h4>许可证详情: GNU Lesser General Public License v3.0</h4>
+            <p style="margin-bottom: 10px; color: #6b7280;">This license is mainly applied to libraries. Derivatives of works may be distributed under different terms and without source code for the derivative work.</p>
+            <div class="permission-tags"><span class="perm-tag allow">✓ commercial-use</span><span class="perm-tag allow">✓ modification</span><span class="perm-tag allow">✓ distribution</span><span class="perm-tag allow">✓ patent-use</span><span class="perm-tag allow">✓ private-use</span><span class="perm-tag require">⚡ disclose-source</span><span class="perm-tag require">⚡ license-and-copyright-notice</span><span class="perm-tag require">⚡ same-license</span><span class="perm-tag forbid">✗ liability</span><span class="perm-tag forbid">✗ warranty</span></div>
+
+            <h4 style="margin-top: 15px;">来源信息</h4>
+            <p>声明来源: requirements.txt</p>
+
+            
+
+            <h4 style="margin-top: 15px;">项目主页</h4><p><a href="https://www.psycopg.org" target="_blank" style="color: #667eea;">https://www.psycopg.org</a></p>
+        </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>pyjwt</strong></td>
+                            <td>2.8.0</td>
+                            <td><span class="license-badge" style="background: #10b981;">MIT</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><span class="status-badge declared">已声明</span> <span class="status-badge used">已使用</span></td>
+                            <td><span class="collapsible" style="color: #667eea; cursor: pointer;">详情 <span class="arrow">▶</span></span>
+                                <div class="collapsible-content">
+                                    
+        <div class="details-panel">
+            <h4>许可证详情: MIT License</h4>
+            <p style="margin-bottom: 10px; color: #6b7280;">A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.</p>
+            <div class="permission-tags"><span class="perm-tag allow">✓ commercial-use</span><span class="perm-tag allow">✓ modification</span><span class="perm-tag allow">✓ distribution</span><span class="perm-tag allow">✓ private-use</span><span class="perm-tag require">⚡ license-and-copyright-notice</span><span class="perm-tag forbid">✗ liability</span><span class="perm-tag forbid">✗ warranty</span></div>
+
+            <h4 style="margin-top: 15px;">来源信息</h4>
+            <p>声明来源: requirements.txt</p>
+
+            <h4 style="margin-top: 15px;">使用位置</h4><div class="file-list"><span>app.py:14</span><span>config.py:9</span></div>
+
+            <h4 style="margin-top: 15px;">项目主页</h4><p><a href="https://pyjwt.readthedocs.io" target="_blank" style="color: #667eea;">https://pyjwt.readthedocs.io</a></p>
+        </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>pytest</strong></td>
+                            <td>7.4.0</td>
+                            <td><span class="license-badge" style="background: #10b981;">MIT</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><span class="status-badge declared">已声明</span> <span class="status-badge unused">未使用</span></td>
+                            <td><span class="collapsible" style="color: #667eea; cursor: pointer;">详情 <span class="arrow">▶</span></span>
+                                <div class="collapsible-content">
+                                    
+        <div class="details-panel">
+            <h4>许可证详情: MIT License</h4>
+            <p style="margin-bottom: 10px; color: #6b7280;">A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.</p>
+            <div class="permission-tags"><span class="perm-tag allow">✓ commercial-use</span><span class="perm-tag allow">✓ modification</span><span class="perm-tag allow">✓ distribution</span><span class="perm-tag allow">✓ private-use</span><span class="perm-tag require">⚡ license-and-copyright-notice</span><span class="perm-tag forbid">✗ liability</span><span class="perm-tag forbid">✗ warranty</span></div>
+
+            <h4 style="margin-top: 15px;">来源信息</h4>
+            <p>声明来源: requirements.txt</p>
+
+            
+
+            <h4 style="margin-top: 15px;">项目主页</h4><p><a href="https://pytest.org" target="_blank" style="color: #667eea;">https://pytest.org</a></p>
+        </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>python-dotenv</strong></td>
+                            <td>1.0.0</td>
+                            <td><span class="license-badge" style="background: #10b981;">BSD-3-Clause</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><span class="status-badge declared">已声明</span> <span class="status-badge used">已使用</span></td>
+                            <td><span class="collapsible" style="color: #667eea; cursor: pointer;">详情 <span class="arrow">▶</span></span>
+                                <div class="collapsible-content">
+                                    
+        <div class="details-panel">
+            <h4>许可证详情: BSD 3-Clause "New" or "Revised" License</h4>
+            <p style="margin-bottom: 10px; color: #6b7280;">A permissive license similar to the BSD 2-Clause License, but with a 3rd clause that prohibits others from using the name of the copyright holder or its contributors to endorse derived products.</p>
+            <div class="permission-tags"><span class="perm-tag allow">✓ commercial-use</span><span class="perm-tag allow">✓ modification</span><span class="perm-tag allow">✓ distribution</span><span class="perm-tag allow">✓ private-use</span><span class="perm-tag require">⚡ license-and-copyright-notice</span><span class="perm-tag forbid">✗ liability</span><span class="perm-tag forbid">✗ warranty</span></div>
+
+            <h4 style="margin-top: 15px;">来源信息</h4>
+            <p>声明来源: pyproject.toml, dependencies</p>
+
+            <h4 style="margin-top: 15px;">使用位置</h4><div class="file-list"><span>config.py:8</span></div>
+
+            <h4 style="margin-top: 15px;">项目主页</h4><p><a href="https://saurabh-kumar.com/python-dotenv/" target="_blank" style="color: #667eea;">https://saurabh-kumar.com/python-dotenv/</a></p>
+        </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>redis</strong></td>
+                            <td>undetected</td>
+                            <td><span class="license-badge" style="background: #10b981;">MIT</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><span class="status-badge used">已使用</span> <span class="status-badge undeclared">未声明</span></td>
+                            <td><span class="collapsible" style="color: #667eea; cursor: pointer;">详情 <span class="arrow">▶</span></span>
+                                <div class="collapsible-content">
+                                    
+        <div class="details-panel">
+            <h4>许可证详情: MIT License</h4>
+            <p style="margin-bottom: 10px; color: #6b7280;">A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.</p>
+            <div class="permission-tags"><span class="perm-tag allow">✓ commercial-use</span><span class="perm-tag allow">✓ modification</span><span class="perm-tag allow">✓ distribution</span><span class="perm-tag allow">✓ private-use</span><span class="perm-tag require">⚡ license-and-copyright-notice</span><span class="perm-tag forbid">✗ liability</span><span class="perm-tag forbid">✗ warranty</span></div>
+
+            <h4 style="margin-top: 15px;">来源信息</h4>
+            <p>声明来源: N/A</p>
+
+            <h4 style="margin-top: 15px;">使用位置</h4><div class="file-list"><span>utils.py:18</span></div>
+
+            <h4 style="margin-top: 15px;">项目主页</h4><p><a href="https://github.com/redis/redis-py" target="_blank" style="color: #667eea;">https://github.com/redis/redis-py</a></p>
+        </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>requests</strong></td>
+                            <td>2.31.0</td>
+                            <td><span class="license-badge" style="background: #10b981;">Apache-2.0</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><span class="status-badge declared">已声明</span> <span class="status-badge used">已使用</span></td>
+                            <td><span class="collapsible" style="color: #667eea; cursor: pointer;">详情 <span class="arrow">▶</span></span>
+                                <div class="collapsible-content">
+                                    
+        <div class="details-panel">
+            <h4>许可证详情: Apache License 2.0</h4>
+            <p style="margin-bottom: 10px; color: #6b7280;">A permissive license whose main conditions require preservation of copyright and license notices. Contributors provide an express grant of patent rights.</p>
+            <div class="permission-tags"><span class="perm-tag allow">✓ commercial-use</span><span class="perm-tag allow">✓ modification</span><span class="perm-tag allow">✓ distribution</span><span class="perm-tag allow">✓ patent-use</span><span class="perm-tag allow">✓ private-use</span><span class="perm-tag require">⚡ license-and-copyright-notice</span><span class="perm-tag require">⚡ state-changes</span><span class="perm-tag forbid">✗ liability</span><span class="perm-tag forbid">✗ trademark-use</span><span class="perm-tag forbid">✗ warranty</span></div>
+
+            <h4 style="margin-top: 15px;">来源信息</h4>
+            <p>声明来源: requirements.txt</p>
+
+            <h4 style="margin-top: 15px;">使用位置</h4><div class="file-list"><span>app.py:13</span><span>enterprise.py:16</span><span>optional_deps.py:7</span></div>
+
+            <h4 style="margin-top: 15px;">项目主页</h4><p><a href="https://requests.readthedocs.io" target="_blank" style="color: #667eea;">https://requests.readthedocs.io</a></p>
+        </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>seaborn</strong></td>
+                            <td>optional</td>
+                            <td><span class="license-badge" style="background: #10b981;">BSD-3-Clause</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><span class="status-badge optional">可选</span> <span class="status-badge used">已使用</span></td>
+                            <td><span class="collapsible" style="color: #667eea; cursor: pointer;">详情 <span class="arrow">▶</span></span>
+                                <div class="collapsible-content">
+                                    
+        <div class="details-panel">
+            <h4>许可证详情: BSD 3-Clause "New" or "Revised" License</h4>
+            <p style="margin-bottom: 10px; color: #6b7280;">A permissive license similar to the BSD 2-Clause License, but with a 3rd clause that prohibits others from using the name of the copyright holder or its contributors to endorse derived products.</p>
+            <div class="permission-tags"><span class="perm-tag allow">✓ commercial-use</span><span class="perm-tag allow">✓ modification</span><span class="perm-tag allow">✓ distribution</span><span class="perm-tag allow">✓ private-use</span><span class="perm-tag require">⚡ license-and-copyright-notice</span><span class="perm-tag forbid">✗ liability</span><span class="perm-tag forbid">✗ warranty</span></div>
+
+            <h4 style="margin-top: 15px;">来源信息</h4>
+            <p>声明来源: N/A</p>
+
+            <h4 style="margin-top: 15px;">使用位置</h4><div class="file-list"><span>optional_deps.py:40</span></div>
+
+            <h4 style="margin-top: 15px;">项目主页</h4><p><a href="https://seaborn.pydata.org" target="_blank" style="color: #667eea;">https://seaborn.pydata.org</a></p>
+        </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>sqlalchemy</strong></td>
+                            <td>2.0.0</td>
+                            <td><span class="license-badge" style="background: #10b981;">MIT</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><span class="status-badge declared">已声明</span> <span class="status-badge used">已使用</span></td>
+                            <td><span class="collapsible" style="color: #667eea; cursor: pointer;">详情 <span class="arrow">▶</span></span>
+                                <div class="collapsible-content">
+                                    
+        <div class="details-panel">
+            <h4>许可证详情: MIT License</h4>
+            <p style="margin-bottom: 10px; color: #6b7280;">A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.</p>
+            <div class="permission-tags"><span class="perm-tag allow">✓ commercial-use</span><span class="perm-tag allow">✓ modification</span><span class="perm-tag allow">✓ distribution</span><span class="perm-tag allow">✓ private-use</span><span class="perm-tag require">⚡ license-and-copyright-notice</span><span class="perm-tag forbid">✗ liability</span><span class="perm-tag forbid">✗ warranty</span></div>
+
+            <h4 style="margin-top: 15px;">来源信息</h4>
+            <p>声明来源: requirements.txt</p>
+
+            <h4 style="margin-top: 15px;">使用位置</h4><div class="file-list"><span>utils.py:13</span><span>utils.py:14</span><span>utils.py:14</span><span>utils.py:14</span><span>utils.py:14</span><span>utils.py:15</span></div>
+
+            <h4 style="margin-top: 15px;">项目主页</h4><p><a href="https://www.sqlalchemy.org" target="_blank" style="color: #667eea;">https://www.sqlalchemy.org</a></p>
+        </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>torch</strong></td>
+                            <td>optional</td>
+                            <td><span class="license-badge" style="background: #ef4444;">Unknown</span></td>
+                            <td><span class="license-badge" style="background: #ef4444;">高风险</span></td>
+                            <td><span class="status-badge optional">可选</span> <span class="status-badge used">已使用</span></td>
+                            <td><span class="collapsible" style="color: #667eea; cursor: pointer;">详情 <span class="arrow">▶</span></span>
+                                <div class="collapsible-content">
+                                    
+        <div class="details-panel">
+            <h4>许可证详情: Unknown License</h4>
+            <p style="margin-bottom: 10px; color: #6b7280;">The license for this package could not be determined.</p>
+            <div class="permission-tags"><span class="perm-tag forbid">✗ commercial-use</span><span class="perm-tag forbid">✗ modification</span><span class="perm-tag forbid">✗ distribution</span><span class="perm-tag forbid">✗ private-use</span></div>
+
+            <h4 style="margin-top: 15px;">来源信息</h4>
+            <p>声明来源: N/A</p>
+
+            <h4 style="margin-top: 15px;">使用位置</h4><div class="file-list"><span>optional_deps.py:49</span></div>
+
+            
+        </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>yaml</strong></td>
+                            <td>undetected</td>
+                            <td><span class="license-badge" style="background: #10b981;">MIT</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><span class="status-badge used">已使用</span> <span class="status-badge undeclared">未声明</span></td>
+                            <td><span class="collapsible" style="color: #667eea; cursor: pointer;">详情 <span class="arrow">▶</span></span>
+                                <div class="collapsible-content">
+                                    
+        <div class="details-panel">
+            <h4>许可证详情: MIT License</h4>
+            <p style="margin-bottom: 10px; color: #6b7280;">A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.</p>
+            <div class="permission-tags"><span class="perm-tag allow">✓ commercial-use</span><span class="perm-tag allow">✓ modification</span><span class="perm-tag allow">✓ distribution</span><span class="perm-tag allow">✓ private-use</span><span class="perm-tag require">⚡ license-and-copyright-notice</span><span class="perm-tag forbid">✗ liability</span><span class="perm-tag forbid">✗ warranty</span></div>
+
+            <h4 style="margin-top: 15px;">来源信息</h4>
+            <p>声明来源: N/A</p>
+
+            <h4 style="margin-top: 15px;">使用位置</h4><div class="file-list"><span>app.py:17</span></div>
+
+            <h4 style="margin-top: 15px;">项目主页</h4><p><a href="https://pyyaml.org" target="_blank" style="color: #667eea;">https://pyyaml.org</a></p>
+        </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-header">
+                <h2>🔍 未声明的依赖包 <span class="count">4</span></h2>
+            </div>
+            <div class="section-body">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>包名</th>
+                            <th>版本</th>
+                            <th>许可证</th>
+                            <th>风险等级</th>
+                            <th>使用位置</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>bs4</strong></td>
+                            <td>undetected</td>
+                            <td><span class="license-badge" style="background: #10b981;">MIT</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><div class="file-list"><span>app.py:18</span><span>app.py:19</span></div></td>
+                        </tr>
+                        <tr>
+                            <td><strong>non_optional_lib</strong></td>
+                            <td>undetected</td>
+                            <td><span class="license-badge" style="background: #10b981;">MIT</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><div class="file-list"><span>optional_deps.py:63</span></div></td>
+                        </tr>
+                        <tr>
+                            <td><strong>redis</strong></td>
+                            <td>undetected</td>
+                            <td><span class="license-badge" style="background: #10b981;">MIT</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><div class="file-list"><span>utils.py:18</span></div></td>
+                        </tr>
+                        <tr>
+                            <td><strong>yaml</strong></td>
+                            <td>undetected</td>
+                            <td><span class="license-badge" style="background: #10b981;">MIT</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><div class="file-list"><span>app.py:17</span></div></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-header">
+                <h2>🔍 可选依赖（try/except导入） <span class="count">6</span></h2>
+            </div>
+            <div class="section-body">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>包名</th>
+                            <th>版本</th>
+                            <th>许可证</th>
+                            <th>风险等级</th>
+                            <th>使用位置</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>cv2</strong></td>
+                            <td>optional</td>
+                            <td><span class="license-badge" style="background: #ef4444;">Unknown</span></td>
+                            <td><span class="license-badge" style="background: #ef4444;">高风险</span></td>
+                            <td><div class="file-list"><span>optional_deps.py:26</span></div></td>
+                        </tr>
+                        <tr>
+                            <td><strong>deep_learning_lib</strong></td>
+                            <td>optional</td>
+                            <td><span class="license-badge" style="background: #10b981;">MIT</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><div class="file-list"><span>optional_deps.py:70</span></div></td>
+                        </tr>
+                        <tr>
+                            <td><strong>lxml</strong></td>
+                            <td>optional</td>
+                            <td><span class="license-badge" style="background: #10b981;">BSD-3-Clause</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><div class="file-list"><span>optional_deps.py:20</span></div></td>
+                        </tr>
+                        <tr>
+                            <td><strong>matplotlib</strong></td>
+                            <td>optional</td>
+                            <td><span class="license-badge" style="background: #10b981;">PSF-2.0</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><div class="file-list"><span>optional_deps.py:32</span></div></td>
+                        </tr>
+                        <tr>
+                            <td><strong>seaborn</strong></td>
+                            <td>optional</td>
+                            <td><span class="license-badge" style="background: #10b981;">BSD-3-Clause</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><div class="file-list"><span>optional_deps.py:40</span></div></td>
+                        </tr>
+                        <tr>
+                            <td><strong>torch</strong></td>
+                            <td>optional</td>
+                            <td><span class="license-badge" style="background: #ef4444;">Unknown</span></td>
+                            <td><span class="license-badge" style="background: #ef4444;">高风险</span></td>
+                            <td><div class="file-list"><span>optional_deps.py:49</span></div></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-header">
+                <h2>🔍 未使用的依赖包 <span class="count">7</span></h2>
+            </div>
+            <div class="section-body">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>包名</th>
+                            <th>版本</th>
+                            <th>许可证</th>
+                            <th>风险等级</th>
+                            <th>使用位置</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>black</strong></td>
+                            <td>23.0.0</td>
+                            <td><span class="license-badge" style="background: #10b981;">MIT</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><span style="color: #9ca3af;">未使用</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>coverage</strong></td>
+                            <td>7.3.0</td>
+                            <td><span class="license-badge" style="background: #10b981;">Apache-2.0</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><span style="color: #9ca3af;">未使用</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>flake8</strong></td>
+                            <td>6.0.0</td>
+                            <td><span class="license-badge" style="background: #10b981;">MIT</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><span style="color: #9ca3af;">未使用</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>mypy</strong></td>
+                            <td>1.0.0</td>
+                            <td><span class="license-badge" style="background: #10b981;">MIT</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><span style="color: #9ca3af;">未使用</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>oracledb</strong></td>
+                            <td>1.4.0</td>
+                            <td><span class="license-badge" style="background: #ef4444;">Proprietary</span></td>
+                            <td><span class="license-badge" style="background: #ef4444;">高风险</span></td>
+                            <td><span style="color: #9ca3af;">未使用</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>psycopg2-binary</strong></td>
+                            <td>2.9.0</td>
+                            <td><span class="license-badge" style="background: #f59e0b;">LGPL-3.0</span></td>
+                            <td><span class="license-badge" style="background: #f59e0b;">中风险</span></td>
+                            <td><span style="color: #9ca3af;">未使用</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>pytest</strong></td>
+                            <td>7.4.0</td>
+                            <td><span class="license-badge" style="background: #10b981;">MIT</span></td>
+                            <td><span class="license-badge" style="background: #10b981;">低风险</span></td>
+                            <td><span style="color: #9ca3af;">未使用</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-header">
+                <h2>📚 引用的 Python 标准库 <span class="count">12</span></h2>
+            </div>
+            <div class="section-body">
+                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                    <span style="background: #f3f4f6; padding: 6px 12px; border-radius: 6px; font-family: monospace;">
+                        collections
+                    </span>
+                    <span style="background: #f3f4f6; padding: 6px 12px; border-radius: 6px; font-family: monospace;">
+                        dataclasses
+                    </span>
+                    <span style="background: #f3f4f6; padding: 6px 12px; border-radius: 6px; font-family: monospace;">
+                        datetime
+                    </span>
+                    <span style="background: #f3f4f6; padding: 6px 12px; border-radius: 6px; font-family: monospace;">
+                        hashlib
+                    </span>
+                    <span style="background: #f3f4f6; padding: 6px 12px; border-radius: 6px; font-family: monospace;">
+                        json
+                    </span>
+                    <span style="background: #f3f4f6; padding: 6px 12px; border-radius: 6px; font-family: monospace;">
+                        logging
+                    </span>
+                    <span style="background: #f3f4f6; padding: 6px 12px; border-radius: 6px; font-family: monospace;">
+                        math
+                    </span>
+                    <span style="background: #f3f4f6; padding: 6px 12px; border-radius: 6px; font-family: monospace;">
+                        os
+                    </span>
+                    <span style="background: #f3f4f6; padding: 6px 12px; border-radius: 6px; font-family: monospace;">
+                        pathlib
+                    </span>
+                    <span style="background: #f3f4f6; padding: 6px 12px; border-radius: 6px; font-family: monospace;">
+                        re
+                    </span>
+                    <span style="background: #f3f4f6; padding: 6px 12px; border-radius: 6px; font-family: monospace;">
+                        sys
+                    </span>
+                    <span style="background: #f3f4f6; padding: 6px 12px; border-radius: 6px; font-family: monospace;">
+                        typing
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>本报告由 Python 依赖许可证扫描器自动生成 | 仅供参考，请结合实际法律意见</p>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.collapsible').forEach(el => {
+            el.addEventListener('click', () => {
+                el.classList.toggle('open');
+            });
+        });
+    </script>
+</body>
+</html>

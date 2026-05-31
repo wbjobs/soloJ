@@ -1,0 +1,26 @@
+# Web 框架
+flask==3.0.0
+requests>=2.31.0
+
+# 数据处理
+numpy>=1.24.0
+pandas==2.1.0
+
+# 数据库
+sqlalchemy==2.0.0
+psycopg2-binary>=2.9.0
+
+# 认证
+pyjwt>=2.8.0
+cryptography>=41.0.0
+
+# GPL 许可证库
+gpl_toolkit>=2.0.0
+
+# 闭源商业库
+commercial_sdk>=3.2.0
+oracledb>=1.4.0
+
+# 测试 (已声明但未使用)
+pytest>=7.4.0
+coverage>=7.3.0

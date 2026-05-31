@@ -1,0 +1,1259 @@
+{
+  "metadata": {
+    "project_path": "E:\\soloJ\\j57\\test_project",
+    "generated_at": "20260528_070320",
+    "scanner_version": "1.0.0"
+  },
+  "summary": {
+    "dependency_summary": {
+      "total_dependencies": 17,
+      "declared_count": 14,
+      "used_count": 11,
+      "undeclared_count": 3,
+      "unused_count": 6,
+      "standard_library_count": 12
+    },
+    "risk_summary": {
+      "total_packages": 17,
+      "risk_distribution": {
+        "low": 16,
+        "medium": 1,
+        "high": 0
+      },
+      "license_distribution": {
+        "BSD-3-Clause": 4,
+        "Apache-2.0": 3,
+        "MIT": 9,
+        "LGPL-3.0": 1
+      },
+      "issues": [
+        {
+          "package": "psycopg2-binary",
+          "version": "2.9.0",
+          "license": "LGPL-3.0",
+          "license_name": "GNU Lesser General Public License v3.0",
+          "risk": "low",
+          "reason": "包已声明但未在代码中使用",
+          "is_used": false,
+          "is_declared": true
+        },
+        {
+          "package": "pytest",
+          "version": "7.4.0",
+          "license": "MIT",
+          "license_name": "MIT License",
+          "risk": "low",
+          "reason": "包已声明但未在代码中使用",
+          "is_used": false,
+          "is_declared": true
+        },
+        {
+          "package": "coverage",
+          "version": "7.3.0",
+          "license": "Apache-2.0",
+          "license_name": "Apache License 2.0",
+          "risk": "low",
+          "reason": "包已声明但未在代码中使用",
+          "is_used": false,
+          "is_declared": true
+        },
+        {
+          "package": "black",
+          "version": "23.0.0",
+          "license": "MIT",
+          "license_name": "MIT License",
+          "risk": "low",
+          "reason": "包已声明但未在代码中使用",
+          "is_used": false,
+          "is_declared": true
+        },
+        {
+          "package": "flake8",
+          "version": "6.0.0",
+          "license": "MIT",
+          "license_name": "MIT License",
+          "risk": "low",
+          "reason": "包已声明但未在代码中使用",
+          "is_used": false,
+          "is_declared": true
+        },
+        {
+          "package": "mypy",
+          "version": "1.0.0",
+          "license": "MIT",
+          "license_name": "MIT License",
+          "risk": "low",
+          "reason": "包已声明但未在代码中使用",
+          "is_used": false,
+          "is_declared": true
+        },
+        {
+          "package": "yaml",
+          "version": "undetected",
+          "license": "MIT",
+          "license_name": "MIT License",
+          "risk": "medium",
+          "reason": "包已在代码中使用但未在依赖文件中声明",
+          "is_used": true,
+          "is_declared": false
+        },
+        {
+          "package": "bs4",
+          "version": "undetected",
+          "license": "MIT",
+          "license_name": "MIT License",
+          "risk": "medium",
+          "reason": "包已在代码中使用但未在依赖文件中声明",
+          "is_used": true,
+          "is_declared": false
+        },
+        {
+          "package": "redis",
+          "version": "undetected",
+          "license": "MIT",
+          "license_name": "MIT License",
+          "risk": "medium",
+          "reason": "包已在代码中使用但未在依赖文件中声明",
+          "is_used": true,
+          "is_declared": false
+        }
+      ],
+      "overall_risk": "low",
+      "overall_risk_label": "低风险",
+      "overall_risk_color": "#10b981"
+    }
+  },
+  "dependencies": [
+    {
+      "name": "black",
+      "version": "23.0.0",
+      "operator": ">=",
+      "sources": [
+        "pyproject.toml",
+        "optional-dependencies/dev"
+      ],
+      "used_in_files": [],
+      "is_standard": false,
+      "is_third_party": true,
+      "is_used": false,
+      "is_declared": true,
+      "license": {
+        "package": "black",
+        "resolved_package": null,
+        "license_id": "MIT",
+        "license_name": "MIT License",
+        "risk_level": "low",
+        "description": "A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.",
+        "permissions": [
+          "commercial-use",
+          "modification",
+          "distribution",
+          "private-use"
+        ],
+        "conditions": [
+          "license-and-copyright-notice"
+        ],
+        "limitations": [
+          "liability",
+          "warranty"
+        ],
+        "homepage": "https://black.readthedocs.io",
+        "is_stdlib": false
+      }
+    },
+    {
+      "name": "bs4",
+      "version": "undetected",
+      "operator": "==",
+      "sources": [],
+      "used_in_files": [
+        {
+          "file": "app.py",
+          "line": 18,
+          "import_type": "import",
+          "full_module": "bs4"
+        },
+        {
+          "file": "app.py",
+          "line": 19,
+          "import_type": "from-import",
+          "full_module": "bs4"
+        }
+      ],
+      "is_standard": false,
+      "is_third_party": true,
+      "is_used": true,
+      "is_declared": false,
+      "license": {
+        "package": "bs4",
+        "resolved_package": "beautifulsoup4",
+        "license_id": "MIT",
+        "license_name": "MIT License",
+        "risk_level": "low",
+        "description": "A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.",
+        "permissions": [
+          "commercial-use",
+          "modification",
+          "distribution",
+          "private-use"
+        ],
+        "conditions": [
+          "license-and-copyright-notice"
+        ],
+        "limitations": [
+          "liability",
+          "warranty"
+        ],
+        "homepage": "https://www.crummy.com/software/BeautifulSoup/",
+        "is_stdlib": false
+      }
+    },
+    {
+      "name": "coverage",
+      "version": "7.3.0",
+      "operator": ">=",
+      "sources": [
+        "requirements.txt"
+      ],
+      "used_in_files": [],
+      "is_standard": false,
+      "is_third_party": true,
+      "is_used": false,
+      "is_declared": true,
+      "license": {
+        "package": "coverage",
+        "resolved_package": null,
+        "license_id": "Apache-2.0",
+        "license_name": "Apache License 2.0",
+        "risk_level": "low",
+        "description": "A permissive license whose main conditions require preservation of copyright and license notices. Contributors provide an express grant of patent rights.",
+        "permissions": [
+          "commercial-use",
+          "modification",
+          "distribution",
+          "patent-use",
+          "private-use"
+        ],
+        "conditions": [
+          "license-and-copyright-notice",
+          "state-changes"
+        ],
+        "limitations": [
+          "liability",
+          "trademark-use",
+          "warranty"
+        ],
+        "homepage": "https://coverage.readthedocs.io",
+        "is_stdlib": false
+      }
+    },
+    {
+      "name": "cryptography",
+      "version": "41.0.0",
+      "operator": ">=",
+      "sources": [
+        "requirements.txt"
+      ],
+      "used_in_files": [
+        {
+          "file": "config.py",
+          "line": 10,
+          "import_type": "from-import",
+          "full_module": "cryptography.fernet"
+        }
+      ],
+      "is_standard": false,
+      "is_third_party": true,
+      "is_used": true,
+      "is_declared": true,
+      "license": {
+        "package": "cryptography",
+        "resolved_package": null,
+        "license_id": "Apache-2.0",
+        "license_name": "Apache License 2.0",
+        "risk_level": "low",
+        "description": "A permissive license whose main conditions require preservation of copyright and license notices. Contributors provide an express grant of patent rights.",
+        "permissions": [
+          "commercial-use",
+          "modification",
+          "distribution",
+          "patent-use",
+          "private-use"
+        ],
+        "conditions": [
+          "license-and-copyright-notice",
+          "state-changes"
+        ],
+        "limitations": [
+          "liability",
+          "trademark-use",
+          "warranty"
+        ],
+        "homepage": "https://cryptography.io",
+        "is_stdlib": false
+      }
+    },
+    {
+      "name": "flake8",
+      "version": "6.0.0",
+      "operator": ">=",
+      "sources": [
+        "pyproject.toml",
+        "optional-dependencies/dev"
+      ],
+      "used_in_files": [],
+      "is_standard": false,
+      "is_third_party": true,
+      "is_used": false,
+      "is_declared": true,
+      "license": {
+        "package": "flake8",
+        "resolved_package": null,
+        "license_id": "MIT",
+        "license_name": "MIT License",
+        "risk_level": "low",
+        "description": "A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.",
+        "permissions": [
+          "commercial-use",
+          "modification",
+          "distribution",
+          "private-use"
+        ],
+        "conditions": [
+          "license-and-copyright-notice"
+        ],
+        "limitations": [
+          "liability",
+          "warranty"
+        ],
+        "homepage": "https://flake8.pycqa.org",
+        "is_stdlib": false
+      }
+    },
+    {
+      "name": "flask",
+      "version": "3.0.0",
+      "operator": "==",
+      "sources": [
+        "requirements.txt"
+      ],
+      "used_in_files": [
+        {
+          "file": "app.py",
+          "line": 11,
+          "import_type": "import",
+          "full_module": "flask"
+        },
+        {
+          "file": "app.py",
+          "line": 12,
+          "import_type": "from-import",
+          "full_module": "flask"
+        },
+        {
+          "file": "app.py",
+          "line": 12,
+          "import_type": "from-import",
+          "full_module": "flask"
+        },
+        {
+          "file": "app.py",
+          "line": 12,
+          "import_type": "from-import",
+          "full_module": "flask"
+        }
+      ],
+      "is_standard": false,
+      "is_third_party": true,
+      "is_used": true,
+      "is_declared": true,
+      "license": {
+        "package": "flask",
+        "resolved_package": null,
+        "license_id": "BSD-3-Clause",
+        "license_name": "BSD 3-Clause \"New\" or \"Revised\" License",
+        "risk_level": "low",
+        "description": "A permissive license similar to the BSD 2-Clause License, but with a 3rd clause that prohibits others from using the name of the copyright holder or its contributors to endorse derived products.",
+        "permissions": [
+          "commercial-use",
+          "modification",
+          "distribution",
+          "private-use"
+        ],
+        "conditions": [
+          "license-and-copyright-notice"
+        ],
+        "limitations": [
+          "liability",
+          "warranty"
+        ],
+        "homepage": "https://flask.palletsprojects.com",
+        "is_stdlib": false
+      }
+    },
+    {
+      "name": "mypy",
+      "version": "1.0.0",
+      "operator": ">=",
+      "sources": [
+        "pyproject.toml",
+        "optional-dependencies/dev"
+      ],
+      "used_in_files": [],
+      "is_standard": false,
+      "is_third_party": true,
+      "is_used": false,
+      "is_declared": true,
+      "license": {
+        "package": "mypy",
+        "resolved_package": null,
+        "license_id": "MIT",
+        "license_name": "MIT License",
+        "risk_level": "low",
+        "description": "A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.",
+        "permissions": [
+          "commercial-use",
+          "modification",
+          "distribution",
+          "private-use"
+        ],
+        "conditions": [
+          "license-and-copyright-notice"
+        ],
+        "limitations": [
+          "liability",
+          "warranty"
+        ],
+        "homepage": "https://mypy.readthedocs.io",
+        "is_stdlib": false
+      }
+    },
+    {
+      "name": "numpy",
+      "version": "1.24.0",
+      "operator": ">=",
+      "sources": [
+        "requirements.txt"
+      ],
+      "used_in_files": [
+        {
+          "file": "utils.py",
+          "line": 9,
+          "import_type": "import",
+          "full_module": "numpy"
+        }
+      ],
+      "is_standard": false,
+      "is_third_party": true,
+      "is_used": true,
+      "is_declared": true,
+      "license": {
+        "package": "numpy",
+        "resolved_package": null,
+        "license_id": "BSD-3-Clause",
+        "license_name": "BSD 3-Clause \"New\" or \"Revised\" License",
+        "risk_level": "low",
+        "description": "A permissive license similar to the BSD 2-Clause License, but with a 3rd clause that prohibits others from using the name of the copyright holder or its contributors to endorse derived products.",
+        "permissions": [
+          "commercial-use",
+          "modification",
+          "distribution",
+          "private-use"
+        ],
+        "conditions": [
+          "license-and-copyright-notice"
+        ],
+        "limitations": [
+          "liability",
+          "warranty"
+        ],
+        "homepage": "https://numpy.org",
+        "is_stdlib": false
+      }
+    },
+    {
+      "name": "pandas",
+      "version": "2.1.0",
+      "operator": "==",
+      "sources": [
+        "requirements.txt"
+      ],
+      "used_in_files": [
+        {
+          "file": "utils.py",
+          "line": 10,
+          "import_type": "import",
+          "full_module": "pandas"
+        }
+      ],
+      "is_standard": false,
+      "is_third_party": true,
+      "is_used": true,
+      "is_declared": true,
+      "license": {
+        "package": "pandas",
+        "resolved_package": null,
+        "license_id": "BSD-3-Clause",
+        "license_name": "BSD 3-Clause \"New\" or \"Revised\" License",
+        "risk_level": "low",
+        "description": "A permissive license similar to the BSD 2-Clause License, but with a 3rd clause that prohibits others from using the name of the copyright holder or its contributors to endorse derived products.",
+        "permissions": [
+          "commercial-use",
+          "modification",
+          "distribution",
+          "private-use"
+        ],
+        "conditions": [
+          "license-and-copyright-notice"
+        ],
+        "limitations": [
+          "liability",
+          "warranty"
+        ],
+        "homepage": "https://pandas.pydata.org",
+        "is_stdlib": false
+      }
+    },
+    {
+      "name": "psycopg2-binary",
+      "version": "2.9.0",
+      "operator": ">=",
+      "sources": [
+        "requirements.txt"
+      ],
+      "used_in_files": [],
+      "is_standard": false,
+      "is_third_party": true,
+      "is_used": false,
+      "is_declared": true,
+      "license": {
+        "package": "psycopg2-binary",
+        "resolved_package": null,
+        "license_id": "LGPL-3.0",
+        "license_name": "GNU Lesser General Public License v3.0",
+        "risk_level": "medium",
+        "description": "This license is mainly applied to libraries. Derivatives of works may be distributed under different terms and without source code for the derivative work.",
+        "permissions": [
+          "commercial-use",
+          "modification",
+          "distribution",
+          "patent-use",
+          "private-use"
+        ],
+        "conditions": [
+          "disclose-source",
+          "license-and-copyright-notice",
+          "same-license"
+        ],
+        "limitations": [
+          "liability",
+          "warranty"
+        ],
+        "homepage": "https://www.psycopg.org",
+        "is_stdlib": false
+      }
+    },
+    {
+      "name": "pyjwt",
+      "version": "2.8.0",
+      "operator": ">=",
+      "sources": [
+        "requirements.txt"
+      ],
+      "used_in_files": [
+        {
+          "file": "app.py",
+          "line": 14,
+          "import_type": "import",
+          "full_module": "jwt"
+        },
+        {
+          "file": "config.py",
+          "line": 9,
+          "import_type": "import",
+          "full_module": "jwt"
+        }
+      ],
+      "is_standard": false,
+      "is_third_party": true,
+      "is_used": true,
+      "is_declared": true,
+      "license": {
+        "package": "pyjwt",
+        "resolved_package": null,
+        "license_id": "MIT",
+        "license_name": "MIT License",
+        "risk_level": "low",
+        "description": "A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.",
+        "permissions": [
+          "commercial-use",
+          "modification",
+          "distribution",
+          "private-use"
+        ],
+        "conditions": [
+          "license-and-copyright-notice"
+        ],
+        "limitations": [
+          "liability",
+          "warranty"
+        ],
+        "homepage": "https://pyjwt.readthedocs.io",
+        "is_stdlib": false
+      }
+    },
+    {
+      "name": "pytest",
+      "version": "7.4.0",
+      "operator": ">=",
+      "sources": [
+        "requirements.txt"
+      ],
+      "used_in_files": [],
+      "is_standard": false,
+      "is_third_party": true,
+      "is_used": false,
+      "is_declared": true,
+      "license": {
+        "package": "pytest",
+        "resolved_package": null,
+        "license_id": "MIT",
+        "license_name": "MIT License",
+        "risk_level": "low",
+        "description": "A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.",
+        "permissions": [
+          "commercial-use",
+          "modification",
+          "distribution",
+          "private-use"
+        ],
+        "conditions": [
+          "license-and-copyright-notice"
+        ],
+        "limitations": [
+          "liability",
+          "warranty"
+        ],
+        "homepage": "https://pytest.org",
+        "is_stdlib": false
+      }
+    },
+    {
+      "name": "python-dotenv",
+      "version": "1.0.0",
+      "operator": ">=",
+      "sources": [
+        "pyproject.toml",
+        "dependencies"
+      ],
+      "used_in_files": [
+        {
+          "file": "config.py",
+          "line": 8,
+          "import_type": "from-import",
+          "full_module": "dotenv"
+        }
+      ],
+      "is_standard": false,
+      "is_third_party": true,
+      "is_used": true,
+      "is_declared": true,
+      "license": {
+        "package": "python-dotenv",
+        "resolved_package": null,
+        "license_id": "BSD-3-Clause",
+        "license_name": "BSD 3-Clause \"New\" or \"Revised\" License",
+        "risk_level": "low",
+        "description": "A permissive license similar to the BSD 2-Clause License, but with a 3rd clause that prohibits others from using the name of the copyright holder or its contributors to endorse derived products.",
+        "permissions": [
+          "commercial-use",
+          "modification",
+          "distribution",
+          "private-use"
+        ],
+        "conditions": [
+          "license-and-copyright-notice"
+        ],
+        "limitations": [
+          "liability",
+          "warranty"
+        ],
+        "homepage": "https://saurabh-kumar.com/python-dotenv/",
+        "is_stdlib": false
+      }
+    },
+    {
+      "name": "redis",
+      "version": "undetected",
+      "operator": "==",
+      "sources": [],
+      "used_in_files": [
+        {
+          "file": "utils.py",
+          "line": 18,
+          "import_type": "import",
+          "full_module": "redis"
+        }
+      ],
+      "is_standard": false,
+      "is_third_party": true,
+      "is_used": true,
+      "is_declared": false,
+      "license": {
+        "package": "redis",
+        "resolved_package": null,
+        "license_id": "MIT",
+        "license_name": "MIT License",
+        "risk_level": "low",
+        "description": "A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.",
+        "permissions": [
+          "commercial-use",
+          "modification",
+          "distribution",
+          "private-use"
+        ],
+        "conditions": [
+          "license-and-copyright-notice"
+        ],
+        "limitations": [
+          "liability",
+          "warranty"
+        ],
+        "homepage": "https://github.com/redis/redis-py",
+        "is_stdlib": false
+      }
+    },
+    {
+      "name": "requests",
+      "version": "2.31.0",
+      "operator": ">=",
+      "sources": [
+        "requirements.txt"
+      ],
+      "used_in_files": [
+        {
+          "file": "app.py",
+          "line": 13,
+          "import_type": "import",
+          "full_module": "requests"
+        }
+      ],
+      "is_standard": false,
+      "is_third_party": true,
+      "is_used": true,
+      "is_declared": true,
+      "license": {
+        "package": "requests",
+        "resolved_package": null,
+        "license_id": "Apache-2.0",
+        "license_name": "Apache License 2.0",
+        "risk_level": "low",
+        "description": "A permissive license whose main conditions require preservation of copyright and license notices. Contributors provide an express grant of patent rights.",
+        "permissions": [
+          "commercial-use",
+          "modification",
+          "distribution",
+          "patent-use",
+          "private-use"
+        ],
+        "conditions": [
+          "license-and-copyright-notice",
+          "state-changes"
+        ],
+        "limitations": [
+          "liability",
+          "trademark-use",
+          "warranty"
+        ],
+        "homepage": "https://requests.readthedocs.io",
+        "is_stdlib": false
+      }
+    },
+    {
+      "name": "sqlalchemy",
+      "version": "2.0.0",
+      "operator": "==",
+      "sources": [
+        "requirements.txt"
+      ],
+      "used_in_files": [
+        {
+          "file": "utils.py",
+          "line": 13,
+          "import_type": "import",
+          "full_module": "sqlalchemy"
+        },
+        {
+          "file": "utils.py",
+          "line": 14,
+          "import_type": "from-import",
+          "full_module": "sqlalchemy"
+        },
+        {
+          "file": "utils.py",
+          "line": 14,
+          "import_type": "from-import",
+          "full_module": "sqlalchemy"
+        },
+        {
+          "file": "utils.py",
+          "line": 14,
+          "import_type": "from-import",
+          "full_module": "sqlalchemy"
+        },
+        {
+          "file": "utils.py",
+          "line": 14,
+          "import_type": "from-import",
+          "full_module": "sqlalchemy"
+        },
+        {
+          "file": "utils.py",
+          "line": 15,
+          "import_type": "from-import",
+          "full_module": "sqlalchemy.ext.declarative"
+        }
+      ],
+      "is_standard": false,
+      "is_third_party": true,
+      "is_used": true,
+      "is_declared": true,
+      "license": {
+        "package": "sqlalchemy",
+        "resolved_package": null,
+        "license_id": "MIT",
+        "license_name": "MIT License",
+        "risk_level": "low",
+        "description": "A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.",
+        "permissions": [
+          "commercial-use",
+          "modification",
+          "distribution",
+          "private-use"
+        ],
+        "conditions": [
+          "license-and-copyright-notice"
+        ],
+        "limitations": [
+          "liability",
+          "warranty"
+        ],
+        "homepage": "https://www.sqlalchemy.org",
+        "is_stdlib": false
+      }
+    },
+    {
+      "name": "yaml",
+      "version": "undetected",
+      "operator": "==",
+      "sources": [],
+      "used_in_files": [
+        {
+          "file": "app.py",
+          "line": 17,
+          "import_type": "import",
+          "full_module": "yaml"
+        }
+      ],
+      "is_standard": false,
+      "is_third_party": true,
+      "is_used": true,
+      "is_declared": false,
+      "license": {
+        "package": "yaml",
+        "resolved_package": "pyyaml",
+        "license_id": "MIT",
+        "license_name": "MIT License",
+        "risk_level": "low",
+        "description": "A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.",
+        "permissions": [
+          "commercial-use",
+          "modification",
+          "distribution",
+          "private-use"
+        ],
+        "conditions": [
+          "license-and-copyright-notice"
+        ],
+        "limitations": [
+          "liability",
+          "warranty"
+        ],
+        "homepage": "https://pyyaml.org",
+        "is_stdlib": false
+      }
+    }
+  ],
+  "undeclared": [
+    {
+      "name": "yaml",
+      "version": "undetected",
+      "operator": "==",
+      "sources": [],
+      "used_in_files": [
+        {
+          "file": "app.py",
+          "line": 17,
+          "import_type": "import",
+          "full_module": "yaml"
+        }
+      ],
+      "is_standard": false,
+      "is_third_party": true,
+      "is_used": true,
+      "is_declared": false,
+      "license": {
+        "package": "yaml",
+        "resolved_package": "pyyaml",
+        "license_id": "MIT",
+        "license_name": "MIT License",
+        "risk_level": "low",
+        "description": "A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.",
+        "permissions": [
+          "commercial-use",
+          "modification",
+          "distribution",
+          "private-use"
+        ],
+        "conditions": [
+          "license-and-copyright-notice"
+        ],
+        "limitations": [
+          "liability",
+          "warranty"
+        ],
+        "homepage": "https://pyyaml.org",
+        "is_stdlib": false
+      }
+    },
+    {
+      "name": "bs4",
+      "version": "undetected",
+      "operator": "==",
+      "sources": [],
+      "used_in_files": [
+        {
+          "file": "app.py",
+          "line": 18,
+          "import_type": "import",
+          "full_module": "bs4"
+        },
+        {
+          "file": "app.py",
+          "line": 19,
+          "import_type": "from-import",
+          "full_module": "bs4"
+        }
+      ],
+      "is_standard": false,
+      "is_third_party": true,
+      "is_used": true,
+      "is_declared": false,
+      "license": {
+        "package": "bs4",
+        "resolved_package": "beautifulsoup4",
+        "license_id": "MIT",
+        "license_name": "MIT License",
+        "risk_level": "low",
+        "description": "A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.",
+        "permissions": [
+          "commercial-use",
+          "modification",
+          "distribution",
+          "private-use"
+        ],
+        "conditions": [
+          "license-and-copyright-notice"
+        ],
+        "limitations": [
+          "liability",
+          "warranty"
+        ],
+        "homepage": "https://www.crummy.com/software/BeautifulSoup/",
+        "is_stdlib": false
+      }
+    },
+    {
+      "name": "redis",
+      "version": "undetected",
+      "operator": "==",
+      "sources": [],
+      "used_in_files": [
+        {
+          "file": "utils.py",
+          "line": 18,
+          "import_type": "import",
+          "full_module": "redis"
+        }
+      ],
+      "is_standard": false,
+      "is_third_party": true,
+      "is_used": true,
+      "is_declared": false,
+      "license": {
+        "package": "redis",
+        "resolved_package": null,
+        "license_id": "MIT",
+        "license_name": "MIT License",
+        "risk_level": "low",
+        "description": "A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.",
+        "permissions": [
+          "commercial-use",
+          "modification",
+          "distribution",
+          "private-use"
+        ],
+        "conditions": [
+          "license-and-copyright-notice"
+        ],
+        "limitations": [
+          "liability",
+          "warranty"
+        ],
+        "homepage": "https://github.com/redis/redis-py",
+        "is_stdlib": false
+      }
+    }
+  ],
+  "unused": [
+    {
+      "name": "psycopg2-binary",
+      "version": "2.9.0",
+      "operator": ">=",
+      "sources": [
+        "requirements.txt"
+      ],
+      "used_in_files": [],
+      "is_standard": false,
+      "is_third_party": true,
+      "is_used": false,
+      "is_declared": true,
+      "license": {
+        "package": "psycopg2-binary",
+        "resolved_package": null,
+        "license_id": "LGPL-3.0",
+        "license_name": "GNU Lesser General Public License v3.0",
+        "risk_level": "medium",
+        "description": "This license is mainly applied to libraries. Derivatives of works may be distributed under different terms and without source code for the derivative work.",
+        "permissions": [
+          "commercial-use",
+          "modification",
+          "distribution",
+          "patent-use",
+          "private-use"
+        ],
+        "conditions": [
+          "disclose-source",
+          "license-and-copyright-notice",
+          "same-license"
+        ],
+        "limitations": [
+          "liability",
+          "warranty"
+        ],
+        "homepage": "https://www.psycopg.org",
+        "is_stdlib": false
+      }
+    },
+    {
+      "name": "pytest",
+      "version": "7.4.0",
+      "operator": ">=",
+      "sources": [
+        "requirements.txt"
+      ],
+      "used_in_files": [],
+      "is_standard": false,
+      "is_third_party": true,
+      "is_used": false,
+      "is_declared": true,
+      "license": {
+        "package": "pytest",
+        "resolved_package": null,
+        "license_id": "MIT",
+        "license_name": "MIT License",
+        "risk_level": "low",
+        "description": "A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.",
+        "permissions": [
+          "commercial-use",
+          "modification",
+          "distribution",
+          "private-use"
+        ],
+        "conditions": [
+          "license-and-copyright-notice"
+        ],
+        "limitations": [
+          "liability",
+          "warranty"
+        ],
+        "homepage": "https://pytest.org",
+        "is_stdlib": false
+      }
+    },
+    {
+      "name": "coverage",
+      "version": "7.3.0",
+      "operator": ">=",
+      "sources": [
+        "requirements.txt"
+      ],
+      "used_in_files": [],
+      "is_standard": false,
+      "is_third_party": true,
+      "is_used": false,
+      "is_declared": true,
+      "license": {
+        "package": "coverage",
+        "resolved_package": null,
+        "license_id": "Apache-2.0",
+        "license_name": "Apache License 2.0",
+        "risk_level": "low",
+        "description": "A permissive license whose main conditions require preservation of copyright and license notices. Contributors provide an express grant of patent rights.",
+        "permissions": [
+          "commercial-use",
+          "modification",
+          "distribution",
+          "patent-use",
+          "private-use"
+        ],
+        "conditions": [
+          "license-and-copyright-notice",
+          "state-changes"
+        ],
+        "limitations": [
+          "liability",
+          "trademark-use",
+          "warranty"
+        ],
+        "homepage": "https://coverage.readthedocs.io",
+        "is_stdlib": false
+      }
+    },
+    {
+      "name": "black",
+      "version": "23.0.0",
+      "operator": ">=",
+      "sources": [
+        "pyproject.toml",
+        "optional-dependencies/dev"
+      ],
+      "used_in_files": [],
+      "is_standard": false,
+      "is_third_party": true,
+      "is_used": false,
+      "is_declared": true,
+      "license": {
+        "package": "black",
+        "resolved_package": null,
+        "license_id": "MIT",
+        "license_name": "MIT License",
+        "risk_level": "low",
+        "description": "A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.",
+        "permissions": [
+          "commercial-use",
+          "modification",
+          "distribution",
+          "private-use"
+        ],
+        "conditions": [
+          "license-and-copyright-notice"
+        ],
+        "limitations": [
+          "liability",
+          "warranty"
+        ],
+        "homepage": "https://black.readthedocs.io",
+        "is_stdlib": false
+      }
+    },
+    {
+      "name": "flake8",
+      "version": "6.0.0",
+      "operator": ">=",
+      "sources": [
+        "pyproject.toml",
+        "optional-dependencies/dev"
+      ],
+      "used_in_files": [],
+      "is_standard": false,
+      "is_third_party": true,
+      "is_used": false,
+      "is_declared": true,
+      "license": {
+        "package": "flake8",
+        "resolved_package": null,
+        "license_id": "MIT",
+        "license_name": "MIT License",
+        "risk_level": "low",
+        "description": "A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.",
+        "permissions": [
+          "commercial-use",
+          "modification",
+          "distribution",
+          "private-use"
+        ],
+        "conditions": [
+          "license-and-copyright-notice"
+        ],
+        "limitations": [
+          "liability",
+          "warranty"
+        ],
+        "homepage": "https://flake8.pycqa.org",
+        "is_stdlib": false
+      }
+    },
+    {
+      "name": "mypy",
+      "version": "1.0.0",
+      "operator": ">=",
+      "sources": [
+        "pyproject.toml",
+        "optional-dependencies/dev"
+      ],
+      "used_in_files": [],
+      "is_standard": false,
+      "is_third_party": true,
+      "is_used": false,
+      "is_declared": true,
+      "license": {
+        "package": "mypy",
+        "resolved_package": null,
+        "license_id": "MIT",
+        "license_name": "MIT License",
+        "risk_level": "low",
+        "description": "A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.",
+        "permissions": [
+          "commercial-use",
+          "modification",
+          "distribution",
+          "private-use"
+        ],
+        "conditions": [
+          "license-and-copyright-notice"
+        ],
+        "limitations": [
+          "liability",
+          "warranty"
+        ],
+        "homepage": "https://mypy.readthedocs.io",
+        "is_stdlib": false
+      }
+    }
+  ],
+  "standard_libraries": [
+    "os",
+    "sys",
+    "json",
+    "logging",
+    "datetime",
+    "typing",
+    "collections",
+    "re",
+    "math",
+    "dataclasses",
+    "pathlib",
+    "hashlib"
+  ]
+}

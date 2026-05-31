@@ -1,0 +1,614 @@
+{
+  "licenses": {
+    "MIT": {
+      "name": "MIT License",
+      "spdx_id": "MIT",
+      "risk_level": "low",
+      "description": "A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.",
+      "permissions": ["commercial-use", "modification", "distribution", "private-use"],
+      "conditions": ["license-and-copyright-notice"],
+      "limitations": ["liability", "warranty"]
+    },
+    "Apache-2.0": {
+      "name": "Apache License 2.0",
+      "spdx_id": "Apache-2.0",
+      "risk_level": "low",
+      "description": "A permissive license whose main conditions require preservation of copyright and license notices. Contributors provide an express grant of patent rights.",
+      "permissions": ["commercial-use", "modification", "distribution", "patent-use", "private-use"],
+      "conditions": ["license-and-copyright-notice", "state-changes"],
+      "limitations": ["liability", "trademark-use", "warranty"]
+    },
+    "BSD-3-Clause": {
+      "name": "BSD 3-Clause \"New\" or \"Revised\" License",
+      "spdx_id": "BSD-3-Clause",
+      "risk_level": "low",
+      "description": "A permissive license similar to the BSD 2-Clause License, but with a 3rd clause that prohibits others from using the name of the copyright holder or its contributors to endorse derived products.",
+      "permissions": ["commercial-use", "modification", "distribution", "private-use"],
+      "conditions": ["license-and-copyright-notice"],
+      "limitations": ["liability", "warranty"]
+    },
+    "BSD-2-Clause": {
+      "name": "BSD 2-Clause \"Simplified\" License",
+      "spdx_id": "BSD-2-Clause",
+      "risk_level": "low",
+      "description": "A permissive license that comes in two variants, the BSD 2-Clause and BSD 3-Clause.",
+      "permissions": ["commercial-use", "modification", "distribution", "private-use"],
+      "conditions": ["license-and-copyright-notice"],
+      "limitations": ["liability", "warranty"]
+    },
+    "GPL-3.0": {
+      "name": "GNU General Public License v3.0",
+      "spdx_id": "GPL-3.0",
+      "risk_level": "high",
+      "description": "Permissions of this strong copyleft license are conditioned on making available complete source code of licensed works and modifications, which include larger works using a licensed work, under the same license.",
+      "permissions": ["commercial-use", "modification", "distribution", "patent-use", "private-use"],
+      "conditions": ["disclose-source", "license-and-copyright-notice", "same-license", "state-changes"],
+      "limitations": ["liability", "warranty"]
+    },
+    "GPL-2.0": {
+      "name": "GNU General Public License v2.0",
+      "spdx_id": "GPL-2.0",
+      "risk_level": "high",
+      "description": "The GNU General Public License is a free, copyleft license for software and other kinds of works.",
+      "permissions": ["commercial-use", "modification", "distribution", "private-use"],
+      "conditions": ["disclose-source", "license-and-copyright-notice", "same-license", "state-changes"],
+      "limitations": ["liability", "warranty"]
+    },
+    "LGPL-3.0": {
+      "name": "GNU Lesser General Public License v3.0",
+      "spdx_id": "LGPL-3.0",
+      "risk_level": "medium",
+      "description": "This license is mainly applied to libraries. Derivatives of works may be distributed under different terms and without source code for the derivative work.",
+      "permissions": ["commercial-use", "modification", "distribution", "patent-use", "private-use"],
+      "conditions": ["disclose-source", "license-and-copyright-notice", "same-license"],
+      "limitations": ["liability", "warranty"]
+    },
+    "LGPL-2.1": {
+      "name": "GNU Lesser General Public License v2.1",
+      "spdx_id": "LGPL-2.1",
+      "risk_level": "medium",
+      "description": "Lesser General Public License for libraries.",
+      "permissions": ["commercial-use", "modification", "distribution", "private-use"],
+      "conditions": ["disclose-source", "license-and-copyright-notice", "same-license"],
+      "limitations": ["liability", "warranty"]
+    },
+    "AGPL-3.0": {
+      "name": "GNU Affero General Public License v3.0",
+      "spdx_id": "AGPL-3.0",
+      "risk_level": "high",
+      "description": "The AGPL license differs from the other GNU licenses in that it was built for network software.",
+      "permissions": ["commercial-use", "modification", "distribution", "patent-use", "private-use"],
+      "conditions": ["disclose-source", "license-and-copyright-notice", "same-license", "state-changes", "network-use-disclosure"],
+      "limitations": ["liability", "warranty"]
+    },
+    "MPL-2.0": {
+      "name": "Mozilla Public License 2.0",
+      "spdx_id": "MPL-2.0",
+      "risk_level": "medium",
+      "description": "Permissions of this weak copyleft license are conditioned on making available source code of licensed files and modifications of those files under the same license.",
+      "permissions": ["commercial-use", "modification", "distribution", "patent-use", "private-use"],
+      "conditions": ["disclose-source", "license-and-copyright-notice", "same-license"],
+      "limitations": ["liability", "trademark-use", "warranty"]
+    },
+    "ISC": {
+      "name": "ISC License",
+      "spdx_id": "ISC",
+      "risk_level": "low",
+      "description": "A permissive license lets people do anything with your code with proper attribution and without warranty.",
+      "permissions": ["commercial-use", "modification", "distribution", "private-use"],
+      "conditions": ["license-and-copyright-notice"],
+      "limitations": ["liability", "warranty"]
+    },
+    "Unlicense": {
+      "name": "The Unlicense",
+      "spdx_id": "Unlicense",
+      "risk_level": "low",
+      "description": "A license with no conditions whatsoever which dedicates works to the public domain.",
+      "permissions": ["commercial-use", "modification", "distribution", "private-use"],
+      "conditions": [],
+      "limitations": ["liability", "warranty"]
+    },
+    "WTFPL": {
+      "name": "Do What The F*ck You Want To Public License",
+      "spdx_id": "WTFPL",
+      "risk_level": "low",
+      "description": "A very permissive free software license.",
+      "permissions": ["commercial-use", "modification", "distribution", "private-use"],
+      "conditions": [],
+      "limitations": ["liability", "warranty"]
+    },
+    "CC0-1.0": {
+      "name": "Creative Commons Zero v1.0 Universal",
+      "spdx_id": "CC0-1.0",
+      "risk_level": "low",
+      "description": "No copyright intended.",
+      "permissions": ["commercial-use", "modification", "distribution", "private-use"],
+      "conditions": [],
+      "limitations": ["liability", "warranty"]
+    },
+    "PSF-2.0": {
+      "name": "Python Software Foundation License 2.0",
+      "spdx_id": "PSF-2.0",
+      "risk_level": "low",
+      "description": "This is a free software license, GPL compatible.",
+      "permissions": ["commercial-use", "modification", "distribution", "private-use"],
+      "conditions": ["license-and-copyright-notice"],
+      "limitations": ["liability", "warranty"]
+    },
+    "Proprietary": {
+      "name": "Proprietary/Commercial License",
+      "spdx_id": "Proprietary",
+      "risk_level": "high",
+      "description": "Proprietary software is non-free software that is not distributed with a license that allows modification or redistribution.",
+      "permissions": ["private-use"],
+      "conditions": [],
+      "limitations": ["commercial-use", "modification", "distribution", "liability", "warranty"]
+    },
+    "Unknown": {
+      "name": "Unknown License",
+      "spdx_id": "Unknown",
+      "risk_level": "high",
+      "description": "The license for this package could not be determined.",
+      "permissions": [],
+      "conditions": [],
+      "limitations": ["commercial-use", "modification", "distribution", "private-use"]
+    }
+  },
+  "packages": {
+    "requests": {
+      "license": "Apache-2.0",
+      "version": "2.31.0",
+      "homepage": "https://requests.readthedocs.io"
+    },
+    "flask": {
+      "license": "BSD-3-Clause",
+      "version": "3.0.0",
+      "homepage": "https://flask.palletsprojects.com"
+    },
+    "django": {
+      "license": "BSD-3-Clause",
+      "version": "5.0.0",
+      "homepage": "https://www.djangoproject.com"
+    },
+    "numpy": {
+      "license": "BSD-3-Clause",
+      "version": "1.24.0",
+      "homepage": "https://numpy.org"
+    },
+    "pandas": {
+      "license": "BSD-3-Clause",
+      "version": "2.1.0",
+      "homepage": "https://pandas.pydata.org"
+    },
+    "matplotlib": {
+      "license": "PSF-2.0",
+      "version": "3.8.0",
+      "homepage": "https://matplotlib.org"
+    },
+    "sqlalchemy": {
+      "license": "MIT",
+      "version": "2.0.0",
+      "homepage": "https://www.sqlalchemy.org"
+    },
+    "pytest": {
+      "license": "MIT",
+      "version": "7.4.0",
+      "homepage": "https://pytest.org"
+    },
+    "scikit-learn": {
+      "license": "BSD-3-Clause",
+      "version": "1.3.0",
+      "homepage": "https://scikit-learn.org"
+    },
+    "beautifulsoup4": {
+      "license": "MIT",
+      "version": "4.12.0",
+      "homepage": "https://www.crummy.com/software/BeautifulSoup/"
+    },
+    "bs4": {
+      "license": "MIT",
+      "version": "4.12.0",
+      "homepage": "https://www.crummy.com/software/BeautifulSoup/"
+    },
+    "lxml": {
+      "license": "BSD-3-Clause",
+      "version": "4.9.0",
+      "homepage": "https://lxml.de"
+    },
+    "celery": {
+      "license": "BSD-3-Clause",
+      "version": "5.3.0",
+      "homepage": "https://docs.celeryq.dev"
+    },
+    "redis": {
+      "license": "MIT",
+      "version": "5.0.0",
+      "homepage": "https://github.com/redis/redis-py"
+    },
+    "pymongo": {
+      "license": "Apache-2.0",
+      "version": "4.5.0",
+      "homepage": "https://pymongo.readthedocs.io"
+    },
+    "psycopg2": {
+      "license": "LGPL-3.0",
+      "version": "2.9.0",
+      "homepage": "https://www.psycopg.org"
+    },
+    "psycopg2-binary": {
+      "license": "LGPL-3.0",
+      "version": "2.9.0",
+      "homepage": "https://www.psycopg.org"
+    },
+    "jinja2": {
+      "license": "BSD-3-Clause",
+      "version": "3.1.0",
+      "homepage": "https://palletsprojects.com/p/jinja/"
+    },
+    "werkzeug": {
+      "license": "BSD-3-Clause",
+      "version": "3.0.0",
+      "homepage": "https://werkzeug.palletsprojects.com"
+    },
+    "click": {
+      "license": "BSD-3-Clause",
+      "version": "8.1.0",
+      "homepage": "https://click.palletsprojects.com"
+    },
+    "fastapi": {
+      "license": "MIT",
+      "version": "0.104.0",
+      "homepage": "https://fastapi.tiangolo.com"
+    },
+    "uvicorn": {
+      "license": "BSD-3-Clause",
+      "version": "0.24.0",
+      "homepage": "https://www.uvicorn.org"
+    },
+    "pydantic": {
+      "license": "MIT",
+      "version": "2.5.0",
+      "homepage": "https://docs.pydantic.dev"
+    },
+    "aiohttp": {
+      "license": "Apache-2.0",
+      "version": "3.9.0",
+      "homepage": "https://docs.aiohttp.org"
+    },
+    "httpx": {
+      "license": "BSD-3-Clause",
+      "version": "0.25.0",
+      "homepage": "https://www.python-httpx.org"
+    },
+    "cryptography": {
+      "license": "Apache-2.0",
+      "version": "41.0.0",
+      "homepage": "https://cryptography.io"
+    },
+    "pyjwt": {
+      "license": "MIT",
+      "version": "2.8.0",
+      "homepage": "https://pyjwt.readthedocs.io"
+    },
+    "jwt": {
+      "license": "MIT",
+      "version": "2.8.0",
+      "homepage": "https://pyjwt.readthedocs.io"
+    },
+    "python-dateutil": {
+      "license": "Apache-2.0",
+      "version": "2.8.0",
+      "homepage": "https://dateutil.readthedocs.io"
+    },
+    "dateutil": {
+      "license": "Apache-2.0",
+      "version": "2.8.0",
+      "homepage": "https://dateutil.readthedocs.io"
+    },
+    "six": {
+      "license": "MIT",
+      "version": "1.16.0",
+      "homepage": "https://github.com/benjaminp/six"
+    },
+    "urllib3": {
+      "license": "MIT",
+      "version": "2.1.0",
+      "homepage": "https://urllib3.readthedocs.io"
+    },
+    "chardet": {
+      "license": "LGPL-2.1",
+      "version": "5.2.0",
+      "homepage": "https://github.com/chardet/chardet"
+    },
+    "idna": {
+      "license": "BSD-3-Clause",
+      "version": "3.6.0",
+      "homepage": "https://github.com/kjd/idna"
+    },
+    "certifi": {
+      "license": "MPL-2.0",
+      "version": "2023.11.0",
+      "homepage": "https://github.com/certifi/python-certifi"
+    },
+    "setuptools": {
+      "license": "MIT",
+      "version": "69.0.0",
+      "homepage": "https://setuptools.pypa.io"
+    },
+    "wheel": {
+      "license": "MIT",
+      "version": "0.42.0",
+      "homepage": "https://wheel.readthedocs.io"
+    },
+    "pip": {
+      "license": "MIT",
+      "version": "23.3.0",
+      "homepage": "https://pip.pypa.io"
+    },
+    "tomli": {
+      "license": "MIT",
+      "version": "2.0.0",
+      "homepage": "https://github.com/hukkin/tomli"
+    },
+    "black": {
+      "license": "MIT",
+      "version": "23.12.0",
+      "homepage": "https://black.readthedocs.io"
+    },
+    "flake8": {
+      "license": "MIT",
+      "version": "6.1.0",
+      "homepage": "https://flake8.pycqa.org"
+    },
+    "mypy": {
+      "license": "MIT",
+      "version": "1.8.0",
+      "homepage": "https://mypy.readthedocs.io"
+    },
+    "coverage": {
+      "license": "Apache-2.0",
+      "version": "7.3.0",
+      "homepage": "https://coverage.readthedocs.io"
+    },
+    "scipy": {
+      "license": "BSD-3-Clause",
+      "version": "1.11.0",
+      "homepage": "https://scipy.org"
+    },
+    "seaborn": {
+      "license": "BSD-3-Clause",
+      "version": "0.13.0",
+      "homepage": "https://seaborn.pydata.org"
+    },
+    "plotly": {
+      "license": "MIT",
+      "version": "5.18.0",
+      "homepage": "https://plotly.com"
+    },
+    "pillow": {
+      "license": "HPND",
+      "version": "10.1.0",
+      "homepage": "https://python-pillow.org"
+    },
+    "PIL": {
+      "license": "HPND",
+      "version": "10.1.0",
+      "homepage": "https://python-pillow.org"
+    },
+    "openpyxl": {
+      "license": "MIT",
+      "version": "3.1.0",
+      "homepage": "https://openpyxl.readthedocs.io"
+    },
+    "pyyaml": {
+      "license": "MIT",
+      "version": "6.0.1",
+      "homepage": "https://pyyaml.org"
+    },
+    "yaml": {
+      "license": "MIT",
+      "version": "6.0.1",
+      "homepage": "https://pyyaml.org"
+    },
+    "toml": {
+      "license": "MIT",
+      "version": "0.10.2",
+      "homepage": "https://github.com/uiri/toml"
+    },
+    "dotenv": {
+      "license": "BSD-3-Clause",
+      "version": "1.0.0",
+      "homepage": "https://saurabh-kumar.com/python-dotenv/"
+    },
+    "python-dotenv": {
+      "license": "BSD-3-Clause",
+      "version": "1.0.0",
+      "homepage": "https://saurabh-kumar.com/python-dotenv/"
+    },
+    "pytz": {
+      "license": "MIT",
+      "version": "2023.3",
+      "homepage": "https://pythonhosted.org/pytz/"
+    },
+    "tzdata": {
+      "license": "Apache-2.0",
+      "version": "2023.3",
+      "homepage": "https://tzdata.readthedocs.io"
+    },
+    "asyncio": {
+      "license": "PSF-2.0",
+      "version": "3.11.0",
+      "homepage": "https://docs.python.org/3/library/asyncio.html",
+      "is_stdlib": true
+    },
+    "json": {
+      "license": "PSF-2.0",
+      "version": "3.11.0",
+      "homepage": "https://docs.python.org/3/library/json.html",
+      "is_stdlib": true
+    },
+    "re": {
+      "license": "PSF-2.0",
+      "version": "3.11.0",
+      "homepage": "https://docs.python.org/3/library/re.html",
+      "is_stdlib": true
+    },
+    "os": {
+      "license": "PSF-2.0",
+      "version": "3.11.0",
+      "homepage": "https://docs.python.org/3/library/os.html",
+      "is_stdlib": true
+    },
+    "sys": {
+      "license": "PSF-2.0",
+      "version": "3.11.0",
+      "homepage": "https://docs.python.org/3/library/sys.html",
+      "is_stdlib": true
+    },
+    "typing": {
+      "license": "PSF-2.0",
+      "version": "3.11.0",
+      "homepage": "https://docs.python.org/3/library/typing.html",
+      "is_stdlib": true
+    },
+    "collections": {
+      "license": "PSF-2.0",
+      "version": "3.11.0",
+      "homepage": "https://docs.python.org/3/library/collections.html",
+      "is_stdlib": true
+    },
+    "logging": {
+      "license": "PSF-2.0",
+      "version": "3.11.0",
+      "homepage": "https://docs.python.org/3/library/logging.html",
+      "is_stdlib": true
+    },
+    "datetime": {
+      "license": "PSF-2.0",
+      "version": "3.11.0",
+      "homepage": "https://docs.python.org/3/library/datetime.html",
+      "is_stdlib": true
+    },
+    "math": {
+      "license": "PSF-2.0",
+      "version": "3.11.0",
+      "homepage": "https://docs.python.org/3/library/math.html",
+      "is_stdlib": true
+    },
+    "readline": {
+      "license": "PSF-2.0",
+      "version": "3.11.0",
+      "homepage": "https://docs.python.org/3/library/readline.html",
+      "is_stdlib": true
+    },
+    "hashlib": {
+      "license": "PSF-2.0",
+      "version": "3.11.0",
+      "homepage": "https://docs.python.org/3/library/hashlib.html",
+      "is_stdlib": true
+    },
+    "dataclasses": {
+      "license": "PSF-2.0",
+      "version": "3.11.0",
+      "homepage": "https://docs.python.org/3/library/dataclasses.html",
+      "is_stdlib": true
+    },
+    "readline": {
+      "license": "GPL-3.0",
+      "version": "3.11.0",
+      "homepage": "https://docs.python.org/3/library/readline.html",
+      "is_stdlib": false
+    },
+    "gnu readline": {
+      "license": "GPL-3.0",
+      "version": "8.2",
+      "homepage": "https://tiswww.case.edu/php/chet/readline/rltop.html"
+    },
+    "pygobject": {
+      "license": "LGPL-2.1",
+      "version": "3.44.0",
+      "homepage": "https://pygobject.readthedocs.io"
+    },
+    "pygtk": {
+      "license": "LGPL-2.1",
+      "version": "2.24.0",
+      "homepage": "https://pygtk.org"
+    },
+    "dbus-python": {
+      "license": "MIT",
+      "version": "1.3.0",
+      "homepage": "https://dbus.freedesktop.org"
+    },
+    "oracle-db": {
+      "license": "Proprietary",
+      "version": "1.4.0",
+      "homepage": "https://oracle.com/database"
+    },
+    "oracledb": {
+      "license": "Proprietary",
+      "version": "1.4.0",
+      "homepage": "https://oracle.com/database"
+    },
+    "snowflake-connector-python": {
+      "license": "Apache-2.0",
+      "version": "3.5.0",
+      "homepage": "https://docs.snowflake.com"
+    },
+    "elasticsearch": {
+      "license": "Apache-2.0",
+      "version": "8.11.0",
+      "homepage": "https://elasticsearch-py.readthedocs.io"
+    },
+    "stripe": {
+      "license": "MIT",
+      "version": "7.0.0",
+      "homepage": "https://stripe.com"
+    },
+    "twilio": {
+      "license": "MIT",
+      "version": "8.0.0",
+      "homepage": "https://twilio.com"
+    },
+    "non_optional_lib": {
+      "license": "MIT",
+      "version": "1.0.0",
+      "homepage": "https://example.com"
+    },
+    "deep_learning_lib": {
+      "license": "MIT",
+      "version": "0.1.0",
+      "homepage": "https://example.com"
+    },
+    "gpl_toolkit": {
+      "license": "GPL-3.0",
+      "version": "2.0.0",
+      "homepage": "https://example.com/gpl-toolkit"
+    },
+    "agpl_web_framework": {
+      "license": "AGPL-3.0",
+      "version": "1.5.0",
+      "homepage": "https://example.com/agpl-web"
+    },
+    "commercial_sdk": {
+      "license": "Proprietary",
+      "version": "3.2.1",
+      "homepage": "https://example.com/commercial-sdk"
+    },
+    "enterprise_lib": {
+      "license": "Proprietary",
+      "version": "5.0.0",
+      "homepage": "https://example.com/enterprise"
+    }
+  },
+  "package_aliases": {
+    "dotenv": "python-dotenv",
+    "jwt": "pyjwt",
+    "bs4": "beautifulsoup4",
+    "yaml": "pyyaml",
+    "PIL": "pillow",
+    "sklearn": "scikit-learn",
+    "cv2": "opencv-python",
+    "torch": "pytorch",
+    "tf": "tensorflow"
+  }
+}
