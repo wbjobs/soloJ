@@ -1,0 +1,21 @@
+{
+  "name": "iot-monitoring-dashboard",
+  "version": "1.0.0",
+  "description": "IoT Monitoring Dashboard with real-time temperature and humidity monitoring",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "concurrently \"npm run server\" \"npm run simulator\"",
+    "server": "node backend/server.js",
+    "simulator": "node simulator/device-simulator.js",
+    "dev": "concurrently \"npm run server\" \"npm run simulator\""
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "socket.io": "^4.7.2",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

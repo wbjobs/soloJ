@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IoT 监控 Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.7.2/dist/socket.io.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
+      color: #e4e4e7;
+    }
+
+    .header {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      background: linear-gradient(90deg, #00d4ff, #7c3aed);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .connection-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ef4444;
+      animation: pulse 2s infinite;
+    }
+
+    .status-dot.connected {
+      background: #22c55e;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .main-container {
+      padding: 2rem;
+      max-width: 1800px;
+      margin: 0 auto;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 40px rgba(0, 212, 255, 0.15);
+    }
+
+    .stat-card .label {
+      font-size: 0.875rem;
+      color: #9ca3af;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-card .value {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #00d4ff, #7c3aed);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-card .sub-value {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 0.25rem;
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .chart-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .chart-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #e4e4e7;
+    }
+
+    .chart-subtitle {
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+
+    .chart-container {
+      width: 100%;
+      height: 400px;
+    }
+
+    .two-column {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 1024px) {
+      .two-column {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .devices-section {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+
+    .devices-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .devices-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 0.75rem;
+      max-height: 300px;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+
+    .devices-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .devices-list::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 3px;
+    }
+
+    .devices-list::-webkit-scrollbar-thumb {
+      background: rgba(0, 212, 255, 0.3);
+      border-radius: 3px;
+    }
+
+    .device-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 0.75rem;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .device-item:hover {
+      background: rgba(0, 212, 255, 0.1);
+      border-color: rgba(0, 212, 255, 0.3);
+    }
+
+    .device-id {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #00d4ff;
+      margin-bottom: 0.5rem;
+    }
+
+    .device-reading {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .device-reading .reading-label {
+      color: #9ca3af;
+    }
+
+    .device-reading .reading-value {
+      font-weight: 600;
+      color: #e4e4e7;
+    }
+
+    .device-reading .reading-value.hot {
+      color: #f97316;
+    }
+
+    .device-reading .reading-value.cool {
+      color: #3b82f6;
+    }
+
+    .device-status {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      margin-top: 0.5rem;
+    }
+
+    .device-status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #22c55e;
+    }
+
+    .device-status-text {
+      font-size: 0.65rem;
+      color: #6b7280;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+
+    .badge-primary {
+      background: rgba(0, 212, 255, 0.2);
+      color: #00d4ff;
+    }
+
+    .badge-success {
+      background: rgba(34, 197, 94, 0.2);
+      color: #22c55e;
+    }
+
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      color: #9ca3af;
+    }
+
+    .spinner {
+      width: 30px;
+      height: 30px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top-color: #00d4ff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 1rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <h1>🔧 IoT 监控 Dashboard</h1>
+    <div class="connection-status">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">连接中...</span>
+    </div>
+  </header>
+
+  <div class="main-container">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="label">在线设备数</div>
+        <div class="value" id="deviceCount">0</div>
+        <div class="sub-value">设备总数</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">数据点总数</div>
+        <div class="value" id="totalRecords">0</div>
+        <div class="sub-value">已接收数据</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">平均温度</div>
+        <div class="value" id="avgTemp">--°C</div>
+        <div class="sub-value">实时统计</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">平均湿度</div>
+        <div class="value" id="avgHumidity">--%</div>
+        <div class="sub-value">实时统计</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">数据吞吐率</div>
+        <div class="value" id="throughput">0</div>
+        <div class="sub-value">点/秒</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">运行时间</div>
+        <div class="value" id="uptime">00:00</div>
+        <div class="sub-value">自启动以来</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">渲染状态</div>
+        <div class="value" id="renderLag" style="font-size:1.25rem">--</div>
+        <div class="sub-value">丢弃过期帧 · 仅渲染最新</div>
+      </div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">📈 实时温度监控</div>
+            <div class="chart-subtitle">100 台设备平均温度 · 每秒更新</div>
+          </div>
+          <span class="badge badge-primary" id="tempUpdateBadge">等待数据...</span>
+        </div>
+        <div class="chart-container" id="temperatureChart"></div>
+      </div>
+
+      <div class="two-column">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">💧 湿度趋势</div>
+              <div class="chart-subtitle">平均湿度变化</div>
+            </div>
+            <span class="badge badge-success">实时</span>
+          </div>
+          <div class="chart-container" id="humidityChart"></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">🌡️ 温度分布</div>
+              <div class="chart-subtitle">最高/最低/平均</div>
+            </div>
+            <span class="badge badge-primary">分析</span>
+          </div>
+          <div class="chart-container" id="tempRangeChart"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="devices-section">
+      <div class="devices-header">
+        <div>
+          <div class="chart-title">📱 设备状态列表</div>
+          <div class="chart-subtitle">点击设备查看详细信息</div>
+        </div>
+        <span class="badge badge-success" id="deviceCountBadge">0 台在线</span>
+      </div>
+      <div class="devices-list" id="devicesList">
+        <div class="loading">
+          <div class="spinner"></div>
+          <span>等待设备数据...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
