@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  influxdb:
+    image: influxdb:2.7-alpine
+    container_name: influxdb
+    restart: unless-stopped
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+      - influxdb-config:/etc/influxdb2
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=${DOCKER_INFLUXDB_INIT_MODE}
+      - DOCKER_INFLUXDB_INIT_USERNAME=${DOCKER_INFLUXDB_INIT_USERNAME}
+      - DOCKER_INFLUXDB_INIT_PASSWORD=${DOCKER_INFLUXDB_INIT_PASSWORD}
+      - DOCKER_INFLUXDB_INIT_ORG=${DOCKER_INFLUXDB_INIT_ORG}
+      - DOCKER_INFLUXDB_INIT_BUCKET=${DOCKER_INFLUXDB_INIT_BUCKET}
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN}
+    healthcheck:
+      test: ["CMD", "influx", "ping"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    restart: unless-stopped
+    ports:
+      - "${BACKEND_PORT}:8080"
+    environment:
+      - INFLUXDB_TOKEN=${INFLUXDB_TOKEN}
+      - INFLUXDB_ORG=${INFLUXDB_ORG}
+      - INFLUXDB_BUCKET=${INFLUXDB_BUCKET}
+      - INFLUXDB_URL=${INFLUXDB_URL}
+      - BACKEND_PORT=${BACKEND_PORT}
+      - WEBHOOK_URL=${WEBHOOK_URL}
+      - ANOMALY_THRESHOLD=${ANOMALY_THRESHOLD}
+      - TEMPERATURE_WARNING=${TEMPERATURE_WARNING}
+      - TEMPERATURE_ERROR=${TEMPERATURE_ERROR}
+      - VIBRATION_WARNING=${VIBRATION_WARNING}
+      - VIBRATION_ERROR=${VIBRATION_ERROR}
+      - VOLTAGE_WARNING_HIGH=${VOLTAGE_WARNING_HIGH}
+      - VOLTAGE_WARNING_LOW=${VOLTAGE_WARNING_LOW}
+      - VOLTAGE_ERROR_HIGH=${VOLTAGE_ERROR_HIGH}
+      - VOLTAGE_ERROR_LOW=${VOLTAGE_ERROR_LOW}
+    depends_on:
+      influxdb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/api/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://localhost:${BACKEND_PORT}
+    container_name: frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  sensor-simulator:
+    build:
+      context: ./sensor-simulator
+      dockerfile: Dockerfile
+    container_name: sensor-simulator
+    restart: unless-stopped
+    environment:
+      - BACKEND_URL=http://backend:${BACKEND_PORT}
+      - SIMULATOR_INTERVAL=1.0
+    command: ["--batch"]
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  influxdb-data:
+  influxdb-config:

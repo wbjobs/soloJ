@@ -1,0 +1,12 @@
+.env
+node_modules/
+dist/
+*.log
+.DS_Store
+*.exe
+*.dll
+*.so
+vendor/
+__pycache__/
+*.pyc
+influxdb-data/
