@@ -1,0 +1,7 @@
+com\astro\fitsviewer\config\WebSocketConfig.class
+com\astro\fitsviewer\service\PsnrService.class
+com\astro\fitsviewer\FitsViewerApplication.class
+com\astro\fitsviewer\websocket\PsnrWebSocketHandler.class
+com\astro\fitsviewer\service\FitsService.class
+com\astro\fitsviewer\controller\FitsController.class
+com\astro\fitsviewer\config\WebConfig.class

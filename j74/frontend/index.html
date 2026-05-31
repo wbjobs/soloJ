@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FITS 天文数据可视化</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>FITS 天文数据可视化平台</h1>
+        <p class="subtitle">上传 .fits 文件，探索星空图像与光谱数据</p>
+        <a href="compare.html" class="back-link">→ 双波段对比模式</a>
+    </header>
+
+    <main>
+        <section class="upload-section">
+            <div class="upload-box" id="uploadBox">
+                <div class="upload-icon">📂</div>
+                <p>拖拽 .fits 文件到此处，或点击选择文件</p>
+                <input type="file" id="fitsFileInput" accept=".fits,.fit,.fts" hidden>
+                <button id="uploadBtn" class="btn-primary">选择 FITS 文件</button>
+            </div>
+            <div class="upload-info" id="uploadInfo"></div>
+        </section>
+
+        <section class="viz-section" id="vizSection" style="display:none;">
+            <div class="panel-row">
+                <div class="panel heatmap-panel">
+                    <h2>星空热力图</h2>
+                    <div class="controls">
+                        <label>HDU:
+                            <select id="imageHduSelect"></select>
+                        </label>
+                        <label>色标:
+                            <select id="colormapSelect">
+                                <option value="inferno">Inferno</option>
+                                <option value="viridis">Viridis</option>
+                                <option value="plasma">Plasma</option>
+                                <option value="magma">Magma</option>
+                                <option value="hot">Hot</option>
+                                <option value="grayscale">Grayscale</option>
+                            </select>
+                        </label>
+                        <label>对比度:
+                            <input type="range" id="contrastSlider" min="0.5" max="3" step="0.1" value="1">
+                        </label>
+                        <label>亮度:
+                            <input type="range" id="brightnessSlider" min="-0.5" max="0.5" step="0.01" value="0">
+                        </label>
+                    </div>
+                    <div class="canvas-container" id="heatmapContainer">
+                        <canvas id="heatmapCanvas"></canvas>
+                    </div>
+                    <div class="colorbar" id="colorbar"></div>
+                    <div class="pixel-info" id="pixelInfo">移动鼠标查看像素信息</div>
+                </div>
+
+                <div class="panel header-panel">
+                    <h2>FITS 文件头信息</h2>
+                    <div class="hdu-tabs" id="hduTabs"></div>
+                    <div class="header-table" id="headerTable"></div>
+                </div>
+            </div>
+
+            <div class="panel spectrum-panel" id="spectrumPanel" style="display:none;">
+                <h2>光谱曲线</h2>
+                <div class="controls">
+                    <label>光谱 HDU:
+                        <select id="spectrumHduSelect"></select>
+                    </label>
+                </div>
+                <div class="chart-container" id="spectrumContainer">
+                    <svg id="spectrumChart"></svg>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="loading-overlay" id="loadingOverlay" style="display:none;">
+        <div class="spinner"></div>
+        <p>正在解析 FITS 文件...</p>
+    </div>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="js/heatmap.js"></script>
+    <script src="js/spectrum.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

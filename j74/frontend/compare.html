@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FITS 双波段对比</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/compare.css">
+</head>
+<body>
+    <header>
+        <h1>FITS 双波段对比分析</h1>
+        <p class="subtitle">上传两张 FITS 图片，对比同一星域在不同波段下的差异</p>
+        <a href="index.html" class="back-link">← 返回单图模式</a>
+    </header>
+
+    <main>
+        <section class="upload-section">
+            <div class="upload-pair">
+                <div class="upload-box" id="uploadBox1">
+                    <div class="upload-icon">🔴</div>
+                    <p>波段 A — 拖拽或点击选择</p>
+                    <input type="file" id="fitsFile1" accept=".fits,.fit,.fts" hidden>
+                    <button class="btn-primary" onclick="document.getElementById('fitsFile1').click()">选择文件 A</button>
+                    <div class="upload-info" id="uploadInfo1"></div>
+                </div>
+                <div class="upload-box" id="uploadBox2">
+                    <div class="upload-icon">🔵</div>
+                    <p>波段 B — 拖拽或点击选择</p>
+                    <input type="file" id="fitsFile2" accept=".fits,.fit,.fts" hidden>
+                    <button class="btn-primary" onclick="document.getElementById('fitsFile2').click()">选择文件 B</button>
+                    <div class="upload-info" id="uploadInfo2"></div>
+                </div>
+            </div>
+            <div class="compare-actions">
+                <button id="startCompareBtn" class="btn-compare" disabled>开始对比分析</button>
+            </div>
+        </section>
+
+        <section class="viz-section" id="vizSection" style="display:none;">
+            <div class="panel compare-panel">
+                <h2>波段混合视图</h2>
+                <div class="controls">
+                    <label>波段 A 透明度:
+                        <input type="range" id="opacitySlider" min="0" max="1" step="0.01" value="0.5">
+                        <span id="opacityValue">50%</span>
+                    </label>
+                    <label>色标:
+                        <select id="colormapSelect">
+                            <option value="inferno">Inferno</option>
+                            <option value="viridis">Viridis</option>
+                            <option value="hot">Hot</option>
+                            <option value="grayscale">Grayscale</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="canvas-container" id="compareContainer">
+                    <canvas id="compareCanvas"></canvas>
+                </div>
+                <div class="opacity-bar">
+                    <div class="opacity-label">波段 A (红)</div>
+                    <div class="opacity-track" id="opacityTrack"></div>
+                    <div class="opacity-label">波段 B (蓝)</div>
+                </div>
+            </div>
+
+            <div class="panel psnr-panel">
+                <h2>PSNR 像素差异分析</h2>
+                <div class="psnr-content">
+                    <div class="psnr-result" id="psnrResult">
+                        <div class="psnr-value" id="psnrValue">--</div>
+                        <div class="psnr-label">PSNR (dB)</div>
+                    </div>
+                    <div class="psnr-result" id="mseResult">
+                        <div class="psnr-value" id="mseValue">--</div>
+                        <div class="psnr-label">MSE</div>
+                    </div>
+                    <div class="psnr-progress-area">
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" id="progressBar" style="width:0%"></div>
+                        </div>
+                        <div class="progress-text" id="progressText">等待开始...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="loading-overlay" id="loadingOverlay" style="display:none;">
+        <div class="spinner"></div>
+        <p id="loadingText">正在加载...</p>
+    </div>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="js/compare.js"></script>
+    <script src="js/compare-app.js"></script>
+</body>
+</html>
