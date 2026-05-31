@@ -1,0 +1,27 @@
+{
+  "name": "roguelike-backend",
+  "version": "1.0.0",
+  "description": "Multiplayer online Roguelike game backend with ECS architecture",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "ws": "^8.18.0",
+    "better-sqlite3": "^11.3.0",
+    "uuid": "^10.0.0",
+    "seedrandom": "^3.0.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/ws": "^8.5.12",
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/uuid": "^10.0.0",
+    "@types/seedrandom": "^3.0.8",
+    "typescript": "^5.5.0",
+    "ts-node": "^10.9.0"
+  }
+}
